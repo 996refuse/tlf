@@ -58,5 +58,11 @@ SITES = {
             "workers": ("cats", "pager", "price", "list", "stock"),
             "ignore": True,
             }, 
+        "yhd": {
+            "site_id": 31,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False, 
+            },
         } 
 
