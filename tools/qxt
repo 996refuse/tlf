@@ -1,0 +1,145 @@
+#! /usr/bin/env python2
+#-*-encoding=utf-8-*-
+
+import re 
+import sys 
+from lxml import etree 
+import pdb
+
+class bcolors:
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m' 
+    BLUE = '\033[94m'
+    GREEN = '\033[92m' 
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m' 
+    UNDERLINE = '\033[4m'
+
+
+def _match_one(tree, nodes, selector):
+    elements = [] 
+    prefix = selector[0]
+    sc = selector[1:] 
+    #find by attr
+    if prefix == ".": 
+        parts = sc.split("-")
+        if len(parts) > 1:
+            cat = parts[0]
+            value = "-".join(parts[1:])
+        else:
+            cat = "class"
+            value = sc 
+        selector = re.compile(value.decode("utf8"))
+        for node in nodes: 
+            if cat not in node.attrib:
+                continue
+            v = node.attrib[cat]
+            if selector.findall(v):
+                elements.append(node) 
+    #find by line number
+    elif prefix == ">":
+        if "-" in selector:
+            smin, smax = [int(x) for x in sc.split("-")]
+        else:        
+            smin = smax = int(sc)
+        for node in nodes:
+            line = node.sourceline
+            if line >= smin and line <= smax:
+                elements.append(node)
+    #find by text
+    elif prefix == "-": 
+        for node in nodes:
+            if node.text and re.findall(sc.decode("utf8"), node.text, re.UNICODE):
+                elements.append(node) 
+    #find by xpath
+    elif prefix == ",":
+        elements.extend(tree.xpath(sc))
+    #dump node parent
+    elif prefix == "=": 
+        node = tree.xpath(sc) 
+        if not node:
+            print "found nothing"
+            exit(1)
+        node = node[0]
+        elements.append(node)
+        for i in range(6):
+            p = node.getparent()
+            if p == None or p == node:
+                break 
+            node = p
+            elements.append(p)
+    #find by tag 
+    else:
+        for node in nodes:
+            if selector == node.tag:
+                elements.append(node)
+    return elements 
+
+
+
+def get_xpath(node): 
+    return node.getroottree().getpath(node)
+ 
+
+
+def query_element(content, selector): 
+    tree = etree.HTML(content) 
+    elements = []
+    nodes = [] 
+    for _, node in etree.iterwalk(tree, tag="*", events=("start", )):
+        nodes.append(node) 
+    if selector.startswith("["):
+        for x in selector.strip("[").strip("]").split(","):
+            elements.extend(_match_one(tree, nodes, x.strip())) 
+    else:
+        elements.extend(_match_one(tree, nodes, selector))
+    return elements 
+
+
+       
+def toutf8(s):
+    if isinstance(s, unicode):
+        return s.encode("utf-8").strip("\r\n\t")
+    return s
+
+
+
+def dump_node(node):   
+    if isinstance(node, (unicode, str, int, float)):
+        print "<br/><span style='color: blue'>%s</span>" % node
+    else: 
+        print "<div>"
+        print "<br/><span style='color: blue'>%s</span>" % toutf8(node.tag)
+        print "<br/>line, ",node.sourceline
+        print "<br/>attrs: " 
+        for k,v in node.attrib.items():
+            print "<br/>", toutf8(k),":", toutf8(v)
+        print "<br/>text, ", toutf8(node.text)
+        print "<br/>xpath, ", get_xpath(node) 
+        print "<br/>"
+        print "</div>"
+
+
+
+def main(): 
+    if len(sys.argv) < 3:
+        print "usage etree_utils.py htmlfile selector"
+        exit(0) 
+    f = open(sys.argv[1], 'r')
+    content = f.read()
+    f.close() 
+    arg1 = sys.argv[1] 
+    selector = sys.argv[2] 
+    els = query_element(content, selector) 
+    for i in els:
+        dump_node(i) 
+
+
+
+
+if __name__ == "__main__":
+    main()

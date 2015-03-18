@@ -62,7 +62,31 @@ SITES = {
             "site_id": 31,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
-            "ignore": False, 
+            "ignore": False,
+            },
+        "scn": {
+            "site_id": 32,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "mi": {
+            "site_id": 33,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "360kxr": {
+            "site_id": 34,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "m6go": {
+            "site_id": 35,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
             },
         } 
 
