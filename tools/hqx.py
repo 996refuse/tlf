@@ -29,7 +29,7 @@ class IndexHandler(tornado.web.RequestHandler):
         t = t[0]
         e = e[0]
 
-        f = open("list.html", "w+")
+        f = open("list.html", "w")
         h, rr = hh.get(m)
         if h["status"] != 200:
             self.write("err, bad response. %r" % h["status"])

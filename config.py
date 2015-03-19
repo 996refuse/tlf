@@ -79,13 +79,31 @@ SITES = {
         "360kxr": {
             "site_id": 34,
             "reload": 1,
-            "workers": ("cats", "pager", "list"),
+            "workers": ("cats", "pager", "list", "stock"),
             "ignore": False,
             },
         "m6go": {
             "site_id": 35,
             "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "bookschina": {
+            "site_id": 36,
+            "reload": 1,
             "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "zm7": {
+            "site_id": 37,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "111": {
+            "site_id": 38,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
             "ignore": False,
             },
         } 

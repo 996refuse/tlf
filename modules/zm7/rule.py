@@ -4,35 +4,35 @@ rule = (
             "name": "cats",
             "type": "fetch",
             "from": {
-                'http://www.m6go.com/baobaoshipin': "//section/div/div/div[1]/div/h3/a/@href",
+                'http://www.zm7.cn': "//div[@class='nav_list']/div/ul/li/a/@href",
             },
             "get": {
                 "type": "simple",
                 "method": "get",
-                "parser": "m6go.cats_parser", 
-                },
+                "parser": "zm7.cats_parser", 
+            },
             "dst": {
-                "name": "m6go_list",
+                "name": "zm7_list",
                 "type": "list",
             }
         },
         {
             "type": "fetch",
             "name": "pager",
-            "rule": "//div[@class='page']/div/a[last()]/@href",
+            "rule": "//div[@id='pager']",
             "src": {
                 "type": "list",
-                "name": "m6go_list",
+                "name": "zm7_list",
                 "batch": 30,
-                "filter": "m6go.pager_filter"
+                "filter": "zm7.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "m6go_page", 
+                "name": "zm7_page", 
                 },
             "get": {
                 "method": "get",
-                "parser": "m6go.pager",
+                "parser": "zm7.pager",
                 "args": {
                     "limit": 30,    
                     "interval": 1,
@@ -45,18 +45,18 @@ rule = (
             "name": "list",
             "src": {
                 "type": "list",
-                "name": "m6go_page",
+                "name": "zm7_page",
                 "batch": 30,
-                "filter": "m6go.list_filter",
+                "filter": "zm7.list_filter",
                 },
-            "rule": "//ul/li[@goodsid]",
+            "rule": "//div[@class='goods_table_list']/ul/li/div",
             "dst": {
                 "type": "list",
-                "name": "m6go_price",
+                "name": "zm7_price",
                 },
             "get": {
                 "method": "get",
-                "parser": "m6go.list_parser",
+                "parser": "zm7.list_parser",
                 "args": {
                     "limit": 30,  
                     "interval": 1,
@@ -68,21 +68,21 @@ rule = (
             "name": "stock",
             "type": "fetch",
             "src": {
-                "name": "m6go_price",
+                "name": "zm7_price",
                 "type": "list",
-                "batch": 30,
+                "batch": 16,
                 "group": True,
                 },
             "get": {
                 "async": True,
                 "method": "post",
-                "parser": "m6go.stock_parser",
+                "parser": "zm7.stock_parser",
                 "args": {
-                    "limit": 10,
+                    "limit": 1,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 
-                    }, 
+                    },
                 "not200": "log", 
                 "randua": True
                 },

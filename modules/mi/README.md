@@ -1,5 +1,5 @@
-#### pager, price, stock
-    * type: ajax
+#### price, stock
+    * type: api
     * method: get
     * url: http://list.mi.com/accessories/ajaxView/0-0-0-a-b-0
         * arguments:
