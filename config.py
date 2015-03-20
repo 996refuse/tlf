@@ -103,8 +103,37 @@ SITES = {
         "111": {
             "site_id": 38,
             "reload": 1,
+            "workers": ("cats", "pager", "list", "price", "stock"),
+            "ignore": False,
+            },
+        "jiuxian": {
+            "site_id": 39,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "price"),
+            "ignore": False,
+            },
+        "gjw": {
+            "site_id": 40,
+            "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
             "ignore": False,
             },
-        } 
-
+        "zhiwo": {
+            "site_id": 41,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "d1": {
+            "site_id": 42,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock1", "stock2"),
+            "ignore": False,
+            },
+        "bookuu": {
+            "site_id": 42,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock1", "stock2"),
+            "ignore": False,
+            },
+}
