@@ -17,9 +17,12 @@ def list_filter(x):
             }
 
 def stock_filter(items):
-	pdb.set_trace()
-	return [{
-		'url': items[0],
-		"gid": items[1][0],
-		"price": items[1][1]
-	}]
+	#pdb.set_trace()
+	ret = []
+	for i in items:
+		ret.append({
+			"url": i[0],
+			"gid": i[1][0],
+			"price": i[1][1]
+		})
+	return ret

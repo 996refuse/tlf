@@ -17,6 +17,7 @@ import socket
 import select
 import json
 import pdb
+import ctypes
 import signal
 
 import async_http
@@ -219,7 +220,6 @@ def forward_dst(result, rule):
     forward_one(r, result,  dst) 
 
 
-
 sp_site = set((25, 1025, 2025, 3025, 31, 1031, 2031, 3031, 4031)) 
 
 
@@ -282,11 +282,11 @@ def run_single(rule):
 
 
 def run_single_repeat(rule):
-    repeat = rule.get("repeat", 0)
+    repeat = rule.get("repeat", 0) 
     if not repeat:
         run_single(rule)
-        log_with_time("%s done" % rule["name"])
-        exit(0)
+        log_with_time("%s done" % rule["name"]) 
+        return 
     while True:
         run_single(rule)
         log_with_time("sleeping") 
@@ -298,7 +298,6 @@ def sleep_with_counter(n):
     for i in range(1, n+1):
         log_with_time("sleeping, cnt, %s" % i)
         time.sleep(1)
-
 
 
 
@@ -316,7 +315,11 @@ def batch_parser(task):
     if task["resp_header"]["status"] != 200 and not200 == "log":
         log_with_time("not200: %s %s" % (task["resp_header"], task["url"]))
         return 
-    result = task["to"](task, task["rule"].get("rule"))
+    try:
+        result = task["to"](task, task["rule"].get("rule"))
+    except:
+        traceback.print_tb(sys.exc_info()[2])
+        exit(1)
     if result and (task["rule"].get("dst") or task["rule"].get("multidst")):
         forward_dst(result, task["rule"]) 
 
@@ -324,7 +327,6 @@ def batch_parser(task):
 
 def default_filter(x):
     return x
-
 
 
 
@@ -355,6 +357,7 @@ def apply_group_task_filter(items, flt, model):
         i.update(model)
         tasks.append(i)
     return tasks
+
 
 
 def apply_single_task_filter(items, flt, model): 
@@ -441,9 +444,12 @@ def run_batch(rule):
 
 
 def run_worker(rule): 
-    rt = rule.get("type")
+    rt = rule.get("type") 
+    if rule.get("boot"):
+        boot = load_func(rule["boot"])
+        boot(conf)
     if rt == "fetch":
-        if not rule.get("src"):    
+        if not rule.get("src"):
             gt = rule["get"] 
             run_single_repeat(rule) 
         else: 
@@ -451,14 +457,26 @@ def run_worker(rule):
     elif rt == "food": 
         if not rule.get("repeat", 0): 
             forward_dst(rule["food"], rule) 
-            log_with_time("%s done" % rule["name"])
+            log_with_time("%s done" % rule["name"]) 
             exit(0) 
-        while True:
+        while True: 
             forward_dst(rule["food"], rule) 
             log_with_time("sleeping") 
             sleep_with_counter(rule.get("repeat")) 
+    elif rt == "generator":
+        func = load_func(rule["generator"])
+        if not rule.get("repeat", 0):
+            ret = func()
+            log_with_time("%s done" % rule["name"]) 
+            exit(0) 
+        while True: 
+            forward_dst(func(), rule) 
+            log_with_time("sleeping") 
+            sleep_with_counter(rule.get("repeat")) 
     else:
-        log_with_time("unknown rule type: %s" % rt)
+        log_with_time("unknown worker type: %s" % rt)
+
+
 
 
 
@@ -485,6 +503,7 @@ def connect_tt(config):
 
 
 
+
 def load_conf(rule): 
     #变量环境,  避免污染全局,  又不用创建一个管理类
     globals()["conf"] = {} 
@@ -503,11 +522,13 @@ def load_conf(rule):
     if "dst" in rule: 
         node = rule["dst"].get("node", "default")
         redis_nodes[node] = redis.StrictRedis(**nodes[node]) 
-    conf["nodes"] = redis_nodes
+    conf["nodes"] = redis_nodes 
 
 
 
 def load_dbs(): 
+    import llkv
+    conf["llkv"] = llkv.Connection(host = "192.168.1.191", port=8000)
     load_conf({
             "name": "commit",
             "dst": {
@@ -516,8 +537,8 @@ def load_dbs():
                 "type": "list" 
                 }
             })
-    connect_mysql(CLIENT["mysql"])
-    conf["tt"] = connect_tt(CLIENT["tt"]) 
+    connect_mysql(CLIENT["mysql"]) 
+
 
 
 
@@ -527,14 +548,15 @@ def replace_log(fobj):
     old_name = name+".old"
     os.rename(name, old_name) 
     new_fobj = open(name, "a+", buffering=0)
+    conf["log_file"] = new_fobj
     sys.stdout = new_fobj
     sys.stdout = new_fobj
     if os.fork():
-        os.execvp("tar", ["tar",
-            "-Pcjf", old_name+".tar.bz2", old_name, "--remove-files"]) 
+        os.execvp("tar", ["tar", "-Pcjf",
+            old_name+".tar.bz2", old_name,
+            "--remove-files"]) 
         exit(0)        
-    conf["log_rotate"] = True 
-
+    conf["log_rotate"] = True
 
 
 
@@ -584,6 +606,21 @@ def detach_and_set_log(conf):
         exit() 
 
 
+def update_llkv(site_id,  key, price, stock):
+    if stock > 1:
+        stock = 1
+    if stock < 0:
+        stock = 0
+    if price > 0x7fffffffffffffffL:
+        log_with_time("price out of range: %s" % price)
+        return
+    if price < 0:
+        price = 0
+    ll_key = (site_id << 32) | ctypes.c_uint(key).value
+    conf["llkv"].set(ll_key, price | (stock << 63)) 
+
+
+
 INSERT_PRICE_SQL = 'insert into T_PriceStock (site_id, url_crc, update_date,  price, stock, update_time, server_id) values(%s, %s, "%s", %s, %s, "%s", %s) on duplicate key update price = %s, stock = %s, update_date="%s", update_time="%s", server_id=%s'
 
 
@@ -595,6 +632,9 @@ def update_mysql(site_id, key, price, stock):
     log_with_time(sql)
     try: 
         conf["mysql_cur"].execute(sql) 
+        update_llkv(site_id, key, price, stock)
+    except connection_error as e:
+        log_with_time("llkv error: %s" % e) 
     except Exception as e: 
         if len(e.args) <= 1: 
             log_with_time("bug, udpate_mysql: %s %s" % (e,  sql)) 
@@ -616,8 +656,6 @@ def wait_for_mysql():
             time.sleep(5) 
 
 
-
-
 TT_INFO = re.compile("p>([\-0-9]+).*s>([0-9]+)") 
 
 
@@ -631,28 +669,27 @@ def format_style_group(main_url, urls):
 
 
 def update_db(items): 
-    try:
-        ret = conf["tt"].multi_get(["%s-%s" % (item[1], item[0]) for item in items])
-    except (record_exists, host_not_found) as e: 
-        log_with_time("bug: ttserver: %s" % e)
-        return 
+    llkv = conf["llkv"] 
     prices = {}
     for i in items:
         prices[i[1]] = i[2:] + (i[0], ) 
-    for item in ret:
-        key, value = item
-        x = key.rfind("-")
-        k2 = int(key[:x])
-        if k2 not in prices: 
-            continue
-        price, stock, site_id = prices[k2]
-        del prices[k2]
-        try:
-            p, s = TT_INFO.findall(value)[0] 
-            if int(p) != price or int(s) != stock:
-                update_mysql(site_id, k2, price, stock)
-        except (ValueError, IndexError):
+    keys = []
+    for item in items:
+        unsigned_crc = ctypes.c_uint(int(item[1])).value
+        keys.append((int(item[0]) << 32) | unsigned_crc) 
+    d = llkv.multi_get(keys) 
+    for key, value in d.items():
+        k2 = ctypes.c_int(key & 0xffffffff).value
+        price, stock, site_id = prices[k2] 
+        del prices[k2] 
+        if not value:
+            log_with_time("llkv empty key, %s" % key)
             update_mysql(site_id, k2, price, stock)
+            continue 
+        s = value >> 63
+        p = value & 0x7fffffffffffffffL
+        if p != price or s != stock:
+            update_mysql(site_id, k2, price, stock) 
     for key, value in prices.items():
         price, stock, site_id = value 
         update_mysql(site_id, key, price, stock) 
@@ -669,12 +706,12 @@ def run_commit():
     unpack = msgpack.unpackb 
     while True: 
         b = []
-        for i in list_pop_n(redis, "spider_result",  10000):
+        items = list_pop_n(redis, "spider_result",  10000)
+        for i in items:
             item = msgpack.unpackb(i) 
             if len(item) != 4: 
                 log_with_time("result format error %s" % item) 
                 continue 
-            #site_id, key, price, stock 
             b.append(item) 
         if not b: 
             if conf.get("log_rotate"):
@@ -696,7 +733,6 @@ def run_commit():
             log_with_time("error, mysql commit: %s" % e) 
 
 
-
 debug = False
 
 
@@ -706,9 +742,7 @@ def flush_lines():
 
 
 
-def run_cat(site, cat): 
-    import atexit
-    atexit.register(flush_lines)
+def load_site(site): 
     s = SITES.get(site)
     if not s:
         print "bad site: %s" % site
@@ -717,9 +751,17 @@ def run_cat(site, cat):
         __import__("spider.modules.%s" % site)
     except IndexError:
         print "site %s not exists" % site 
-        return
+        return 
     m = getattr(modules, site)
-    rule = getattr(m, "rule")
+    return m
+
+
+
+def run_module_test(site, cat):
+    global debug
+    debug = True
+    m = load_site(site)
+    rule = getattr(m, "rule") 
     ok = 0
     for c in rule:
         if c["name"] == cat:
@@ -728,18 +770,89 @@ def run_cat(site, cat):
     if not ok:
         print "cat %s not exists" % cat
         return 
-    load_conf(ok)
-    conf["site_id"] = s["site_id"] 
+    test = ok.get("test")
+    if not test:
+        print "I don't known how to test"
+        exit(1) 
+    parser = load_func(ok["get"]["parser"]) 
+    for case in test:
+        url = case["url"]
+        func = load_func(case["check"])
+        method = case.get("method", "get")
+        h,c = getattr(simple_http, method)(url,
+                query = case.get("query"),
+                payload = case.get("payload"))
+        if h["status"] != 200:
+            print "fetch %s failed" % url
+            exit(1) 
+        if ok.get("src"):
+            func(parser({
+                "url": url,
+                "text": c,
+                }, ok.get("rule"))) 
+            exit(0)
+        func(parser(url, c, ok["from"][url])) 
+
+
+def run_cat(site, cat): 
+    import atexit
+    atexit.register(flush_lines)
+    m = load_site(site)
+    rule = getattr(m, "rule") 
+    ok = 0
+    for c in rule:
+        if c["name"] == cat:
+            ok = c 
+            break
+    if not ok:
+        print "cat %s not exists" % cat
+        return 
+    load_conf(ok) 
+    site_id = SITES[site]["site_id"]
+    conf["site_id"] = site_id
+    conf["site"] = site
     load_lua_scripts() 
-    if not debug:
-        log = s.get("log", "/tmp/spider-%s-%s.log" % (site, cat))
+    #日志重定向
+    if not debug: 
+        log = SITES[site].get("log",
+                "/tmp/spider-%s-%s.log" % (site, cat)) 
         sys.stdin = open("/dev/null", "r")
         fobj = open(log, "a+", buffering=0)
         sys.stdout = fobj
         sys.stderr = fobj
-        conf["log_obj"] = fobj
+        conf["log_obj"] = fobj 
+    #无分站
+    subsites = getattr(m, "sites", {})
+    if not subsites:
+        run_worker(ok)
+        exit(0)
+    #顺序执行分站 
+    if subsites.get("source") == "cats" and cat == "cats":
+        repeat = ok.get("repeat")
+        if not repeat:
+            run_subsite(subsites, ok)
+            exit(1) 
+        while True:
+            run_subsite(subsites, ok)
+            sleep_with_counter(repeat)
+    #修改分站队列名 
+    if site_id in subsites.get("sites", {}):
+        name = subsites["sites"][site_id] 
+        ok["dst"]["name"] += "_" + name
+        ok["src"]["name"] += "_" + name 
     run_worker(ok) 
 
+
+def run_subsite(subsites, rule): 
+    for site_id, name in subsites["sites"].items(): 
+        conf["site_id"] = site_id
+        conf["site"] = name
+        rule["dst"]["name"] += "_" + name
+        repeat = rule.get("repeat", 60)
+        rule["repeat"] = 0
+        log_with_time("run site: %s" % name)
+        run_worker(rule) 
+        sleep_with_counter(repeat) 
 
 
 def start_all_sites(workers): 
@@ -753,7 +866,7 @@ def start_all_sites(workers):
             log_with_time("site %s not exists" % i) 
             return 
         for j in v.get("workers"): 
-            pid = detach_worker(i, j)
+            pid = detach_worker(i, j) 
             workers[pid] = (i, j) 
 
 

@@ -131,9 +131,9 @@ SITES = {
             "ignore": False,
             },
         "bookuu": {
-            "site_id": 42,
+            "site_id": 43,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock1", "stock2"),
+            "workers": ("cats", "list"),
             "ignore": False,
             },
 }

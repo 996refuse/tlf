@@ -1,4 +1,8 @@
-#### cats, pager, price, stock
+#### cats, pager, stock
     * from: html
-    * description:
-    > 暂时没找到库存
+
+#### price
+    * from: api
+    * method: get
+    * url: http://act.jiuxian.com/act/selectPricebypids.htm?ids=%gid[,%gid]
+        * %gid: goods id

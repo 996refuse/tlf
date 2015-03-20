@@ -38,7 +38,7 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
         },
         {
             "type": "fetch",
@@ -91,6 +91,7 @@ rule = (
             "type": "fetch",
             "name": "stock2",
             "src": {
+                "group": True,
                 "type": "list",
                 "name": "d1_stock2",
                 "batch": 30,

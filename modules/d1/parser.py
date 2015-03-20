@@ -12,7 +12,7 @@ def cats_parser(url, content, rule):
     t = etree.HTML(content)
     ret = t.xpath(rule)
 
-    return ['http://www.d1.com.cn/result.jsp?productsort=030']
+    return ret
 
 def pager(task, rule):
     burl = task['url']
@@ -58,28 +58,30 @@ def list_parser(task, rule):
 
 def stock_parser(task, rule):
     surl2 = lambda g,s: 'http://m.d1.cn/ajax/flow/InCartnew.jsp?gdsid=%s&count=1&skuId=%s'%(g,s)
-    j = json.loads(task['text'])
+    code = re.search("(?<=code\"\:)\d+(?=,)", task['text'])
+    message = re.search('(?<=message).+(?=\")', task['text'])
+    success = re.search("(?<=success\":).+(?=,)", task['text'])
+
     url = ""
-    pdb.set_trace()
     stock = 0
 
-    if 'code' in j.keys():
-        if j['code'] == 0:
+    if code:
+        code = int(code.group())
+        if code == 0:
             stock = 1
-        elif j['code'] == 3:
-            try:
-                skuid = j['message'].split(":")[1].split("#")
-                skuid = re.search("\d+", skuid).group()
-                url = surl2(task['gid'], skuid)
-            except:
-                pass
-    elif "success" in j.keys():
-        pdb.set_trace()
-        if j['success'] == True:
-            stock = 1
+        elif code == 3:
+            if message:
+                try:
+                    skuid = re.search("\d+", message.group()).group()
+                    url = surl2(task['gid'], skuid)
+                except:
+                    return []
 
+    if success and success.group() == 'true':
+            stock = 1
+    
     if url:
-        return [url, (task['gid'], task['price'])]
+        return [(url, (task['gid'], task['price']))]
 
     ret = [(task['gid'], task['price'], stock)]
 

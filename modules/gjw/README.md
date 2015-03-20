@@ -1,4 +1,9 @@
-#### cats, pager, price, stock
+#### cats, pager, price
     * from: html
-    * description:
-    > 暂时没找到库存
+
+#### stock
+    * from: api
+    * method: get
+    * url: http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-%1-Quantity-1.htm
+        * %1: gid
+

@@ -12,32 +12,8 @@ rule = (
                 "parser": "bookuu.cats_parser", 
                 },
             "dst": {
-                "name": "bookuu_pager",
+                "name": "bookuu_list",
                 "type": "list",
-            }
-        },
-        {
-            "type": "fetch",
-            "name": "pager",
-            "rule": "//div[@id='paging']/li[last()-1]/a",
-            "src": {
-                "type": "list",
-                "name": "bookuu_pager",
-                "batch": 30,
-                "filter": "bookuu.pager_filter"
-                },
-            "dst": {
-                "type": "list",
-                "name": "bookuu_list", 
-                },
-            "get": {
-                "method": "get",
-                "parser": "bookuu.pager",
-                "args": {
-                    "limit": 30,    
-                    "interval": 1,
-                    "debug": False
-                }
             }
         },
         {
@@ -46,10 +22,10 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookuu_list",
-                "batch": 30,
+                "batch": 10,
                 "filter": "bookuu.list_filter",
                 },
-            "rule": "//ul[@id='bfd_show_fu']/li",
+            "rule": "//div[@class='main-wrap']/div[contains(@class, 'books-list')]",
             "dst": {
                 "type": "list",
                 "name": "spider_result",
@@ -58,7 +34,7 @@ rule = (
                 "method": "get",
                 "parser": "bookuu.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 1,  
                     "interval": 1,
                     "debug": False
                 }
