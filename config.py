@@ -79,7 +79,7 @@ SITES = {
         "360kxr": {
             "site_id": 34,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
+            "workers": ("cats", "pager", "list", "price"),
             "ignore": False,
             },
         "m6go": {

@@ -15,3 +15,12 @@ def list_filter(x):
     return {
             "url": x
             }
+
+def stock_filter(items):
+	ret = []
+	for g,p in items:
+		ret.append({
+			"url": g,
+			"price": p
+		})
+	return ret

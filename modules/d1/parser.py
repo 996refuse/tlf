@@ -56,34 +56,38 @@ def list_parser(task, rule):
         })
     return ret
 
-def stock_parser(task, rule):
+def stock1_parser(task, rule):
     surl2 = lambda g,s: 'http://m.d1.cn/ajax/flow/InCartnew.jsp?gdsid=%s&count=1&skuId=%s'%(g,s)
     code = re.search("(?<=code\"\:)\d+(?=,)", task['text'])
     message = re.search('(?<=message).+(?=\")', task['text'])
+
+    if not code:
+        log_with_time("bad response: %r"%task['url'])
+        return []
+
+    code = int(code.group())
+    url = ""
+
+    if code and code == 3:
+        if message:
+            try:
+                skuid = re.search("\d+", message.group()).group()
+                url = surl2(task['gid'], skuid)
+            except:
+                return []
+    if url == "":
+        url = surl2(task['gid'], "")
+
+    return [(url, task['gid'], task['price'])]
+
+def stock2_parser(task, rule):
+    url = 'http://www.d1.com.cn/product/'
     success = re.search("(?<=success\":).+(?=,)", task['text'])
 
-    url = ""
     stock = 0
-
-    if code:
-        code = int(code.group())
-        if code == 0:
-            stock = 1
-        elif code == 3:
-            if message:
-                try:
-                    skuid = re.search("\d+", message.group()).group()
-                    url = surl2(task['gid'], skuid)
-                except:
-                    return []
-
     if success and success.group() == 'true':
-            stock = 1
-    
-    if url:
-        return [(url, (task['gid'], task['price']))]
+        stock = 1
 
-    ret = [(task['gid'], task['price'], stock)]
-
+    ret = [(url+task['gid'], task['price'], stock)]
     fret = format_price(ret)
-    return fret
+    return ret

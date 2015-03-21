@@ -29,35 +29,21 @@ def pager(task, rule):
     return ret
 
 def list_parser(task, rule):
-    burl = "http://www.m6go.com/Goods/checkIsMTrial.do"
+    gid_html = lambda x: "http://www.m6go.com/product_%s.html"%x
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
     for node in nodes:
         gid = node.attrib["goodsid"]
         price = node.attrib['price'][1:]
-        ret.append({
-            "url": burl,
-            "price": price,
-            "payload": {
-                "sid": "",
-                "goodsid": gid,
-                "amount": ""
-            }
-        })
-    return ret
-
-def stock_parser(task, rule):
-    try:
-        t = int(task["text"])
-    except:
-        log_with_time("bad response: %r" % task['url'])
-        return []
-    price = task["price"]
-    if t < 0:
-        stock = 0
-    else:
-        stock = 1
-    ret = [(task['url'], price, stock)]
+        ostock = node.xpath("div/input[@class='addCarNone']")
+        if not gid or not price:
+            log_with_time("bad response %r"%task['url'])
+            return ret
+        if ostock:
+            stock = 0
+        else:
+            stock = 1
+        ret.append((gid_html(gid), price, stock))
     fret = format_price(ret)
     return fret

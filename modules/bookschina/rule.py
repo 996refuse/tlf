@@ -12,7 +12,7 @@ rule = (
                 "parser": "bookschina.cats_parser", 
                 },
             "dst": {
-                "name": "bookschina_list",
+                "name": "bookschina_page",
                 "type": "list",
             }
         },
@@ -22,13 +22,13 @@ rule = (
             "rule": "//div[@class='bottompage']/a[last()]/@href",
             "src": {
                 "type": "list",
-                "name": "bookschina_list",
+                "name": "bookschina_page",
                 "batch": 30,
                 "filter": "bookschina.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "bookschina_page", 
+                "name": "bookschina_list", 
                 },
             "get": {
                 "method": "get",
@@ -45,7 +45,7 @@ rule = (
             "name": "list",
             "src": {
                 "type": "list",
-                "name": "bookschina_page",
+                "name": "bookschina_list",
                 "batch": 30,
                 "filter": "bookschina.list_filter",
                 },

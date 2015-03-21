@@ -46,15 +46,15 @@ def list_parser(task, rule):
 
 def stock_parser(task, rule):
     t = etree.HTML(task["text"])
+    stock = t.xpath(rule)
     ret = []
-    if t is None:
+    if not stock:
         log_with_time("bad response: %s" % task["url"])
-        return
-    stock = re.search('(?<=store\"\:).+(?=\,)', task['text'])
-    if stock:
+        return ret
+    if int(stock[0].text):
         stock = 1
     else:
-        pdb.set_trace()
         stock = 0
     ret.append((task['url'], int(float(task['info'])*100), stock))
-    return ret
+    fret = format_price(ret)
+    return fret

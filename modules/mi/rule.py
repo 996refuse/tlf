@@ -5,7 +5,7 @@ rule = (
             "type": "food",
             "food": ['http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0'],
             "dst": {
-                "name": "mi_list",
+                "name": "mi_page",
                 "type": "list",
             }
         },
@@ -15,13 +15,13 @@ rule = (
             "rule": "",
             "src": {
                 "type": "list",
-                "name": "mi_list",
+                "name": "mi_page",
                 "batch": 30,
                 "filter": "mi.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "mi_page", 
+                "name": "mi_list", 
                 },
             "get": {
                 "method": "get",
@@ -38,7 +38,7 @@ rule = (
             "name": "list", 
             "src": {
                 "type": "list",
-                "name": "mi_page",
+                "name": "mi_list",
                 "batch": 30,
                 "filter": "mi.list_filter",
                 },

@@ -68,6 +68,6 @@ def price_parser(task, rule):
     except:
         return []
     
-    format_price(ret)
+    fret = format_price(ret)
     
-    return ret
+    return fret

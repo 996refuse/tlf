@@ -53,5 +53,5 @@ def list_parser(task, rule):
         price = price[0].text
         price = re.search("\d+\.\d+", price).group()
         ret.append((burl+gid, price, 1))
-    format_price(ret)
-    return ret
+    fret = format_price(ret)
+    return fret

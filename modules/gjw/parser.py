@@ -63,6 +63,6 @@ def stock_parser(task, rule):
 
     ret.append((info[0], info[1], stock))
 
-    format_price(ret)
+    fret = format_price(ret)
     
-    return ret
+    return fret

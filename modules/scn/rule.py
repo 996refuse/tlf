@@ -13,7 +13,7 @@ rule = (
                 "parser": "scn.cats_parser", 
                 },
             "dst": {
-                "name": "scn_list",
+                "name": "scn_pager",
                 "type": "list",
             }
         },
@@ -23,13 +23,13 @@ rule = (
             "rule": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
             "src": {
                 "type": "list",
-                "name": "scn_list",
+                "name": "scn_pager",
                 "batch": 30,
                 "filter": "scn.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "scn_page", 
+                "name": "scn_list", 
                 },
             "get": {
                 "method": "get",
@@ -46,7 +46,7 @@ rule = (
             "name": "list", 
             "src": {
                 "type": "list",
-                "name": "scn_page",
+                "name": "scn_list",
                 "batch": 30,
                 "filter": "scn.list_filter",
                 },
@@ -55,7 +55,7 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "scn_price", 
+                "name": "scn_stock", 
                 },
             "get": {
                 "method": "get",
@@ -71,12 +71,13 @@ rule = (
             "name": "stock",
             "type": "fetch",
             "src": {
-                "name": "scn_price",
+                "name": "scn_stock",
                 "type": "list",
                 "batch": 16,
                 "group": True,
                 "filter": "scn.stock_task_filter"
                 },
+            "rule": "//div[@class='buyinfo_bot']//span[@class='store']",
             "get": {
                 "method": "get",
                 "parser": "scn.stock_parser",

@@ -12,7 +12,7 @@ rule = (
                 "parser": "zm7.cats_parser", 
             },
             "dst": {
-                "name": "zm7_list",
+                "name": "zm7_pager",
                 "type": "list",
             }
         },
@@ -22,13 +22,13 @@ rule = (
             "rule": "//div[@id='pager']",
             "src": {
                 "type": "list",
-                "name": "zm7_list",
+                "name": "zm7_pager",
                 "batch": 30,
                 "filter": "zm7.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "zm7_page", 
+                "name": "zm7_list", 
                 },
             "get": {
                 "method": "get",
@@ -45,14 +45,14 @@ rule = (
             "name": "list",
             "src": {
                 "type": "list",
-                "name": "zm7_page",
+                "name": "zm7_list",
                 "batch": 30,
                 "filter": "zm7.list_filter",
                 },
             "rule": "//div[@class='goods_table_list']/ul/li/div",
             "dst": {
                 "type": "list",
-                "name": "zm7_price",
+                "name": "zm7_stock",
                 },
             "get": {
                 "method": "get",
@@ -68,14 +68,15 @@ rule = (
             "name": "stock",
             "type": "fetch",
             "src": {
-                "name": "zm7_price",
+                "name": "zm7_stock",
                 "type": "list",
                 "batch": 16,
                 "group": True,
+                "filter": "zm7.stock_filter"
                 },
             "get": {
                 "async": True,
-                "method": "post",
+                "method": "get",
                 "parser": "zm7.stock_parser",
                 "args": {
                     "limit": 1,

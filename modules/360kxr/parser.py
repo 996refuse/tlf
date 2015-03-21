@@ -41,23 +41,29 @@ def pager(task, rule):
 def list_parser(task, rule):
     burl = "http://www.360kxr.com"
     t = etree.HTML(task['text'])
-    nodes = [ burl + i for i in t.xpath(rule) ]
-    return nodes
+    nodes = t.xpath(rule)
+    ret = []
+    for node in nodes:
+        gid = node.xpath("dl/div/dt/a/@href")
+        stock = node.xpath("dl/div/dd/div/p[@class='cart']")
+        if not gid:
+            log_with_time("bad response %r"%task['url'])
+            return ret
+        if stock:
+            stock = 1
+        else:
+            stock = 0
+        ret.append((burl+gid[0], stock))
+    return ret
 
-def stock_parser(task, rule):
+def price_parser(task, rule):
     t = etree.HTML(task["text"])
     price = t.xpath(rule['kxrprice'])
-    out_of_stock = re.search("(?<=isRX:).+(?=,)", task['text'])
     ret = []
-    if not price or not out_of_stock:
+    if not price:
         log_with_time("bad response %r" % task['url'])
         return ret
-    out_of_stock = int(out_of_stock.group())
-    if not out_of_stock:
-        stock = 1
-    else:
-        stock = 0
     price = price[0].text
-    ret = [(task['url'], price, stock)]
+    ret = [(task['url'], price, task['stock'])]
     fret = format_price(ret)
     return fret

@@ -15,10 +15,11 @@ def list_filter(x):
             "url": x
             }
 
-def stock_task_filter(items):
+def price_filter(items):
     ret = []
-    for i in items:
+    for g,s in items:
     	ret.append({
-    		"url": i
-    		})
+    		"url": g,
+            "stock": s
+    	})
     return ret

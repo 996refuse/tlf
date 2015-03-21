@@ -12,7 +12,7 @@ rule = (
                 "parser": "m6go.cats_parser", 
                 },
             "dst": {
-                "name": "m6go_list",
+                "name": "m6go_page",
                 "type": "list",
             }
         },
@@ -22,13 +22,13 @@ rule = (
             "rule": "//div[@class='page']/div/a[last()]/@href",
             "src": {
                 "type": "list",
-                "name": "m6go_list",
+                "name": "m6go_page",
                 "batch": 30,
                 "filter": "m6go.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "m6go_page", 
+                "name": "m6go_list", 
                 },
             "get": {
                 "method": "get",
@@ -45,14 +45,14 @@ rule = (
             "name": "list",
             "src": {
                 "type": "list",
-                "name": "m6go_page",
+                "name": "m6go_list",
                 "batch": 30,
                 "filter": "m6go.list_filter",
                 },
             "rule": "//ul/li[@goodsid]",
             "dst": {
                 "type": "list",
-                "name": "m6go_price",
+                "name": "spider_result",
                 },
             "get": {
                 "method": "get",
@@ -64,31 +64,4 @@ rule = (
                 }
             }
         },
-        {
-            "name": "stock",
-            "type": "fetch",
-            "src": {
-                "name": "m6go_price",
-                "type": "list",
-                "batch": 30,
-                "group": True,
-                },
-            "get": {
-                "async": True,
-                "method": "post",
-                "parser": "m6go.stock_parser",
-                "args": {
-                    "limit": 10,
-                    "interval": 2, 
-                    "debug": False, 
-                    "timeout": 10, 
-                    }, 
-                "not200": "log", 
-                "randua": True
-                },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
-                }
-        }
 )

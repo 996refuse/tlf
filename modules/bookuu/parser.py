@@ -38,6 +38,5 @@ def list_parser(task, rule):
         else:
             stock = 0
         ret.append((gid, price, stock))
-    pdb.set_trace()
-    format_price(ret)
-    return ret
+    fret = format_price(ret)
+    return fret

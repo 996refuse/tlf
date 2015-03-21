@@ -79,7 +79,7 @@ rule = (
             "get": {
                 "async": True,
                 "method": "post",
-                "parser": "d1.stock_parser",
+                "parser": "d1.stock1_parser",
                 "args": {
                     "limit": 30,  
                     "interval": 1,
@@ -95,7 +95,7 @@ rule = (
                 "type": "list",
                 "name": "d1_stock2",
                 "batch": 30,
-                "filter": "d1.stock_filter",
+                "filter": "d1.stock2_filter",
                 },
             "dst": {
                 "type": "list",
@@ -103,7 +103,7 @@ rule = (
                 },
             "get": {
                 "method": "get",
-                "parser": "d1.stock_parser",
+                "parser": "d1.stock2_parser",
                 "args": {
                     "limit": 30,  
                     "interval": 1,

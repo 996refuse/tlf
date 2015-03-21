@@ -16,7 +16,6 @@ def cats_parser(url, content, rule):
     return ret
 
 def pager(task, rule):
-    # eg: http://www.zm7.cn/category-21-b0-min0-max0-attr0-2-sort_order-ASC.html
     pad = lambda n: "min0-max0-attr0-%d-sort_order-ASC.html" % n
     burl = task['url'][:-5] + '-'
     t = etree.HTML(task['text'])
@@ -35,17 +34,7 @@ def pager(task, rule):
         ret.append(burl+pad(i))
     return ret
 
-def payload(gid):
-    return json.dumps({
-        "quick": 1,
-        "spec": [],
-        "goods_id": gid,
-        "number": 1,
-        "parent": 0
-    })
-
 def list_parser(task, rule):
-    purl = "http://www.zm7.cn/flow.php?step=add_to_cart"
     burl = "http://www.zm7.cn/"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
@@ -56,31 +45,20 @@ def list_parser(task, rule):
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
             return ret
-        gid_html = gid[0]
-        gid = re.search("\d+", gid_html).group()
+        gid = burl + gid[0]
         price = price[0].text
         price = re.search("\d+\.\d+", price).group()
-        ret.append({
-            "url": purl,
-            "info": (burl+gid_html, price),
-            "payload": {
-                "goods": payload(gid)
-            }
-        })
+        ret.append((gid, price))
     return ret
 
 def stock_parser(task, rule):
     ret = []
-    try:
-        j = json.loads(task["text"])
-    except:
-        log_with_time("bad response: %r" % task['url'])
-        return ret
+    ostock = re.search("暂时无货", task['text'])
 
-    gid = task['info'][0]
-    price = task["info"][1]
+    gid = task["url"]
+    price = task["price"]
 
-    if j.get("error"):
+    if ostock:
         stock = 0
     else:
         stock = 1

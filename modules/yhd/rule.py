@@ -11,7 +11,7 @@ rule = (
                 "parser": "yhd.cats_parser", 
                 },
             "dst": {
-                "name": "yhd_list",
+                "name": "yhd_pager",
                 "type": "list",
                 }
             },
@@ -21,13 +21,13 @@ rule = (
             "rule": '//input[@id="pageCountPage"]/@value',
             "src": {
                 "type": "list",
-                "name": "yhd_list",
+                "name": "yhd_pager",
                 "batch": 30,
                 "filter": "yhd.pager_filter"
                 },
             "dst": {
                 "type": "list",
-                "name": "yhd_page", 
+                "name": "yhd_list", 
                 },
             "get": {
                 "method": "get",
@@ -44,7 +44,7 @@ rule = (
             "name": "list", 
             "src": {
                 "type": "list",
-                "name": "yhd_page",
+                "name": "yhd_list",
                 "batch": 30,
                 "filter": "yhd.list_filter",
                 }, 
@@ -55,7 +55,7 @@ rule = (
                 },
             "dst": { 
                 "type": "list",
-                "name": "yhd_price", 
+                "name": "yhd_stock",
                 }, 
             "get": {
                 "method": "get",
@@ -72,7 +72,7 @@ rule = (
             "type": "fetch",
             "url": "http://busystock.i.yihaodian.com/busystock/restful/truestock?mcsite=1&provinceId=1&",
             "src": {
-                "name": "yhd_price", 
+                "name": "yhd_stock", 
                 "type": "list",
                 "batch": 16,
                 "group": True,

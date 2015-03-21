@@ -99,7 +99,7 @@ rule = (
                 "group": True,
                 "filter": "111.stock_task_filter"
                 },
-            "rule": "//div[@class='o2o_box']/span[@class='o2o_note']",
+            "rule": "//div[@class='o2o_box']/p/span[@class='o2o_note']",
             "get": {
                 "method": "get",
                 "parser": "111.stock_parser",
