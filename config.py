@@ -136,4 +136,16 @@ SITES = {
             "workers": ("cats", "list"),
             "ignore": False,
             },
+        "vancl": {
+            "site_id": 44,
+            "reload": 1,
+            "workers": ("pager", "list"),
+            "ignore": False,
+            },
+        "lenovo": {
+            "site_id": 45,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
 }
