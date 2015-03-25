@@ -30,7 +30,7 @@ def list_parser(task, rule):
         
         if not gid or not price or not stock:
             log_with_time("bad response: %r" % task['url'])
-            return ret
+            continue
         gid = gid[0]
         price = re.search("\d+\.\d+|\d+", price[0].text).group()
         if "getCart" in stock[0]:

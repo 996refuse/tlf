@@ -40,7 +40,7 @@ def list_parser(task, rule):
         gid = node.attrib['itemid']
         if not gid:
             log_with_time("bad response: %r"%task['url'])
-            return ret
+            continue
         ret.append((burl+gid+'.html',gid))
     return ret
 

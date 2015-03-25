@@ -66,10 +66,10 @@ rule = (
             }
         },
         {
-            "name": "stock",
+            "name": "price",
             "type": "fetch",
             "src": {
-                "name": "360kxr_stock",
+                "name": "360kxr_price",
                 "type": "list",
                 "batch": 30,
                 "group": True,

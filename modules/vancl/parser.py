@@ -29,7 +29,7 @@ def list_parser(task, rule):
             price = node.xpath("div/div[1]")
             if not price:
                 log_with_time("bad response %r"%task['url'])
-                return []
+                continue
             price = price[0].text
         else:
             price = price.group()

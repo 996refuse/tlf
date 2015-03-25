@@ -43,7 +43,7 @@ def list_parser(task, rule):
         stock = node.xpath("p/a/img/@src")
         if not gid or not price or not stock:
             log_with_time("bad response: %r" % task['url'])
-            return ret
+            continue
         gid = burl + gid[0]
         price = re.search("\d+\.\d+", price[0].text).group()
         if re.search("add_to_cart", stock[0]):

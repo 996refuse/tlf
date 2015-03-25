@@ -41,7 +41,7 @@ def list_parser(task, rule):
         price = node.xpath("div[@class='g_price']/span/font")
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
-            return ret
+            continue
         gid = re.search("(?<=product/)\d+", gid[0]).group()
         price = re.search("\d+", price[0].text).group()
         ret.append({
@@ -90,4 +90,4 @@ def stock2_parser(task, rule):
 
     ret = [(url+task['gid'], task['price'], stock)]
     fret = format_price(ret)
-    return ret
+    return fret

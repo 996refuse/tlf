@@ -48,7 +48,7 @@ def list_parser(task, rule):
         stock = node.xpath("dl/div/dd/div/p[@class='cart']")
         if not gid:
             log_with_time("bad response %r"%task['url'])
-            return ret
+            continue
         if stock:
             stock = 1
         else:

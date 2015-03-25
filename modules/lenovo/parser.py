@@ -45,10 +45,12 @@ def stock_parser(task, rule):
     except:
         log_with_time("bad response %r"%task['url'])
         return []
-    if '无' in stockstatus.encode("utf8"):
+
+    if not stockstatus or '无' in stockstatus.encode("utf8"):
         stock = 0
     else:
         stock = 1
+
     code = re.search("(?<=gcodes=)\d+", task['url']).group()
     ret = [(burl(code), task['price'], stock)]
     fret = format_price(ret)

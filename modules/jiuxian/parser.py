@@ -46,7 +46,7 @@ def list_parser(task, rule):
         ostock = node.xpath("div/a[contains(@class, 'lack')]")
         if not gid:
             log_with_time("bad response: %r" % task['url'])
-            return ret
+            continue
         gid = re.search("\d+", gid[0]).group()
         if not ostock:
             stock = 1

@@ -44,7 +44,7 @@ def list_parser(task, rule):
         price = node.xpath("p/span")
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
-            return ret
+            continue
         gid = burl + gid[0]
         price = price[0].text
         price = re.search("\d+\.\d+", price).group()

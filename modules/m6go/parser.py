@@ -39,7 +39,7 @@ def list_parser(task, rule):
         ostock = node.xpath("div/input[@class='addCarNone']")
         if not gid or not price:
             log_with_time("bad response %r"%task['url'])
-            return ret
+            continue
         if ostock:
             stock = 0
         else:

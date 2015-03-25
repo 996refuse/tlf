@@ -30,7 +30,7 @@ def pager(task, rule):
     count = tree.xpath(rule) 
     if not count:
         log_with_time("pager, no count: %s" % task["url"])
-        return
+        return []
     count = int(count[0])
     pm = 'http://list.yhd.com/c27438-0-0#page='
     ret = []

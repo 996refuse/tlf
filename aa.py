@@ -1,18 +1,34 @@
 #!/usr/bin/python2
 
 from _http import *
+from filepack import *
+
+import MySQLdb as mysqldb
+
 import async_http as ah
+import sqlite3
 import zlib
 import pdb
 import redis
 import sys
 import re
 import os
+import atexit
 
-redis = redis.Redis(host='192.168.1.191')
+REDIS_SERVER = '192.168.1.191'
+MYSQL_SERVER = '192.168.1.192'
+
+LOCALHOST = '127.0.0.1'
+
+gcount = type("gcount",(),{"count": 0})
+
+redis = redis.Redis(host=REDIS_SERVER)
 result = "dp_"
 
-gdict = dict()
+gdict = {
+    "2": "dangdang"
+}
+pack = None
 
 ah.config['limit'] = 100
 
@@ -31,63 +47,51 @@ def reformat(rid, url):
     return formats[rid](url)
 
 def page_parser(body):
-    target = result + str(body['site_id'])
-    print("grab: %s %s %r" % (body['site_id'], body['url'], body['resp_header']['status']))
-    if body['resp_header']['status'] == 200:
-        redis.lpush(target, zlib.compress(body['text']))
+    pack = body['filepack']
+    sid = body['site_id']
+    url = body['url']
+    status = body['resp_header']['status']
+    target = result + str(sid)
+    #print("grab: %s %s %r" % (sid, url, status))
+    if status == 200:
+        pack.add(int(body['site_id']), body['url'], body['text'])
     else:
-        redis.lpush(target, body['resp_header']['status'], body['url'])
+        print("err: %s %s %r" % (sid, url, status))
 
 def myheader():
     ret = dict(html_header)
     ret["User-Agent"] = ah.random_useragent()
     return ret
 
-'''
-def runtasks(f):
-    l = f.readline()
-    while l:
-        c = 0
-        tasks = []
-        while c < 5000 and l:
-            sid, url = l.split("\t")
-            if sid != '2':
-                l = f.readline()
-                continue
-            tasks.append({
-                "url": reformat(sid, url.replace("\n", "")),
-                "parser": page_parser,
-                "site_id": sid,
-                "header": myheader(),
-                "retry": 0
-            })
-            c += 1
-            l = f.readline()
-        #print("dispatch tasks %r" % len(tasks))
+def runtask(sid):
+    rid = 'idx_'+ gdict[sid]
+    pdb.set_trace()
+    url = redis.lpop(rid)
+    tasks = []
+    while url:
+        tasks.append({
+            "url": reformat(sid, url.replace("\n", "")),
+            "parser": page_parser,
+            "site_id": sid,
+            "header": myheader(),
+            "retry": 0,
+            "filepack": pack
+        })
+        if len(tasks) >= 5000:
+            ah.dispatch_tasks(tasks)
+            tasks = []
+        url = redis.lpop(rid)
+    if tasks:
         ah.dispatch_tasks(tasks)
-'''
-
-def runtask(sid, urls):
-    cc = len(urls) // 5000 + (1 if len(urls) % 5000 else 0)
-    for i in range(0, cc):
-        tasks = []
-        for url in urls[i*5000:(i+1)*5000]:
-            tasks.append({
-                "url": reformat(sid, url.replace("\n", "")),
-                "parser": page_parser,
-                "site_id": sid,
-                "header": myheader(),
-                "retry": 0
-            })
-        #pdb.set_trace()
-        ah.dispatch_tasks(tasks)
-
-def runtasks(gdict):
-    for k,v in gdict.items():
-        runtask(*v)
 
 def gencats(s, filter):
-    return  re.findall("(?<=\d\t).*"+filter+".*(?=\n)", s)
+    rt = re.findall("(?<=\d\t).*"+filter+".*(?=\n)", s)
+    sid = rt[0].split("\t")[0]
+    le = len(rt)
+    i = 0
+    while i < le:
+        redis.lpush('idx_'+filter, *rt[i:i+1000])
+        i += 1000
 
 def daemon(cb, log=None, *args):
     if not os.fork():
@@ -96,7 +100,7 @@ def daemon(cb, log=None, *args):
         if not p:
             sys.stdin = open("/dev/null", "r")
             if log:
-                fobj = open(log, "a+", buffering=0)
+                fobj = open("log", "a+", buffering=0)
                 sys.stdout = fobj
                 sys.stderr = fobj
             cb(*args)
@@ -104,20 +108,26 @@ def daemon(cb, log=None, *args):
             exit()
     else: 
         os.wait()
-        exit() 
+        exit()
+
+def eflush():
+    pack.flush()
 
 if __name__ == "__main__":
-    def main(fn):
-        buf = open(fn).read(-1)
-        gdict['dangdang'] = ("2", gencats(buf, 'dangdang'))
-        runtask(*gdict['dangdang'])
 
     formats["2"] = dangdang_r
+    
+    margs = {"host":MYSQL_SERVER, "db":'dp_idx', "user":'minishop', "passwd":"MiniShop!@#"}
+    pack = FilePack(margs)
+
+    atexit.register(eflush)
 
     if len(sys.argv) < 2:
         print("usage: aa [-d] file")
     else:
         if sys.argv[1] == '-d':
-            daemon(main, "log_ck", sys.argv[2])
+            daemon(runtask, "log", sys.argv[2])
+        if sys.argv[1] == '-g':
+            gencats(gdict, open(sys.argv[2]).read(-1), "dangdang")
         else:
-            main(sys.argv[1])
+            runtask(sys.argv[1])
