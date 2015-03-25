@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.m6go.com/baobaoshipin': "//section/div/div/div[1]/div/h3/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='page']/div/a[last()]/@href",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "m6go_page",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "m6go_list",

@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.zm7.cn': "//div[@class='nav_list']/div/ul/li/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@id='pager']",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "zm7_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "zm7_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "zm7_stock",
                 "type": "list",

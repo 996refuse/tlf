@@ -33,19 +33,19 @@ SITES = {
             "site_id": 12,
             "reload": 1, 
             "workers": ("cats", "pager", "list"),
-            "ignore": False,
+            "ignore": True,
             }, 
         "vip": {
             "site_id": 129,
             "reload": 1,
             "workers": ("cats", "pager", "list"),
-            "ignore": False,
+            "ignore": True,
             },
         "miyabaobei": {
             "site_id": 195,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
-            "ignore": False
+            "ignore": True,
             },
         "gome": {
             "site_id": 28,
@@ -85,7 +85,7 @@ SITES = {
         "m6go": {
             "site_id": 51,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
+            "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
         "bookschina": {
@@ -139,7 +139,7 @@ SITES = {
         "vancl": {
             "site_id": 19,
             "reload": 1,
-            "workers": ("pager", "list"),
+            "workers": ("pager", "list", "stock"),
             "ignore": False,
             },
         "lenovo": {

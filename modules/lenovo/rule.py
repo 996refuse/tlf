@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://shop.lenovo.com.cn/head.html': "//div[@class='ns_category-menu-content']/div/ul/li/a/@href",
             },
@@ -19,6 +20,7 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "lenovo_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "lenovo_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "lenovo_stock",
                 "type": "list",

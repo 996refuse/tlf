@@ -2,7 +2,7 @@ rule = (
 {
             "name": "cats",
             "type": "fetch",
-
+            "repeat": 20000,
             "from": {
                 "http://www.yhd.com/marketing/allproduct.html": ["//dd/em/span/a/@href"]},
             "get": {
@@ -19,6 +19,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": '//input[@id="pageCountPage"]/@value',
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "yhd_pager",
@@ -42,6 +43,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list", 
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "yhd_list",
@@ -71,6 +73,7 @@ rule = (
             "name": "stock",
             "type": "fetch",
             "url": "http://busystock.i.yihaodian.com/busystock/restful/truestock?mcsite=1&provinceId=1&",
+            "wait": 4,
             "src": {
                 "name": "yhd_stock", 
                 "type": "list",

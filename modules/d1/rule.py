@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.d1.com.cn/': "//div[@class='hmenu_txt']/ul/li[position()>2]/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='GPager']/a[last()]/@href",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "d1_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "d1_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "type": "fetch",
             "name": "stock1",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "d1_stock1",
@@ -90,6 +94,7 @@ rule = (
         {
             "type": "fetch",
             "name": "stock2",
+            "wait": 4,
             "src": {
                 "group": True,
                 "type": "list",

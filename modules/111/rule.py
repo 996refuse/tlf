@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.111.com.cn': "//div[@id='allCategoryHeader']/ul/li[(position()<last())]/div/h4/a/@href",
             },
@@ -19,6 +20,7 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
+            "wait": 4,
             "rule": "//div[@class='turnPageBottom']/a[@id='page_']/@pageno",
             "src": {
                 "type": "list",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "111_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "type": "fetch",
             "name": "price",
+            "wait": 4,
             "src": {
                 "group": True,
                 "type": "list",
@@ -92,6 +96,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "111_stock",
                 "type": "list",

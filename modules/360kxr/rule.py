@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.360kxr.com/drugs.html': "//div[@class='left-nav-cont']/ul/li/h4/a/@href",
             },
@@ -19,6 +20,7 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
+            "wait": 4,
             "rule": "//div[@class='pages-box']/div[@class='page-num']/span",
             "src": {
                 "type": "list",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "360kxr_list",
@@ -68,6 +71,7 @@ rule = (
         {
             "name": "price",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "360kxr_price",
                 "type": "list",

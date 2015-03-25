@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "food",
+            "repeat": 20000,
             "food": ['http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0'],
             "dst": {
                 "name": "mi_page",
@@ -12,7 +13,7 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
-            "rule": "",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "mi_page",
@@ -36,6 +37,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list", 
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "mi_list",

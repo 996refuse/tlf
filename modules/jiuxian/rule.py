@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.jiuxian.com/': "//ul[@id='nav']/li[position() > 1]/h3/@url",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='clearfix']/div/a[@class='number'][last()]",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "jiuxian_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "jiuxian_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "name": "price",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "jiuxian_price",
                 "type": "list",

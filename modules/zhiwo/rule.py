@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.zhiwo.com/mall': "//div[@class='col-sub']/div[@class='content-box']/ul/li/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@id='paging']/li[last()-1]/a",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "zhiwo_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "zhiwo_list",

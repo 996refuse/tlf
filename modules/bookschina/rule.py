@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.bookschina.com/books/kind/sort.asp': "//div[@class='categories']/h3/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='bottompage']/a[last()]/@href",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "bookschina_page",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "bookschina_list",

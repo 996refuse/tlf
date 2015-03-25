@@ -3,6 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
+            "repeat": 20000,
             "from": {
                 'http://www.gjw.com/': "//div[@class='cateMenu']/ul/li/div[1]/strong/a/@href",
             },
@@ -20,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='page_box']/span[last()]/a/@href",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "gjw_pager",
@@ -43,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "gjw_list",
@@ -67,6 +70,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "gjw_stock",
                 "type": "list",

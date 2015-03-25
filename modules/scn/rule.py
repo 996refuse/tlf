@@ -3,7 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-
+            "repeat": 20000,
             "from": {
                 "http://www.s.cn/list": ""
             },
@@ -21,6 +21,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "rule": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "scn_pager",
@@ -44,6 +45,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list", 
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "scn_list",
@@ -70,6 +72,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "scn_stock",
                 "type": "list",

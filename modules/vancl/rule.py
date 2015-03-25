@@ -3,6 +3,7 @@ rule = (
         {
             "name": "pager",
             "type": "fetch",
+            "repeat": 1000,
             "from": {
                 'http://s.vancl.com/search': "//div[@id='pager']/em",
             },
@@ -19,6 +20,7 @@ rule = (
         {
             "type": "fetch",
             "name": "list",
+            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "vancl_list",
