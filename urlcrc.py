@@ -131,7 +131,7 @@ site_template=  {
      132: '/item/@-',
      133: '&id=@;&Id@',
      134: '/product/@.html;/item-[^-]+-@,;/item-@,;/item-[^-]+-@&;/item-[^-]+-@?;/item-[^-]+-@;/item-@&;/item-@?;/item-@',
-     135: 'product-@.html',
+     135: 'product/@.html',
      136: '/product/@/;/product/@?;/product/@', 
      138: '/goods-@.html',
      139: 'miqi.cn/[^/]+/p@.htm;id=@',

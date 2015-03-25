@@ -46,7 +46,12 @@ def list_parser(task, rule):
             stock = 0
         else:
             stock = 1
-        ret.append((i['url'], i['price_min'], stock))
+        price = i['price_min']
+        if not price:
+            log_with_time("bad response: %r %r" % (task['url'], i['commodity_id']))
+            continue
+
+        ret.append((i['url'], price, stock))
 
     fret = format_price(ret)
     return fret

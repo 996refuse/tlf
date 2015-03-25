@@ -113,7 +113,7 @@ SITES = {
             "ignore": False,
             },
         "gjw": {
-            "site_id": 214,
+            "site_id": 108,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
             "ignore": False,
