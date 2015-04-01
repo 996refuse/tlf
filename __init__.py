@@ -190,6 +190,8 @@ def forward_one(redis, result, dst):
     if not result: 
         return
     tp = dst["type"] 
+    if not tp:
+        return
     qname = dst["name"] 
     if dst.get("log", True):
         log_result(tp, result)
@@ -215,7 +217,7 @@ def forward_dst(result, rule):
             r = CONFIG["nodes"][v.get("node", "default")]
             forward_one(r, result[k], v) 
     if not "dst" in rule:
-        return
+        return 
     dst = rule["dst"]
     r = CONFIG["nodes"][dst.get("node", "default")]
     forward_one(r, result,  dst) 
@@ -1126,7 +1128,7 @@ def run():
     CONFIG["line_cnt"] = 0
     CONFIG["line_buffer"] = [] 
     CONFIG["log_name"] = "/tmp/spider-all.log" 
-    detach_and_set_log(conf)
+    detach_and_set_log(CONFIG)
     workers = {}
     CONFIG["workers"] = workers 
     import atexit 
