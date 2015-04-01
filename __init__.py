@@ -19,6 +19,7 @@ import json
 import pdb
 import ctypes
 import signal
+import subprocess
 
 import async_http
 import simple_http
@@ -113,6 +114,7 @@ scripts = {
         "set_push_n": lua_set_push_n
         }
 
+
 sids = {}
 
 
@@ -153,6 +155,7 @@ def set_push_n(redis, key, *args):
 
 
 CONFIG = {}
+
 
 def jsonp_json(content):
     a = content.find("(")
@@ -521,19 +524,19 @@ def run_worker(rule):
 
 
 def my_server_id():
-    output = subprocess.check_output("ifCONFIG", shell=True)
+    output = subprocess.check_output("ifconfig", shell=True)
     myid = re.compile("192.168.1.([0-9]{1,3})").findall(output)[0]
     return myid 
 
 
 
-def connect_mysql(CONFIG): 
+def connect_mysql(config): 
     if "mysql_con" in CONFIG:
         try:
             CONFIG["mysql_con"].close() 
         except Exception as e:
             log_with_time("close prev mysql con failed") 
-    CONFIG["mysql_con"] = MySQLdb.connect(**CONFIG)
+    CONFIG["mysql_con"] = MySQLdb.connect(**config)
     CONFIG["mysql_cur"] = CONFIG["mysql_con"].cursor() 
 
 
@@ -542,13 +545,10 @@ def connect_mysql(CONFIG):
 def replace_log(name): 
     old_name = name+".old"
     os.rename(name, old_name) 
-    new_fobj = open(name, "a+", buffering=0)
-    CONFIG["log_file"] = new_fobj
-    sys.stdout = new_fobj
-    sys.stdout = new_fobj
+    replace_stdout(name) 
     try:
         cmd = "7z a %s.7z %s" % (old_name, old_name)
-        subprocess.checkout_output(cmd, shell=True)
+        print subprocess.check_output(cmd, shell=True)
         os.remove(old_name) 
     except OSError as e:
         print "7z: compress log failed: %s" % e 
@@ -669,7 +669,7 @@ def _safe_commit():
             if "gone away" in msg or "lost" in msg:
                 wait_for_mysql()
             else: 
-                log_with_time("bug, _safe_insert_sql: %s %s" % (e,  sql)) 
+                log_with_time("bug, _safe_commit: %s" % e)
                 return 
 
 
@@ -678,7 +678,7 @@ def wait_for_mysql():
     while True: 
         log_with_time("bug: wait_for_mysql: reconnect mysql") 
         try:
-            connect_mysql(CLIENT["mysql"]) 
+            connect_mysql(CONFIG["client"]["mysql"]) 
             break
         except Exception as e:
             log_with_time("waiting mysql: %s" % e) 
@@ -703,7 +703,7 @@ def update_db(items):
     llkv = CONFIG["llkv"] 
     prices = {}
     for i in items:
-        prices[i[1]] = i[2:] + (i[0], )
+        prices[i[1]] = i[2:] + [i[0]]
     keys = []
     for site_id, crc, _, _ in items:
         unsigned_crc = ctypes.c_uint(int(crc)).value
@@ -745,17 +745,18 @@ def run_commit():
     load_config()
     apply_config(commit_rule)
     import llkv
-    CONFIG["llkv"] = llkv.Connection(**CLIENT["llkv_list"])
-    connect_mysql(CLIENT["mysql"]) 
+    client = CONFIG["client"]
+    CONFIG["llkv"] = llkv.Connection(**client["llkv_list"])
+    connect_mysql(client["mysql"]) 
     load_lua_scripts(CONFIG["nodes"].get("default")) 
     CONFIG["log_name"] = "/tmp/spider-commit.log" 
-    replace_stdout(config["sites"]["commit"].get("log",
+    replace_stdout(CONFIG["sites"]["commit"].get("log",
         "/tmp/spider-commit.log"))
     redis = CONFIG["nodes"]["default"] 
     unpack = msgpack.unpackb 
     while True: 
         b = []
-        items = list_pop_n(redis, "spider_result",  1)
+        items = list_pop_n(redis, "spider_result",  1000)
         for i in items:
             item = msgpack.unpackb(i) 
             if len(item) != 4: 
@@ -865,7 +866,7 @@ dp_idx_rule = {
 def run_dp_idx(): 
     load_config()
     apply_config(dp_idx_rule) 
-    connect_mysql(CLIENT["dp_idx"])
+    connect_mysql(CONFIG["client"]["dp_idx"])
     r = CONFIG["nodes"].get("default")
     wait = dp_idx_rule.get("wait", 2) 
     replace_stdout(CONFIG["sites"]["idx"].get("log",
@@ -992,7 +993,7 @@ def get_cat_from_rule(rule, cat):
 
 def use_config(role):
     if not role:
-        role = spider.my_server_id() 
+        role = my_server_id() 
     import importlib 
     try:
         config = importlib.import_module("spider.configs.%s" % role) 
@@ -1002,14 +1003,13 @@ def use_config(role):
     CONFIG["client"] =  config.CLIENT
     CONFIG["sites"] = config.SITES
 
+role = "" 
 
-
-def load_config(role="local"): 
+def load_config(): 
     CONFIG["myid"] = 170 
     CONFIG["line_cnt"] = 0
     CONFIG["line_buffer"] = []
     use_config(role)
-
 
 
 
@@ -1125,6 +1125,7 @@ def kill_workers():
 
 
 def run(): 
+    load_config() 
     CONFIG["line_cnt"] = 0
     CONFIG["line_buffer"] = [] 
     CONFIG["log_name"] = "/tmp/spider-all.log" 
@@ -1133,7 +1134,7 @@ def run():
     CONFIG["workers"] = workers 
     import atexit 
     atexit.register(kill_workers) 
-    start_all_sites(workers)
+    start_all_sites(workers) 
     run_master(workers)
 
 
@@ -1299,4 +1300,3 @@ def run_master(workers):
         log_with_time("reloading %s %s" % (site, worker))
         pid = detach_worker(site, worker)
         workers[pid] = (site, worker) 
-

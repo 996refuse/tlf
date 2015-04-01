@@ -5,7 +5,7 @@ import sys
 if __name__ == "__main__": 
     path = "/".join(os.path.dirname(__file__).split("/")[:-1])
     sys.path.append(path) 
-    import spider
+    import spider 
     arg1 = sys.argv[1]
     if arg1 == "all":
         spider.run() 
