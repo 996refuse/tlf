@@ -136,20 +136,24 @@ def handle_chunked(cbuf, normal_stream):
 
 
 def wait_header(data, hbuf): 
+    skip = 0
     hend = data.find(HEADER_END) 
     if hend < 0: 
         hend = data.find(HEADER_END2)
         if hend < 0:
             #slow network, wait for header 
             hbuf.write(data) 
-            return None, None
+            return None, None 
+        else:
+            skip = 2
+    else:
+        skip = 4
     if hend >= 0:
         hbuf.write(data)
-        data = hbuf.getvalue()
-        hend = data.find(HEADER_END)
+        data = hbuf.getvalue() 
         hbuf.close() 
     header = parse_server_header(data[:hend]) 
-    return header, data[hend+4:] 
+    return header, data[hend+skip:] 
 
 
 
