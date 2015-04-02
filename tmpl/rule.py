@@ -3,44 +3,41 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-            "repeat": 20000,
             "from": {
-                'http://www.111.com.cn': "//div[@id='allCategoryHeader']/ul/li[(position()<last())]/div/h4/a/@href",
             },
             "get": {
                 "type": "simple",
                 "method": "get",
-                "parser": "111.cats_parser", 
-                },
+                "parser": "",
+            },
             "dst": {
-                "name": "111_pager",
+                "name": "",
                 "type": "list",
             }
         },
         {
             "type": "fetch",
             "name": "pager",
-            "wait": 4,
-            "rule": "//div[@class='turnPageBottom']/a[@id='page_']/@pageno",
+            "rule": "",
             "src": {
                 "type": "list",
-                "name": "111_pager",
+                "name": "",
                 "batch": 30,
-                "filter": "111.pager_filter"
-                },
+                "filter": ""
+            },
             "dst": {
                 "type": "list",
-                "name": "111_list", 
-                },
+                "name": "",
+            },
             "get": {
                 "method": "get",
-                "parser": "111.pager",
+                "parser": "",
                 "args": {
                     "limit": 30,    
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
         },
         {
             "type": "fetch",
@@ -48,44 +45,42 @@ rule = (
             "wait": 4,
             "src": {
                 "type": "list",
-                "name": "111_list",
+                "name": "",
                 "batch": 30,
-                "filter": "111.list_filter",
-                },
-            "rule": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
+                "filter": "",
+            },
+            "rule": "",
             "dst": {
                 "type": "list",
-                "name": "111_price",
-                },
+                "name": "",
+            },
             "get": {
                 "method": "get",
-                "parser": "111.list_parser",
+                "parser": "",
                 "args": {
                     "limit": 30,  
                     "interval": 1,
                     "debug": False
                 }
-            },
+            }
         },
         {
             "type": "fetch",
-            "name": "price",
-            "wait": 4,
+            "name": "stock",
             "src": {
                 "group": True,
                 "type": "list",
-                "name": "111_price",
+                "name": "",
                 "batch": 30,
-                "filter": "111.price_filter",
+                "filter": "",
                 },
-            "rule": "",
             "dst": {
                 "type": "list",
                 "name": "spider_result",
                 },
             "get": {
                 "method": "get",
-                "parser": "111.price_parser",
+                "parser": "",
                 "args": {
                     "limit": 30,  
                     "interval": 1,

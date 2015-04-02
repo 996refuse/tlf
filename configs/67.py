@@ -64,7 +64,7 @@ SITES = {
             "site_id": 25,
             "workers": ("cats", "pager"),
             "ignore": False
-            }
+            },
 
         "sephora": {
             "site_id": 12,

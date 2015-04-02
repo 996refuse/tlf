@@ -6,6 +6,11 @@ import pdb
 import async_http
 import re
 
+def cats_filter(x):
+	return {
+		"url": x
+	}
+
 def pager_filter(x):
     return {
             "url": x

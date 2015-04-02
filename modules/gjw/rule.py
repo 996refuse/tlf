@@ -1,11 +1,32 @@
 #-*-encoding=utf-8-*-
 rule = (
         {
-            "name": "cats",
+            "name": "boot",
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.gjw.com/': "//div[@class='cateMenu']/ul/li/div[1]/strong/a/@href",
+                'http://www.gjw.com/': "",
+            },
+            "get": {
+                "type": "simple",
+                "method": "get",
+                "parser": "gjw.boot_parser",
+            },
+            "dst": {
+                "name": "gjw_cats",
+                "type": "list",
+            }
+        },
+        {
+            "name": "cats",
+            "type": "fetch",
+            "repeat": 20000,
+            "rule": "//div[@class='cateMenu']/ul/li/div[1]/strong/a/@href",
+            "src": {
+                "type": "list",
+                "name": "gjw_cats",
+                "batch": 30,
+                "filter": "gjw.cats_filter"
             },
             "get": {
                 "type": "simple",

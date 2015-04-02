@@ -38,10 +38,15 @@ def list_parser(task, rule):
     ret = []
     for node in nodes:
         gid = node.attrib['itemid']
+        stock = node.xpath("div[@class='buyInfo']/button[@class='buy']")
         if not gid:
             log_with_time("bad response: %r"%task['url'])
             continue
-        ret.append((burl+gid+'.html',gid))
+        if stock:
+            stock = 1
+        else:
+            stock = 0
+        ret.append((gid, stock))
     return ret
 
 def price_parser(task, rule):
@@ -50,16 +55,6 @@ def price_parser(task, rule):
     except:
         log_with_time("bad response: %r"%task['url'])
         return []
-    ret = [(task['gurl'], price)]
-    return ret
-
-def stock_parser(task, rule):
-    t = etree.HTML(task['text'])
-    ostock = t.xpath(rule)
-    if ostock:
-        stock = 0
-    else:
-        stock = 1
-    ret = [(task['url'], task['price'], stock)]
+    ret = [(task['gid'], price, task['stock'])]
     fret = format_price(ret)
     return fret

@@ -8,10 +8,16 @@ import pdb
 import re
 import json
 
-def cats_parser(url, content, rule):
-    t = etree.HTML(content)
-    ret = t.xpath(rule)
+def boot_parser(url, content, rule):
+    if 'www.yundun.cn' in content:
+        parts = re.findall("(?<=\')\w+(?=\')", content)
+        parts.reverse()
+        return url + '/yundunkey=' + ''.join(parts)
+    return [url]
 
+def cats_parser(task, rule):
+    t = etree.HTML(task['text'])
+    ret = t.xpath(rule)
     return ret
 
 def pager(task, rule):

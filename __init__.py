@@ -456,7 +456,7 @@ def run_batch(rule):
         async_config(rule) 
     unpack = msgpack.unpackb 
     tp = src["type"] 
-    if "filter" in src:
+    if "filter" in src and src['filter']:
         flt = load_func(src["filter"])
     else:
         flt = default_filter 
