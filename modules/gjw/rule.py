@@ -36,7 +36,7 @@ rule = (
                 "method": "get",
                 "parser": "gjw.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 5,    
                     "interval": 1,
                     "debug": False
                 }
@@ -61,7 +61,7 @@ rule = (
                 "method": "get",
                 "parser": "gjw.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 5,  
                     "interval": 1,
                     "debug": False
                 }
