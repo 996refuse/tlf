@@ -26,17 +26,21 @@ class FilePack:
         self.rdb = redis.StrictRedis(**db) 
 
 
-    def add(self, name, content):
+    def add(self, name, content, crc=None):
         if not name or not content:
-            return
+            return 
         assert len(name) < 103
-        self.meta.append({
+        m = {
             "title": name,
             "size": len(content),
             "offset": self.idx, 
-            "crc": get_urlcrc(self.site_id, name), 
             "date_time": int(time.time())
-            }) 
+            } 
+        if crc:
+            m["crc"] = int(crc) 
+        else:
+            m["crc"] = get_urlcrc(self.site_id, name), 
+        self.meta.append(m)
         self.b.append(content)
         self.idx += len(content)
         self.cnt += 1
@@ -109,6 +113,7 @@ class FileUnpack:
         self.version = unpack("I", self.fobj.read(4))[0]
         self.n_entry = unpack("I", self.fobj.read(4))[0]
         self.entry_size = unpack("I", self.fobj.read(4))[0] 
+        self.data_offset = self.fobj.tell()
 
 
     def get_file(self, meta):
@@ -136,6 +141,7 @@ class FileUnpack:
 
 
     def get_idx(self):
+        self.fobj.seek(self.data_offset, io.SEEK_SET)
         files = []
         for i in range(self.n_entry):
             meta_str = self.fobj.read(self.entry_size)
