@@ -15,6 +15,7 @@ def pager_parser(url, content, rule):
     return [url + str(i) + '.html' for i in range(1, pagenum+1)]
 
 def list_parser(task, rule):
+    murl = 'http://m.vancl.com/style/index/'
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
@@ -24,6 +25,7 @@ def list_parser(task, rule):
         if not gid or not price:
             log_with_time("bad response %r"%task['url'])
             return ret
+        gid = re.search("\d+", gid[0]).group()
         price = re.search("\d+", price[0].text)
         if not price:
             price = node.xpath("div/div[1]")
@@ -33,15 +35,15 @@ def list_parser(task, rule):
             price = price[0].text
         else:
             price = price.group()
-        ret.append((gid[0], price))
+
+        ret.append((murl+gid, price))
     return ret
 
 def stock_parser(task, rule):
-    t = etree.HTML(task['text'])
-    if t.xpath(rule):
-        stock = 1
-    else:
+    if '售罄' in task['text']:
         stock = 0
+    else:
+        stock = 1
     ret = [(task['url'], task['price'], stock)]
     fret = format_price(ret)
-    return fret
+    return ret

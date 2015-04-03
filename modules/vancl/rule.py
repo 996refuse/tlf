@@ -53,7 +53,7 @@ rule = (
                 "group": True,
                 "filter": "vancl.stock_filter"
                 },
-            "rule": "//p[@class='NowHasGoods']",
+            #"rule": "//p[@class='NowHasGoods']",
             "get": {
                 "method": "get",
                 "parser": "vancl.stock_parser",

@@ -8,12 +8,13 @@ import pdb
 import re
 import json
 
-def boot_parser(url, content, rule):
+def boot_parser(burl, content, rule):
     if 'www.yundun.cn' in content:
-        parts = re.findall("(?<=\')\w+(?=\')", content)
-        parts.reverse()
-        return url + '/yundunkey=' + ''.join(parts)
-    return [url]
+        urlexprs = re.search("(?<=\">).+(?=window)", content).group()
+        urlexprs = urlexprs.replace("var", "")
+        exec urlexprs
+        return [burl + url]
+    return [burl]
 
 def cats_parser(task, rule):
     t = etree.HTML(task['text'])

@@ -5,7 +5,7 @@ rule = (
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.gjw.com/': "",
+                'http://www.gjw.com': "",
             },
             "get": {
                 "type": "simple",
