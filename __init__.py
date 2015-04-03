@@ -254,10 +254,10 @@ def format_price(result):
         try:
             price = int(Decimal(i[1]) * 100)
         except:
-            log_with_time("price format error: %s" % i)
+            log_with_time("price format error: %s" % i[1])
             continue
         if not isinstance(i[2], int):
-            log_with_time("stock format error: %s" % i)
+            log_with_time("stock format error: %s" % i[2])
             continue
         stock = i[2]
         if price < 0:
@@ -782,9 +782,8 @@ def dp_parser(task):
     if status != 200: 
         log_with_time("status: %s" % status) 
         return 
-    CONFIG["fpack"].add(task["url"], task["text"]) 
+    CONFIG["fpack"].add(task["url"], task["text"], crc=task["crc"]) 
     log_with_time(task["url"])
-
 
 
 def get_dp_tasks(redis, qname): 
@@ -801,25 +800,27 @@ def get_dp_tasks(redis, qname):
             url, title = i 
             crc = get_urlcrc(site_id, url)
         elif li == 3:
-            url, crc, title = i
+            url, crc, title = i 
+            crc = int(crc)
         else:
             log_with_time("unknown dp format") 
             continue
         key = ctypes.c_uint(crc).value | site_id << 32
-        crcs[key] = url 
+        crcs[key] = (crc, url) 
     d = CONFIG["lc"].multi_get(crcs.keys())
     ret = []
     for k,v in d.items():
         if not v:
-            ret.append(crcs[k]) 
+            ret.append(crcs[k])
     tasks = [] 
-    for url in ret:
+    for crc, url in ret:
         hdr = async_http.html_header.copy()
         hdr["User-Agent"] = async_http.random_useragent()
         task = {
             "site_id": site_id,
-            "url": url,
-            "header":  hdr,
+            "url": url, 
+            "crc": str(crc),
+            "header": hdr,
             "parser": dp_parser
             }
         tasks.append(task) 
@@ -833,10 +834,11 @@ def dp_fetch_tasks(tasks):
 
 
 def run_dp(rule): 
-    CONFIG["lc"] = llkv.Connection(**CLIENT["llkv_dp"])
-    CONFIG["fpack"] = filepack2.FilePack(db = CLIENT["nodes"]["default"],
-            limit = 1000, site_id=CONFIG["site_id"])
-    async_http.copy_keys = ("url", "parser", "header", "site_id") 
+    client = CONFIG["client"]
+    CONFIG["lc"] = llkv.Connection(**client["llkv_dp"])
+    CONFIG["fpack"] = filepack2.FilePack(db = client["nodes"]["default"],
+            limit = 1000, site_id=CONFIG["site_id"], datadir="/mnt/mfs")
+    async_http.copy_keys = ("url", "parser", "header", "site_id", "crc") 
     node = CONFIG["nodes"].get("default") 
     load_lua_scripts(node)
     CONFIG["dp_redis"] = redis
@@ -921,6 +923,8 @@ def load_site(site):
     if not s:
         print "bad site: %s" % site
         return 
+    if "." in site:
+        site = site.split('.')[0]
     try:
         __import__("spider.modules.%s" % site)
     except IndexError:
@@ -991,14 +995,14 @@ def get_cat_from_rule(rule, cat):
 
 
 
-def use_config(role):
+def use_config(role): 
     if not role:
         role = my_server_id() 
     import importlib 
     try:
         config = importlib.import_module("spider.configs.%s" % role) 
-    except:
-        print "unknown role: %s" % role
+    except ImportError as e:
+        print "import error: %s" % e
         exit(1) 
     CONFIG["client"] =  config.CLIENT
     CONFIG["sites"] = config.SITES
@@ -1028,11 +1032,10 @@ def apply_config(rule):
     CONFIG["nodes"] = redis_nodes 
 
 
-
 def run_cat(site, cat): 
     import atexit
     atexit.register(flush_lines) 
-    load_config()
+    load_config() 
     if site in blt_worker: 
         blt_worker[site]()
         exit(0)
@@ -1061,6 +1064,7 @@ def run_cat(site, cat):
     #顺序执行分站 
     if subsites.get("source") == "cats" and cat == "cats":
         repeat = target.get("repeat")
+        target["old_dst"] = target["dst"].copy()
         if not repeat:
             run_subsite(subsites, target)
             exit(1) 
@@ -1083,10 +1087,9 @@ def run_cat(site, cat):
 def run_subsite(subsites, rule): 
     for site_id, name in subsites["sites"].items(): 
         CONFIG["site_id"] = site_id
-        CONFIG["site"] = name
-        suffix = "_" + name
-        if not suffix in rule["dst"]:
-            rule["dst"]["name"] += "_" + name
+        CONFIG["site"] = name 
+        new_name = rule["old_dst"]["name"] + "_" + name
+        rule["dst"]["name"] = new_name
         repeat = rule.get("repeat", 60)
         rule["repeat"] = 0
         log_with_time("run site: %s" % name)
@@ -1099,10 +1102,10 @@ def start_all_sites(workers):
         if v.get("ignore"):
             log_with_time("skip: %s" % i)
             continue
-        if i not in blt_worker:
+        if i not in blt_worker and "." not in i:
             try:
                 __import__("spider.modules.%s" % i)
-            except IndexError:
+            except ImportError:
                 log_with_time("site %s not exists" % i) 
                 return 
         for j in v.get("workers"): 
@@ -1122,6 +1125,7 @@ def kill_workers():
             log_with_time("%s,  %s, %s killed" % (i, v[0], v[1]))
         except OSError:
             log_with_time("kill %s failed" % i) 
+
 
 
 def run(): 
@@ -1164,7 +1168,7 @@ def command_stop(**kwargs):
             to.append((pid, site, worker))
     for pid, site, worker in to:
         try:
-            os.kill(pid, signal.SIGTERM) 
+            os.kill(pid, signal.SIGKILL) 
             del CONFIG["workers"][pid]
             log_with_time("%s,  %s, %s killed" % (pid, site, worker))
         except OSError:
@@ -1173,7 +1177,13 @@ def command_stop(**kwargs):
 
 def command_start(**kwargs): 
     site = kwargs.get("site")
-    worker = kwargs.get("worker")
+    worker = kwargs.get("worker") 
+    if not CONFIG["sites"].get(site):
+        log_with_time("site not allowed")
+        return
+    if cat not in CONFIG["site"][site]["workers"]:
+        log_with_time("worker not allowed")
+        return 
     pid = detach_worker(site, worker) 
     CONFIG["workers"][pid] = (site, worker) 
 
@@ -1194,14 +1204,9 @@ def command_stat(**kwargs):
 
 
 
-def command_report(**kwargs):
-    pass
-
-
-
 def command_getall(**kwargs):
     workers = []
-    for pid, value in CONFIG["workers"]:
+    for pid, value in CONFIG["workers"].items():
         workers.append({
             "pid": pid,
             "site": value[0],
@@ -1210,7 +1215,7 @@ def command_getall(**kwargs):
     return {
             "status": True,
             "workers": workers
-            }
+            } 
 
 
 master_comamds = {
@@ -1220,9 +1225,9 @@ master_comamds = {
         "start": command_start,
         "statall": command_statall,
         "stat": command_stat, 
-        "report": command_report,
         "getall": command_getall,
         } 
+
 
 
 def die_msg(sk, addr, msg):
@@ -1232,6 +1237,7 @@ def die_msg(sk, addr, msg):
                 "msg": msg
             }), 
             addr) 
+
 
 
 def handle_control_msg(sk): 
