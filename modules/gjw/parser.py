@@ -11,7 +11,8 @@ import json
 def boot_parser(burl, content, rule):
     if 'www.yundun.cn' in content:
         urlexprs = re.search("(?<=\">).+(?=window)", content).group()
-        urlexprs = urlexprs.replace("var", "")
+        urlexprs = urlexprs.replace("var", "").strip()
+        urlexprs = urlexprs[:-1]
         exec urlexprs
         return [burl + url]
     return [burl]
