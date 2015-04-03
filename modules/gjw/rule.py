@@ -20,7 +20,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-            "repeat": 20000,
+            "wait": 4,
             "rule": "//div[@class='cateMenu']/ul/li/div[1]/strong/a/@href",
             "src": {
                 "type": "list",

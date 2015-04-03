@@ -26,7 +26,7 @@ def pager(task, rule):
     burl = task['url'][:-1]
     t = etree.HTML(task['text'])
     lastpage = t.xpath(rule)
-
+    pdb.set_trace()
     ret = []
 
     if not lastpage:
