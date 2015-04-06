@@ -26,21 +26,26 @@ def cats_parser(url, content,  rule):
     return ret
 
 def pager(task, rule): 
+    burl = 'http://list.yhd.com/searchPage/c30786-0-81933/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
     tree = etree.HTML(task["text"])
     count = tree.xpath(rule) 
     if not count:
         log_with_time("pager, no count: %s" % task["url"])
         return []
     count = int(count[0])
-    pm = 'http://list.yhd.com/c27438-0-0#page='
     ret = []
     for i in range(1, count+1):
-        ret.append(pm+str(i)+'&sort=1')
+        ret.append(burl%str(i))
     return ret
 
 def list_parser(task, rule):
-    tree = etree.HTML(task["text"])
-    nodes = tree.xpath(rule["node"])
+    try:
+        j = json.loads(task["text"])
+        t = etree.HTML(j['value'])
+        nodes = t.xpath(rule["node"])
+    except:
+        log_with_time("bad response %s"%task['url'])
+        return []
     ret = []
     for node in nodes:
         pid = node.xpath(rule['pid'])
@@ -65,4 +70,4 @@ def stock_parser(task, rule):
         qid = str(i["productId"])
         ret.append((qid, task['price'][qid], stock))
     result = format_price(ret)
-    return result 
+    return ret
