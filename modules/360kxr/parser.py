@@ -33,8 +33,8 @@ def pager(task, rule):
         pagenum = 1
     else:
         pagenum = int(re.search("\d+", pagenum[0].text).group())
-
-    for i in range(1, pagenum+1):
+    ret.append(task['url'])
+    for i in range(2, pagenum+1):
         ret.append(burl + cat + bpath + str(i) + '.html')
     return ret
 

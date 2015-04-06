@@ -321,10 +321,12 @@ def sleep_with_counter(n):
 
 def load_func(path):
     import spider.modules
-    m, r = path.split(".")
-    __import__("spider.modules.%s" % m)
+    l = path.split(".")
+    m = l.pop(0)
     module = getattr(spider.modules, m)
-    return getattr(module, r) 
+    if not l: return module
+    __import__("spider.modules.%s" % m)
+    return getattr(module, l[0]) 
 
 
 

@@ -66,6 +66,20 @@ rule = (
                     "debug": False
                 }
             },
+            "test": [
+            {
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-934.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-913.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.111.com.cn/list/964106-0-0-0-0-0-0-55.html",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -91,6 +105,6 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
         },
 )

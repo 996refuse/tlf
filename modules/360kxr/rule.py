@@ -66,7 +66,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.360kxr.com/category/483-1-4-2-2-0,999999-all-9-all-all-all-2.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.360kxr.com/category/992-1-4-2-2-0,999999-all-9-all-all-all-1.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.360kxr.com/category/328-1-4-2-2-0,999999-all-9-all-all-all-9.html",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "price",
