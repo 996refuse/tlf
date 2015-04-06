@@ -26,7 +26,7 @@ def cats_parser(url, content,  rule):
     return ret
 
 def pager(task, rule): 
-    burl = 'http://list.yhd.com/searchPage/c30786-0-81933/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
+    burl = 'http://list.yhd.com/searchPage/%s/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
     tree = etree.HTML(task["text"])
     count = tree.xpath(rule) 
     if not count:
@@ -34,8 +34,9 @@ def pager(task, rule):
         return []
     count = int(count[0])
     ret = []
+    cat = task['url'].split('/')[-1]
     for i in range(1, count+1):
-        ret.append(burl%str(i))
+        ret.append(burl%(cat, str(i)))
     return ret
 
 def list_parser(task, rule):
