@@ -55,6 +55,6 @@ def stock_parser(task, rule):
         stock = 1
     else:
         stock = 0
-    ret.append((task['url'], int(float(task['info'])*100), stock))
+    ret.append((task['url'], task['info'], stock))
     fret = format_price(ret)
     return fret
