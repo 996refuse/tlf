@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "m6go_page",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://www.m6go.com/baobaoshipin",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",

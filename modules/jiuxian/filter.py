@@ -15,12 +15,12 @@ def list_filter(x):
             "url": x
             }
 
+rurl = "http://act.jiuxian.com/act/selectPricebypids.htm?ids="
 def price_filter(items):
 	if not items:
 		return []
-	url = "http://act.jiuxian.com/act/selectPricebypids.htm?ids="
 	dstock = dict(items)
-	url += ",".join(dstock.keys())
+	url = rurl + ",".join(dstock.keys())
 	return [{
 		"url": url,
 		"stock": dstock

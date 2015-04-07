@@ -8,8 +8,8 @@ import pdb
 import re
 import json
 
+burl = "http://www.zhiwo.com"
 def cats_parser(url, content, rule):
-    burl = "http://www.zhiwo.com"
     t = etree.HTML(content)
     ret = [ burl + i for i in t.xpath(rule) ]
 
@@ -33,7 +33,6 @@ def pager(task, rule):
     return ret
 
 def list_parser(task, rule):
-    burl = "http://www.zhiwo.com"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []

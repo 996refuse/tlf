@@ -8,13 +8,13 @@ import pdb
 import re
 import json
 
+catsburl = 'http://www.360kxr.com'
 def cats_parser(url, content, rule):
-    burl = 'http://www.360kxr.com'
     t = etree.HTML(content)
-    return [ burl+i for i in t.xpath(rule) ]
+    return [catsburl+i for i in t.xpath(rule) ]
 
+pagerburl = 'http://www.360kxr.com/category/'
 def pager(task, rule):
-    burl = 'http://www.360kxr.com/category/'
     bpath = '-1-4-2-2-0,999999-all-9-all-all-all-'
     rr = re.search("(?<=category/)[0-9]+(?=-)", task['url'])
 
@@ -35,11 +35,11 @@ def pager(task, rule):
         pagenum = int(re.search("\d+", pagenum[0].text).group())
     ret.append(task['url'])
     for i in range(2, pagenum+1):
-        ret.append(burl + cat + bpath + str(i) + '.html')
+        ret.append(pagerburl + cat + bpath + str(i) + '.html')
     return ret
 
+listburl = "http://www.360kxr.com"
 def list_parser(task, rule):
-    burl = "http://www.360kxr.com"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
@@ -53,7 +53,7 @@ def list_parser(task, rule):
             stock = 1
         else:
             stock = 0
-        ret.append((burl+gid[0], stock))
+        ret.append((listburl+gid[0], stock))
     return ret
 
 def price_parser(task, rule):

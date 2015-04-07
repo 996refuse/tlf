@@ -13,48 +13,47 @@ def cats_parser(url, content,  rule):
     ret = []
     for i in rule:
         items = t.xpath(i)
-        oo = []
         for v in items:
-            if 'list' in v:
-                p = 'http://list.yhd.com/'
-                s = v[len(p):]
-                ti = s.index('/')
-                if ti == len(s)-1 or s[ti+1] == '/':
-                    oo.append(p+s[:ti])
-        o1 = set(oo)
-        ret.extend(list(o1))
+            if not 'list.yhd.com' in v or '/b/' in v:
+                continue
+            ret.append(v)
     return ret
 
+pgburl = 'http://list.yhd.com/searchPage/%s/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
 def pager(task, rule): 
-    burl = 'http://list.yhd.com/searchPage/%s/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
     tree = etree.HTML(task["text"])
     count = tree.xpath(rule) 
     if not count:
-        log_with_time("pager, no count: %s" % task["url"])
-        return []
+        count = [1]
     count = int(count[0])
     ret = []
-    cat = task['url'].split('/')[-1]
+    cat = task['url'].split('/')
+    while not cat[-1]:
+        cat.pop(-1)
+    cat = cat[-1]
     for i in range(1, count+1):
-        ret.append(burl%(cat, str(i)))
+        ret.append(pgburl%(cat, str(i)))
     return ret
 
 def list_parser(task, rule):
     try:
+       #pdb.set_trace()
         j = json.loads(task["text"])
         t = etree.HTML(j['value'])
-        nodes = t.xpath(rule["node"])
+        nodes = t.xpath(rule)
     except:
         log_with_time("bad response %s"%task['url'])
         return []
     ret = []
     for node in nodes:
-        pid = node.xpath(rule['pid'])
-        price = node.xpath(rule['price'])
+        pid = re.search("\d+", node.attrib['id']).group()
+        price = node.xpath("div/p[@class='proPrice']/em")
         if not pid or not price:
-            log_with_time("wrong rule. please fix. %r %r %r"%(pid,price,stock))
+            log_with_time("bad response %s"%task['url'])
             continue
-        ret.append((pid[0], price[0]))
+        price = etree.tostring(price)
+        price = re.search("(?<=b\>)\d+\.\d+|(?<=b\>)\d+", price).group()
+        ret.append((pid[0], price))
     return ret
 
 def stock_parser(task, rule):

@@ -55,8 +55,8 @@ def list_parser(task, rule):
         ret.append((gid, stock))
     return ret
 
+itemurl = "http://www.jiuxian.com/goods-%s.html"
 def price_parser(task, rule):
-    gurl = lambda g: "http://www.jiuxian.com/goods-%s.html" % g
     j = json.loads(task['text'])
     stocks = task['stock']
     
@@ -64,7 +64,7 @@ def price_parser(task, rule):
 
     try:
         for k,v in j['data'].items():
-            ret.append((gurl(k), v['np'], stocks[k]))
+            ret.append((gurl%k, v['np'], stocks[k]))
     except:
         return []
     

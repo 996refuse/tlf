@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "lenovo_pager",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://shop.lenovo.com.cn/head.html",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -40,7 +46,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://shop.lenovo.com.cn/search/getproduct.do?plat=4&categorycode=0141&keyword=&sorder=0&spage=1&sarry=1",
+                "check": "module_test"
+            },
+            {
+                "url": "http://shop.lenovo.com.cn/search/getproduct.do?plat=4&categorycode=0113&keyword=&sorder=0&spage=1&sarry=1",
+                "check": "module_test"
+            },
+            {
+                "url": "http://shop.lenovo.com.cn/search/getproduct.do?plat=4&categorycode=0116&keyword=&sorder=0&spage=1&sarry=1",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -65,7 +85,7 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
         },
         {
             "name": "stock",

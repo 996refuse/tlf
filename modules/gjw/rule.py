@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "gjw_cats",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://www.gjw.com",
+                "check": "module_test"
             }
+            ]
         },
         {
             "name": "cats",
@@ -61,7 +67,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.gjw.com/baojianjiu/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.gjw.com/putaojiu/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.gjw.com/chaye/",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -86,7 +106,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.gjw.com/putaojiu-search-page-1.htm",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.gjw.com/putaojiu-search-page-21.htm",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.gjw.com/yangjiu-search-page-9.htm",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "stock",

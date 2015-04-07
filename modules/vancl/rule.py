@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "vancl_list",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://s.vancl.com/search",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -41,7 +47,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://s.vancl.com/p6.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://s.vancl.com/p9.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://s.vancl.com/p3.html",
+                "check": "module_test"
             }
+            ]
         },
         {
             "name": "stock",

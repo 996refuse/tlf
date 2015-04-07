@@ -28,8 +28,8 @@ def pager(task, rule):
         ret.append(burl + '/' + str(i))
     return ret
 
+gid_html = "http://www.m6go.com/product_%s.html"
 def list_parser(task, rule):
-    gid_html = lambda x: "http://www.m6go.com/product_%s.html"%x
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
@@ -44,6 +44,6 @@ def list_parser(task, rule):
             stock = 0
         else:
             stock = 1
-        ret.append((gid_html(gid), price, stock))
+        ret.append((gid_html%gid, price, stock))
     fret = format_price(ret)
     return fret
