@@ -73,7 +73,7 @@ rule = (
                 "check": "module_test"
             },
             {
-                "url": "http://www.360kxr.com/category/992-1-4-2-2-0,999999-all-9-all-all-all-1.html",
+                "url": "http://www.360kxr.com/category/201-0-2-1-15-1.html",
                 "check": "module_test"
             },
             {
