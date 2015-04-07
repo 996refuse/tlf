@@ -170,7 +170,7 @@ def wait_header(data, hbuf):
     else:
         skip = 4 
     header = parse_server_header(hdr[:hend]) 
-    return header, data[hend+skip:] 
+    return header, hdr[hend+skip:] 
 
 
 
