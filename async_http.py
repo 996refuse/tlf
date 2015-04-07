@@ -14,11 +14,10 @@ import errno
 import pprint
 import io
 import random 
+import time
 import traceback
 
-from cStringIO import StringIO
-from time import sleep
-from time import time
+from cStringIO import StringIO 
 from select import *
 from select import * 
 
@@ -89,8 +88,7 @@ def nope_parser(body):
 
 
 def nope_streamer(task, content):
-    pass
-
+    pass 
 
 
 fd_task = { }
@@ -269,9 +267,9 @@ def set_dns_buffer(hosts):
         else:
             port = 80 
         host = d["host"]
-        start = time()
+        start = time.time()
         ret = socket.getaddrinfo(host, port)
-        cost = time() - start
+        cost = time.time() - start
         if cost > 1:
             print "dns slow query: %s, %s" % (cost, host)
         if not len(ret):
@@ -385,7 +383,7 @@ def connect_remote(task):
     task["send"].write(content) 
     task["status"] = STATUS_SEND 
     #设定连接初始化时间 
-    task["start"] = time()
+    task["start"] = time.time()
 
 
 def handle_write_later(task):
@@ -595,11 +593,11 @@ def handle_event(ep):
             continue
         if event & EPOLLOUT: 
             if task["status"] & STATUS_SEND:
-                task["start"] = time() 
+                task["start"] = time.time() 
                 handle_remote_connect(task) 
             if task["send"].tell():
                 #连接有有效活动更新活动时间 
-                task["start"] = time() 
+                task["start"] = time.time() 
                 try:
                     handle_write_later(task) 
                 except ValueError:  
@@ -607,7 +605,7 @@ def handle_event(ep):
                     continue
         if event & EPOLLIN:
             #连接有有效活动更新活动时间 
-            task["start"] = time()
+            task["start"] = time.time()
             try:
                 handle_pollin(task) 
             except ValueError:
@@ -653,7 +651,7 @@ def find_timeout(item, cur):
 
 
 def do_timer(): 
-    current = time() 
+    current = time.time() 
     g["timer_signal"] = False
     if current - http_time > config["timeout"]: 
         #根据任务开始的时间排序
@@ -693,8 +691,8 @@ def do_timer():
 
 
 def run_async(ep): 
-    g["http_time"] = time()
-    g["task_time"] = time()
+    g["http_time"] = time.time()
+    g["task_time"] = time.time()
     g["timer_signal"] = False
     signal.setitimer(signal.ITIMER_REAL, 1, 1)
     signal.signal(signal.SIGALRM, internal_timer)
@@ -721,7 +719,6 @@ def internal_timer(signum, frame):
 
 
 
-
 def fill_task(task): 
     task["send"] = StringIO() 
     task["recv"] = StringIO() 
@@ -745,13 +742,44 @@ def fill_task(task):
             task[k] = v
 
 
+def preset_dns(task_list): 
+    for i in task_list:
+        d = urlparse(i["url"])
+        if "host" not in d:
+            continue
+        host = d["host"]
+        if "port" not in d:
+            port = 80
+        else:
+            port = d["port"]
+        remote = "%s:%d" % (d["host"], port) 
+        if remote in dns_buffer:
+            continue
+        start = time.time() 
+        addrs = socket.getaddrinfo(host, port)
+        cost = time.time() - start
+        if cost > 1:
+            print "dns slow query: %s, %s" % (cost, host)
+        if not len(addrs):
+            raise socket.error("dns query failed: %s" % host) 
+        dns_buffer[remote] = addrs[0][-1] 
+
+
+def log_with_time(msg):
+    print u"async_http %s: %s" % (time.ctime(), repr(msg)) 
+
+
+
 def dispatch_tasks(task_list): 
     g["ep"] = epoll() 
     #补全任务缺少的
     for i in task_list: 
         fill_task(i) 
     #初始化任务管理 
+    preset_dns(task_list)
     space = config["limit"]
+    start_time = time.time()
+    acnt =  len(task_list)
     for i in task_list: 
         while True:
             random = get_random() 
@@ -767,6 +795,11 @@ def dispatch_tasks(task_list):
                 continue
             space -= 1 
     run_async(ep) 
+    fcnt = len(failed_tasks) 
+    log_with_time("acnt: %d, fcnt: %d, time: %d" % (acnt,
+        fcnt, time.time() - start_time))
+    for k,v in failed_tasks.iteritems():
+        log_with_time("failed: %s" % v["url"])
 
 
 
@@ -788,7 +821,6 @@ def loop_until_done(task_list):
 
 
 
-
 def insert_task(task):
     task = default_copy(task)
     fill_task(task)
@@ -804,7 +836,7 @@ def insert_task(task):
 def wait_timeout(n): 
     #临时忽略itimer产生的信号
     signal.signal(signal.SIGALRM, signal.SIG_IGN)
-    sleep(n) 
+    time.sleep(n) 
     #恢复信号处理
     signal.signal(signal.SIGALRM, internal_timer)
 

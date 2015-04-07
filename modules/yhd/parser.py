@@ -51,9 +51,9 @@ def list_parser(task, rule):
         if not pid or not price:
             log_with_time("bad response %s"%task['url'])
             continue
-        price = etree.tostring(price)
+        price = etree.tostring(price[0])
         price = re.search("(?<=b\>)\d+\.\d+|(?<=b\>)\d+", price).group()
-        ret.append((pid[0], price))
+        ret.append((pid, price))
     return ret
 
 def stock_parser(task, rule):

@@ -165,14 +165,14 @@ def jsonp_json(content):
     return json.loads(content[a+1:b])
 
 
-
 def log_result(tp, result): 
     if tp =="hash":
-        for i in result.iteritems():
-            log_with_time(i)
+        b = []
+        for k,v in result.iteritems():
+            b.append("%s: %s" % (k, v))
+        log_with_time("\n".join(b)) 
     else:
-        for i in result:
-            log_with_time(i)
+        log_with_time("\n".join([repr(i) for i in result])) 
 
 
 def pack_result(tp, result): 
@@ -346,7 +346,12 @@ def batch_parser(task):
     except:
         traceback.print_exc()
         exit(1) 
-    if result and (task["rule"].get("dst") or task["rule"].get("multidst")):
+    if not result:
+        log_with_time("empty result: %s" % task["url"])
+        return
+    if result and (task["rule"].get("dst") or
+            task["rule"].get("multidst")):
+        log_with_time("result of %s" % task["url"])
         forward_dst(result, task["rule"]) 
 
 
@@ -364,7 +369,9 @@ def async_config(rule):
     async_http.debug = args.get("debug") 
     default = ("url", "parser", "to", "origin",
             "method", "rule", "old_url", "payload")
-    keys = set(args.get("keys", [])).union(set(default))
+    keys = set(args.get("keys", [])).union(set(default)) 
+    if "pool" in args: 
+        async_http.sconf.update(args["pool"]) 
     async_http.copy_keys = tuple(keys) 
 
 
@@ -458,7 +465,7 @@ def run_batch(rule):
         async_config(rule) 
     unpack = msgpack.unpackb 
     tp = src["type"] 
-    if "filter" in src and src['filter']:
+    if "filter" in src:
         flt = load_func(src["filter"])
     else:
         flt = default_filter 
@@ -481,6 +488,9 @@ def run_batch(rule):
         if not tasks and wait_or_die(rule): 
             log_with_time("%s done" % rule["name"])
             break 
+        if not tasks:
+            log_with_time("sleeping")
+            continue
         async_http.loop_until_done(tasks) 
         async_http.stats = [] 
 
@@ -558,16 +568,22 @@ def replace_log(name):
 
 
 def log_with_time(obj): 
-    if not debug:
+    if not isinstance(obj, str): 
+        obj = repr(obj) 
+    if not debug: 
+        #5行写磁盘,  减少压力 
+        try:
+            msg = u"%s: %s" % (time.ctime(), obj)
+        except UnicodeDecodeError:
+            msg = u"%s: %s" % (time.ctime(), repr(obj))
+        CONFIG["line_buffer"].append(msg)
         CONFIG["line_cnt"] += 1
-        #5行写磁盘,  减少压力
-        CONFIG["line_buffer"].append(u"%s: %s" % (time.ctime(), repr(obj)))
         if CONFIG["line_cnt"] > 4:
             print "\n".join(CONFIG["line_buffer"]) 
             CONFIG["line_cnt"] = 0 
             CONFIG["line_buffer"] = []
     else:
-        print u"%s: %s" % (time.ctime(), repr(obj))
+        print u"%s: %s" % (time.ctime(), obj)
     if "log_file" in CONFIG and CONFIG["log_file"].tell() > 536870912: 
         fobj = CONFIG["log_file"]
         name = fobj.name
@@ -618,7 +634,7 @@ def update_llkv(site_id,  key, price, stock):
         return
     if price < 0:
         price = 0
-    ll_key = (site_id << 32) | ctypes.c_uint(key).value
+    ll_key = (site_id << 48) | ctypes.c_uint(key).value
     CONFIG["llkv"].set(ll_key, price | (stock << 63)) 
 
 
@@ -709,7 +725,7 @@ def update_db(items):
     keys = []
     for site_id, crc, _, _ in items:
         unsigned_crc = ctypes.c_uint(int(crc)).value
-        keys.append((int(site_id) << 32) | unsigned_crc) 
+        keys.append((int(site_id) << 48) | unsigned_crc) 
     d = llkv.multi_get(keys) 
     for key, value in d.items():
         k2 = ctypes.c_int(key & 0xffffffff).value
@@ -775,8 +791,7 @@ def run_commit():
         for i in range(n):
             items = b[i*1000: (i+1) * 1000]
             update_db(items) 
-        _safe_commit()
-
+        _safe_commit() 
 
 
 def dp_parser(task):
@@ -784,8 +799,39 @@ def dp_parser(task):
     if status != 200: 
         log_with_time("status: %s" % status) 
         return 
+    if "crc" not in task:
+        log_with_time("crc missing: %s" % task["url"])
+        return 
     CONFIG["fpack"].add(task["url"], task["text"], crc=task["crc"]) 
+    key = (CONFIG["site_id"] << 48) | ctypes.c_uint(task["crc"]).value
+    CONFIG["lc"].set(key, 0)
     log_with_time(task["url"])
+
+
+
+def dp_diff(lc, items): 
+    site_id = CONFIG["site_id"]
+    crcs = {}
+    for item in items: 
+        li = len(item)
+        if li == 2:
+            url, title = item 
+            crc = get_urlcrc(site_id, url)
+        elif li == 3:
+            url, crc, title = item 
+            crc = int(crc)
+        else:
+            log_with_time("unknown dp format") 
+            continue
+        key = ctypes.c_uint(crc).value | site_id << 48
+        crcs[key] = (crc, url) 
+    d = lc.multi_get(crcs.keys())
+    ret = []
+    for k,v in d.items():
+        if v == None:
+            ret.append(crcs[k])
+    return ret
+
 
 
 def get_dp_tasks(redis, qname): 
@@ -794,34 +840,15 @@ def get_dp_tasks(redis, qname):
         b.append(msgpack.unpackb(i)) 
     if not b:
         return
-    crcs = {}
-    site_id = CONFIG["site_id"]
-    for i in b: 
-        li = len(i)
-        if li == 2:
-            url, title = i 
-            crc = get_urlcrc(site_id, url)
-        elif li == 3:
-            url, crc, title = i 
-            crc = int(crc)
-        else:
-            log_with_time("unknown dp format") 
-            continue
-        key = ctypes.c_uint(crc).value | site_id << 32
-        crcs[key] = (crc, url) 
-    d = CONFIG["lc"].multi_get(crcs.keys())
-    ret = []
-    for k,v in d.items():
-        if not v:
-            ret.append(crcs[k])
+    crcs = {} 
+    diffset = dp_diff(CONFIG["lc"], b)
     tasks = [] 
-    for crc, url in ret:
+    for crc, url in diffset:
         hdr = async_http.html_header.copy()
         hdr["User-Agent"] = async_http.random_useragent()
-        task = {
-            "site_id": site_id,
+        task = { 
             "url": url, 
-            "crc": str(crc),
+            "crc": int(crc),
             "header": hdr,
             "parser": dp_parser
             }
@@ -889,6 +916,10 @@ def run_dp_idx():
 
 
 
+def run_rt(rule):
+    pass
+
+
 def run_guard(rule):
     tp = rule["src"]["type"]
     qname = rule["src"]["name"] 
@@ -935,15 +966,34 @@ def load_site(site):
     m = getattr(modules, site)
     return m 
 
-
 debug = False 
+
+def run_test_cases(cases, rule): 
+    parser = load_func(rule["get"]["parser"]) 
+    for case in cases: 
+        url = case["url"]
+        func = load_func(case["check"])
+        method = case.get("method", "get")
+        h,c = getattr(simple_http, method)(url,
+            query = case.get("query"),
+            payload = case.get("payload"))
+        if h["status"] != 200:
+            print "request %s failed" % url
+            exit(1) 
+        if not "src" in rule:
+            func(parser(url, c, rule["from"][url])) 
+        ctx = {"url": url, "text": c}
+        ctx.update(case) 
+        func(parser(ctx, rule.get("rule"))) 
 
 
 def run_module_test(site, cat): 
     global debug
     debug = True 
-    load_config()
+    load_config() 
     m = load_site(site) 
+    if not m: 
+        return
     rule = getattr(m, "rule") 
     target = get_cat_from_rule(rule, cat) 
     if not target:
@@ -954,22 +1004,7 @@ def run_module_test(site, cat):
     if not test:
         print "I don't known how to test"
         exit(1) 
-    parser = load_func(target["get"]["parser"]) 
-    for case in test:
-        url = case["url"]
-        func = load_func(case["check"])
-        method = case.get("method", "get")
-        h,c = getattr(simple_http, method)(url,
-            query = case.get("query"),
-            payload = case.get("payload"))
-        if h["status"] != 200:
-            print "fetch %s failed" % url
-            exit(1) 
-        if target.get("src"):
-            func(parser({"url": url, "text": c, },
-                target.get("rule"))) 
-            continue
-        func(parser(url, c, target["from"][url])) 
+    run_test_cases(test, target)
 
 
 blt_worker = {
@@ -999,7 +1034,10 @@ def get_cat_from_rule(rule, cat):
 
 def use_config(role): 
     if not role:
-        role = my_server_id() 
+        try:
+            role = my_server_id() 
+        except:
+            role = "local"
     import importlib 
     try:
         config = importlib.import_module("spider.configs.%s" % role) 
@@ -1096,6 +1134,7 @@ def run_subsite(subsites, rule):
         rule["repeat"] = 0
         log_with_time("run site: %s" % name)
         run_worker(rule) 
+        rule["repeat"] = repeat
         sleep_with_counter(repeat) 
 
 
@@ -1164,10 +1203,6 @@ def command_stop(**kwargs):
         site,worker = v 
         if s and w and site == s and worker == w: 
             to.append((pid, site,worker))  
-        elif s and site == s:
-            to.append((pid, site, worker))
-        elif w and worker == w:
-            to.append((pid, site, worker))
     for pid, site, worker in to:
         try:
             os.kill(pid, signal.SIGKILL) 
@@ -1183,7 +1218,7 @@ def command_start(**kwargs):
     if not CONFIG["sites"].get(site):
         log_with_time("site not allowed")
         return
-    if cat not in CONFIG["site"][site]["workers"]:
+    if worker not in CONFIG["sites"][site]["workers"]:
         log_with_time("worker not allowed")
         return 
     pid = detach_worker(site, worker) 
@@ -1277,7 +1312,10 @@ def udp_event(sock, pollobj):
             log_with_time("epollerr, master die")  
             exit(1)
         if event & select.EPOLLIN:
-            handle_control_msg(sock) 
+            try:
+                handle_control_msg(sock) 
+            except (KeyError, ValueError, OSError) as e:
+                log_with_time("udp: %s" % e) 
 
 
 
