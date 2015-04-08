@@ -16,9 +16,9 @@ def list_filter(x):
             "url": x
             }
 
+gprice_url = 'http://www.111.com.cn/interfaces/item/itemPrice.action?itemids=%s'
 def price_filter(items):
-    gprice_url = lambda i: 'http://www.111.com.cn/interfaces/item/itemPrice.action?itemids=%s'%i
     ret = []
     for g,s in items:
-        ret.append({"url": gprice_url(g), "gid":g, "stock": s})
+        ret.append({"url": gprice_url%g, "gid":g, "stock": s})
     return ret

@@ -15,11 +15,11 @@ def list_filter(x):
             "url": x
             } 
 
+stburl ="http://busystock.i.yihaodian.com/busystock/restful/truestock?mcsite=1&provinceId=1&"
 def stock_task_filter(items):
     prices = dict(items)
     ret = []
-    base ="http://busystock.i.yihaodian.com/busystock/restful/truestock?mcsite=1&provinceId=1&"
-    base += "&".join(["productIds=" + i for i in prices.keys()])
+    base = stburl + "&".join(["productIds=" + i for i in prices.keys()])
     ret.append({
             "url": base,
             "price":  prices,

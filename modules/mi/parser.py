@@ -8,8 +8,12 @@ import pdb
 import re
 import json
 
+reqburl = 'http://list.mi.com/accessories/ajaxView/0-0-0-0-'
+
+def cats_parser(url, content, rule):
+    return [reqburl + '0-0']
+
 def pager(task, rule):
-    burl = 'http://list.mi.com/accessories/ajaxView/0-0-0-0-'
     rr = re.search("items\(", task['text'])
 
     j = json.loads(task['text'][rr.end():-1])
@@ -23,7 +27,7 @@ def pager(task, rule):
     pagenum = int(j['data']['total_pages'])
 
     for i in range(1, pagenum+1):
-        ret.append(burl + str(i) + '-0')
+        ret.append(reqburl + str(i) + '-0')
 
     return ret
 

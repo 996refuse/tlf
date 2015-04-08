@@ -8,9 +8,6 @@ import pdb
 import re
 import json
 
-def cats_parser(url, content,  rule):
-    return [url]
-
 def pager(task, rule):
     burl = task['url']
     tree = etree.HTML(task["text"])

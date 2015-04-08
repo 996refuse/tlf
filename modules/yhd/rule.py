@@ -1,5 +1,5 @@
 rule = (
-{
+        {
             "name": "cats",
             "type": "fetch",
             "repeat": 20000,
@@ -13,8 +13,14 @@ rule = (
             "dst": {
                 "name": "yhd_pager",
                 "type": "list",
-                }
             },
+            "test": [
+            {
+                "url": "http://www.yhd.com/marketing/allproduct.html",
+                "check": "module_test"
+            }
+            ],
+        },
         {
             "type": "fetch",
             "name": "pager",
@@ -38,7 +44,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://list.yhd.com/c34641-0-0/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.yhd.com/c31329-0-0/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.yhd.com/c21770-0-85959/",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -50,11 +70,7 @@ rule = (
                 "batch": 30,
                 "filter": "yhd.list_filter",
                 }, 
-            "rule": {
-                "node": "//ul[@id='itemSearchList']/li", 
-                "pid": "div/div/span[@productid]/@productid",
-                "price": 'div/div/span[@productid]/@yhdprice',
-                },
+            "rule": "//div[@id='itemSearchList']/div", 
             "dst": { 
                 "type": "list",
                 "name": "yhd_stock",
@@ -67,7 +83,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 } 
-            }
+            },
+            "test": [
+            {
+                "url": "http://list.yhd.com/c34641-0-0/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.yhd.com/c31329-0-0/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.yhd.com/c21770-0-85959/",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "stock",

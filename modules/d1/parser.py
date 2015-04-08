@@ -31,8 +31,8 @@ def pager(task, rule):
         ret.append(burl + '&pageno=' + str(i))
     return ret
 
+surl1 = "http://www.d1.com.cn/ajax/flow/listInCart.jsp"
 def list_parser(task, rule):
-    surl1 = "http://www.d1.com.cn/ajax/flow/listInCart.jsp"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
@@ -56,8 +56,8 @@ def list_parser(task, rule):
         })
     return ret
 
+surl2 = lambda g,s: 'http://m.d1.cn/ajax/flow/InCartnew.jsp?gdsid=%s&count=1&skuId=%s'%(g,s)
 def stock1_parser(task, rule):
-    surl2 = lambda g,s: 'http://m.d1.cn/ajax/flow/InCartnew.jsp?gdsid=%s&count=1&skuId=%s'%(g,s)
     code = re.search("(?<=code\"\:)\d+(?=,)", task['text'])
     message = re.search('(?<=message).+(?=\")', task['text'])
 
@@ -80,14 +80,14 @@ def stock1_parser(task, rule):
 
     return [(url, task['gid'], task['price'])]
 
+itemurl = 'http://www.d1.com.cn/product/'
 def stock2_parser(task, rule):
-    url = 'http://www.d1.com.cn/product/'
     success = re.search("(?<=success\":).+(?=,)", task['text'])
 
     stock = 0
     if success and success.group() == 'true':
         stock = 1
 
-    ret = [(url+task['gid'], task['price'], stock)]
+    ret = [(itemurl+task['gid'], task['price'], stock)]
     fret = format_price(ret)
     return fret

@@ -11,11 +11,17 @@ rule = (
                 "type": "simple",
                 "method": "get",
                 "parser": "360kxr.cats_parser", 
-                },
+            },
             "dst": {
                 "name": "360kxr_page",
                 "type": "list",
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.360kxr.com/drugs.html",
+                "check": "module_test",
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -40,7 +46,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.360kxr.com/category/394-0-2-1-15-1.html",
+                "check": "module_test",
+            },
+            {
+                "url": "http://www.360kxr.com/category/977-0-2-1-15-1.html",
+                "check": "module_test",
+            },
+            {
+                "url": "http://www.360kxr.com/category/992-0-2-1-15-1.html",
+                "check": "module_test",
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -66,7 +86,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.360kxr.com/category/483-1-4-2-2-0,999999-all-9-all-all-all-2.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.360kxr.com/category/201-0-2-1-15-1.html",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.360kxr.com/category/328-1-4-2-2-0,999999-all-9-all-all-all-9.html",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "price",
@@ -97,6 +131,6 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
         }
 )

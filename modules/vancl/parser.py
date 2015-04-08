@@ -8,14 +8,14 @@ import pdb
 import re
 import json
 
+purl = 'http://s.vancl.com/p'
 def pager_parser(url, content, rule):
-    url = 'http://s.vancl.com/p'
     t = etree.HTML(content)
     pagenum = int(re.search("\d+", t.xpath(rule)[0].text).group())
-    return [url + str(i) + '.html' for i in range(1, pagenum+1)]
+    return [purl + str(i) + '.html' for i in range(1, pagenum+1)]
 
+murl = 'http://m.vancl.com/style/index/'
 def list_parser(task, rule):
-    murl = 'http://m.vancl.com/style/index/'
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []

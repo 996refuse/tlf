@@ -38,8 +38,8 @@ def pager(task, rule):
         ret.append(burl + '_5_1_' + str(i) + '/')
     return ret
 
+listburl = "http://www.bookschina.com"
 def list_parser(task, rule):
-    burl = "http://www.bookschina.com"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []
@@ -52,6 +52,8 @@ def list_parser(task, rule):
         gid = gid[0]
         price = price[0].text
         price = re.search("\d+\.\d+", price).group()
-        ret.append((burl+gid, price, 1))
+        ret.append((listburl+gid, price, 1))
+    pdb.set_trace()
     fret = format_price(ret)
+    pdb.set_trace()
     return fret

@@ -1,33 +1,20 @@
 #-*-encoding=utf-8-*-
 rule = (
         {
-            "name": "cats",
+            "type": "fetch",
+            "name": "pager",
+            "rule": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
             "type": "fetch",
             "repeat": 20000,
             "from": {
                 "http://www.s.cn/list": ""
             },
-            "get": {
-                "type": "simple",
-                "method": "get",
-                "parser": "scn.cats_parser", 
-                },
-            "dst": {
-                "name": "scn_pager",
-                "type": "list",
-            }
-        },
-        {
-            "type": "fetch",
-            "name": "pager",
-            "rule": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
-            "wait": 4,
             "src": {
                 "type": "list",
                 "name": "scn_pager",
                 "batch": 30,
                 "filter": "scn.pager_filter"
-                },
+            },
             "dst": {
                 "type": "list",
                 "name": "scn_list", 
@@ -40,7 +27,13 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://www.s.cn/list",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -67,7 +60,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.s.cn/list/pg66",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.s.cn/list/pg23",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.s.cn/list/pg79",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "stock",

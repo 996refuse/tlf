@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "bookuu_list",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://search.bookuu.com/",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",

@@ -21,15 +21,15 @@ def list_filter(x):
             "url": x
             }
 
+surl = "http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-%s-Quantity-1.htm"
 def stock_filter(items):
-	surl = lambda g: "http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-%s-Quantity-1.htm"%g
 	if not items:
 		return []
 	ret = []
 	for gh, p in items:
 		g = re.search("\d+", gh).group()
 		ret.append({
-			"url": surl(g),
+			"url": surl%g,
 			"item": (gh,p)
 		})
 	return ret

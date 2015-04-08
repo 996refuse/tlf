@@ -2,13 +2,26 @@
 rule = (
         {
             "name": "cats",
-            "type": "food",
+            "type": "fetch",
             "repeat": 20000,
-            "food": ['http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0'],
+            "from": {
+                "http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0": ""
+            },
             "dst": {
                 "name": "mi_page",
                 "type": "list",
+            },
+            "get": {
+                "type": "simple",
+                "method": "get",
+                "parser": "mi.cats_parser"
+            },
+            "test": [
+            {
+                "url": "http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -32,7 +45,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://list.mi.com/accessories/ajaxView/0-0-0-0-20-0",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.mi.com/accessories/ajaxView/0-0-0-0-34-0",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.mi.com/accessories/ajaxView/0-0-0-0-52-0",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",

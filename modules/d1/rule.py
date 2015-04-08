@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "d1_pager",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://www.d1.com.cn/",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -41,6 +47,20 @@ rule = (
                     "debug": False
                 }
             },
+            "test": [
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=014",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=030",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=020",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -65,7 +85,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=014&pageno=59",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=014&pageno=27",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.d1.com.cn/result.jsp?productsort=020&pageno=5",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -89,7 +123,7 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
         },
         {
             "type": "fetch",

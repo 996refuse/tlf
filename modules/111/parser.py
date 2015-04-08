@@ -32,7 +32,6 @@ def pager(task, rule):
     return ret
 
 def list_parser(task, rule):
-    burl = "http://www.111.com.cn/product/"
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)
     ret = []

@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "jiuxian_pager",
                 "type": "list",
+            },
+            "test": [
+            {
+                "url": "http://www.jiuxian.com/",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -40,7 +46,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://list.jiuxian.com/95-0-0-0-0-0-0-0-0-0-0-0.htm#v2",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.jiuxian.com/68-0-0-0-0-0-0-0-0-0-0-0.htm#v2",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.jiuxian.com/179-0-0-0-0-0-0-0-0-0-0-0.htm",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -65,7 +85,21 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+            {
+                "url": "http://list.jiuxian.com/2-0-0-0-0-0-0-0-0-0-0-0.htm?pageNum=23&",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.jiuxian.com/2-0-0-0-0-0-0-0-0-0-0-0.htm?pageNum=11&",
+                "check": "module_test"
+            },
+            {
+                "url": "http://list.jiuxian.com/1-0-0-0-0-0-0-0-0-0-0-0.htm?pageNum=100&",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "name": "price",

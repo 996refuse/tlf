@@ -15,7 +15,13 @@ rule = (
             "dst": {
                 "name": "bookschina_page",
                 "type": "list",
-            }
+            },
+            "test": [
+            {
+                "url": "http://www.bookschina.com/books/kind/sort.asp",
+                "check": "module_test"
+            },
+            ]
         },
         {
             "type": "fetch",
@@ -25,7 +31,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookschina_page",
-                "batch": 30,
+                "batch": 10,
                 "filter": "bookschina.pager_filter"
                 },
             "dst": {
@@ -36,11 +42,25 @@ rule = (
                 "method": "get",
                 "parser": "bookschina.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 2,
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://www.bookschina.com/kinder/49000000/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.bookschina.com/kinder/35000000/",
+                "check": "module_test"
+            },
+            {
+                "url": "http://www.bookschina.com/kinder/17000000/",
+                "check": "module_test"
             }
+            ]
         },
         {
             "type": "fetch",
@@ -49,7 +69,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookschina_list",
-                "batch": 30,
+                "batch": 10,
                 "filter": "bookschina.list_filter",
                 },
             "rule": "//div[@class='inright']/div[@class='bookContent']",
@@ -61,10 +81,17 @@ rule = (
                 "method": "get",
                 "parser": "bookschina.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 2,
                     "interval": 1,
                     "debug": False
                 }
-            }
+            },
+            "test": [
+
+            {
+                "url": "http://www.bookschina.com/kinder/64000000_5_1_22/",
+                "check": "module_test",
+            },
+            ]
         },
 )
