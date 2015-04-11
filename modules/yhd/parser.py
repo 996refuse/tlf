@@ -70,4 +70,4 @@ def stock_parser(task, rule):
         qid = str(i["productId"])
         ret.append((qid, task['price'][qid], stock))
     result = format_price(ret)
-    return fret
+    return result
