@@ -48,6 +48,7 @@ def list_parser(task, rule):
     for node in nodes:
         pid = re.search("\d+", node.attrib['id']).group()
         price = node.xpath("div/p[@class='proPrice']/em")
+        pdb.set_trace()
         if not pid or not price:
             log_with_time("bad response %s"%task['url'])
             continue
@@ -70,4 +71,4 @@ def stock_parser(task, rule):
         qid = str(i["productId"])
         ret.append((qid, task['price'][qid], stock))
     result = format_price(ret)
-    return ret
+    return fret
