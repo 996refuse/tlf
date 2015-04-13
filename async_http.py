@@ -487,7 +487,7 @@ def parse_response(header, task):
         #内存复制问题
         content = buf.getvalue()
         chunk_end = content.rfind("0\r\n\r\n") 
-        if chunk_end < 0 or content[chunk_end-1].isdigit():
+        if chunk_end < 0 or content[chunk_end-1] in hex_digits_set:
             return
         normal = StringIO()
         try:

@@ -78,6 +78,7 @@ letters = [0 for x in range(256)]
 for x in string.letters:
     letters[ord(x)] = 1 
 
+hex_digits_set = set(string.hexdigits) 
 
 default_header = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
