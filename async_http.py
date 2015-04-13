@@ -371,8 +371,9 @@ def connect_remote(task):
     #生成请求，暂时写到发送缓冲 
     try:
         remote, content = generate_request(**task) 
-    except KeyError:
-        pdb.set_trace()
+    except KeyError as e:
+        log_with_time("generate_request error: %s" % e)
+        return 
     if "remote" in task:
         remote = task["remote"] 
     if task.get("method", METHOD_GET).lower() == "head":
@@ -425,7 +426,34 @@ def read_to_buffer(con, buf):
 
             
 
-def handle_chunked(cbuf, normal_stream): 
+
+
+def call_parser(task): 
+    enc =  task["resp_header"].get("Content-Encoding") 
+    text = task["recv"].getvalue() 
+    task["recv"].truncate(0) 
+    task["text"] = text
+    if enc == "gzip": 
+        task["text"] = zlib.decompress(text, 16+zlib.MAX_WBITS)
+    elif enc == "deflate": 
+        task["text"] = zlib.decompress(text, -zlib.MAX_WBITS) 
+    task["parser"](task) 
+
+
+
+def decode_chunked(task): 
+    normal = StringIO()
+    try:
+        convert_chunked(task["recv"], normal) 
+    except Exception as e: 
+        remove_task(task, why="chunked: %s" % e)
+        return 
+    task["recv"].close()
+    task["recv"] = normal 
+
+
+
+def convert_chunked(cbuf, normal_stream): 
     #内存复制问题
     end = cbuf.tell()
     cbuf.seek(0)
@@ -453,70 +481,45 @@ def handle_chunked(cbuf, normal_stream):
         normal_stream.write(chunk) 
 
 
-
-def call_parser(task): 
-    enc =  task["resp_header"].get("Content-Encoding") 
-    text = task["recv"].getvalue() 
-    task["recv"].truncate(0) 
-    task["text"] = text
-    if enc == "gzip": 
-        task["text"] = zlib.decompress(text, 16+zlib.MAX_WBITS)
-    elif enc == "deflate": 
-        task["text"] = zlib.decompress(text, -zlib.MAX_WBITS) 
-    task["parser"](task) 
+def handle_stream(header, task): 
+    data = ""
+    try:
+        data = task["con"].recv(4) 
+    except socket.error as e:
+        if e.errno != errno.EAGAIN:
+            remove_task(task, why="检查http流结尾时失效") 
+            return
+    #远端已经关闭, 流结束 
+    if not data: 
+        if header.get("Transfer-Encoding") == "chunked":
+            decode_chunked(task)
+        call_parser(task) 
+        remove_task(task)   
+        return 
+    else:
+        task["recv"].write(data) 
 
 
 
 def parse_response(header, task): 
     #检测请求是否完成，并调用paser
-    total_length = 0xffffffff
-    has_chunk = False
+    total_length = 0xffffffff 
     has_range = False
     length_unknown = True 
     buf = task["recv"]
     if "Content-Length" in header:
         total_length = int(header["Content-Length"]) 
-        length_unknown = False
-    if header.get("Transfer-Encoding") == "chunked":
-        has_chunk = True
+        length_unknown = False 
     if header.get("Accept-Ranges") == "bytes":
         has_range = True
     if header.get("Content-Range"):
-        length_unknown = False
-    if has_chunk: 
-        #内存复制问题
-        content = buf.getvalue()
-        chunk_end = content.rfind("0\r\n\r\n") 
-        if chunk_end < 0 or content[chunk_end-1] in hex_digits_set:
-            return
-        normal = StringIO()
-        try:
-            handle_chunked(buf, normal) 
-        except Exception as e: 
-            remove_task(task, why="chunked: %s" % e)
-            return 
-        buf.close()
-        task["recv"] = normal 
-        call_parser(task) 
-        remove_task(task)   
+        length_unknown = False 
+    if buf.tell() >= total_length: 
+        handle_stream(header, task)
         return 
-    if buf.tell() >= total_length:
-        call_parser(task)
-        remove_task(task)
-        return 
-    if length_unknown and not has_chunk: 
-        try:
-            data = task["con"].recv(4) 
-        except socket.error as e:
-            if e.errno != errno.EINPROGRESS:
-                remove_task(task, why="检查http流结尾时失效") 
-            return 
-        #远端已经关闭, 流结束
-        if not data:
-            call_parser(task) 
-            remove_task(task)
-        else:
-            task["recv"].write(data) 
+    if length_unknown:
+        handle_stream(header, task)
+        return
 
 
 def handle_pollin(task): 
