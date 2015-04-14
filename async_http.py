@@ -18,7 +18,6 @@ import time
 import traceback
 
 from cStringIO import StringIO 
-from select import *
 from select import * 
 
 
@@ -85,10 +84,6 @@ def random_useragent():
 
 def nope_parser(body): 
     pass
-
-
-def nope_streamer(task, content):
-    pass 
 
 
 fd_task = { }
@@ -418,10 +413,10 @@ def read_to_buffer(con, buf):
             buf.write(con.recv(409600)) 
             #连接终止退出
             if buf.tell() == mark:
-                break 
+                return True
         except socket.error as e:
             if e.errno == errno.EAGAIN:
-                break
+                return False
             raise e 
 
             
@@ -454,7 +449,6 @@ def decode_chunked(task):
 
 
 def convert_chunked(cbuf, normal_stream): 
-    #内存复制问题
     end = cbuf.tell()
     cbuf.seek(0)
     goout = 0
@@ -481,73 +475,100 @@ def convert_chunked(cbuf, normal_stream):
         normal_stream.write(chunk) 
 
 
-def handle_stream(header, task): 
-    data = ""
-    try:
-        data = task["con"].recv(4) 
-    except socket.error as e:
-        if e.errno != errno.EAGAIN:
-            remove_task(task, why="检查http流结尾时失效") 
-            return
-    #远端已经关闭, 流结束 
-    if not data: 
-        if header.get("Transfer-Encoding") == "chunked":
-            decode_chunked(task)
+def decode_chunk_stream(task):
+    goout = 0
+    b = task["chunked_b"]
+    recv = task["recv"]
+    done = False 
+    recv_end = recv.tell() 
+    recv.seek(0, task["chunked_idx"]) 
+    while True: 
+        back_idx = recv.tell()
+        num = "" 
+        while True: 
+            char = recv.read(1) 
+            if not char:
+                goout = True
+                break 
+            if char == "\r": 
+                break
+            num += char 
+        if goout:
+            break
+        recv.seek(1, io.SEEK_CUR)
+        x = int(num, 16) 
+        if not x:
+            done = True
+            break
+        chunk = recv.read(x)
+        recv.seek(2, io.SEEK_CUR)
+        if len(chunk) != x:
+            recv.seek(back_idx, io.SEEK_SET)
+            break
+        b.write(chunk) 
+    task["chunked_idx"] = recv.tell()
+    recv.seek(recv_end, io.SEEK_SET)
+    if done: 
+        task["recv"] = task["chunked_b"] 
+        del task["chunked_b"] 
+        del task["chunked_idx"]
         call_parser(task) 
         remove_task(task)   
-        return 
-    else:
-        task["recv"].write(data) 
 
+    
+
+
+def parse_http_buffer(task): 
+    header = task.get("resp_header")
+    if not header:
+        remove_task(task)
+        return
+    if header.get("Transfer-Encoding") == "chunked":
+        decode_chunked(task)
+    call_parser(task) 
+    remove_task(task)   
+    
 
 
 def parse_response(header, task): 
-    #检测请求是否完成，并调用paser
+    #检测请求是否完成，并调用paser 
     total_length = 0xffffffff 
     has_range = False
     length_unknown = True 
-    buf = task["recv"]
-    if "Content-Length" in header:
+    if "Content-Length" in header: 
         total_length = int(header["Content-Length"]) 
         length_unknown = False 
     if header.get("Accept-Ranges") == "bytes":
         has_range = True
     if header.get("Content-Range"):
         length_unknown = False 
-    if buf.tell() >= total_length: 
-        handle_stream(header, task)
+    if task["recv"].tell() >= total_length: 
+        parse_http_buffer(task) 
         return 
-    if length_unknown:
-        handle_stream(header, task)
-        return
+    if header.get("Transfer-Encoding") == "chunked": 
+        if not "chunked_b" in task:
+            task["chunked_b"] = StringIO()
+            task["chunked_idx"] = 0
+        decode_chunk_stream(task) 
+
 
 
 def handle_pollin(task): 
     con = task["con"]
-    recv_buffer = task["recv"] 
-    #如果连接被异常终止 
-    mark = recv_buffer.tell()
-    recv_buffer.write(con.recv(4)) 
-    #连接的正常终止
-    if recv_buffer.tell() == mark:
-        remove_task(task)
-        return 
-    read_to_buffer(con, recv_buffer) 
-    #通知streamer
-    if task["streamer"]:
-        mark = recv_buffer.tell()
-        task["streamer"](task, recv_buffer)
-        recv_buffer.seek(mark) 
+    recv = task["recv"] 
+    if read_to_buffer(con, recv): 
+        parse_http_buffer(task)
+        return
     #找http头并解析 
     if task["status"] & STATUS_RECV:
-        content = recv_buffer.getvalue()
+        content = recv.getvalue()
         body_pos = content.find("\r\n\r\n") 
         #没找到头再等 
         if body_pos < 0:
             return
         task["status"] = STATUS_HEADER
-        recv_buffer.truncate(0)
-        recv_buffer.write(content[body_pos+4:]) 
+        recv.truncate(0)
+        recv.write(content[body_pos+4:]) 
         try:
             task["resp_header"] = parse_server_header(content[:body_pos]) 
         except (ValueError, IndexError, TypeError) as e: 
@@ -733,8 +754,7 @@ def fill_task(task):
         "random": "",
         "fd": -1, 
         "resp_header": {},
-        "parser": nope_parser,
-        "streamer": None,
+        "parser": nope_parser, 
         "start": 0,
         "retry": 0,
         "status": STATUS_SEND,
