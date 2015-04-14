@@ -476,12 +476,12 @@ def convert_chunked(cbuf, normal_stream):
 
 
 def decode_chunk_stream(task):
-    goout = 0
+    goout = False
     b = task["chunked_b"]
     recv = task["recv"]
     done = False 
     recv_end = recv.tell() 
-    recv.seek(0, task["chunked_idx"]) 
+    recv.seek(task["chunked_idx"], io.SEEK_SET) 
     while True: 
         back_idx = recv.tell()
         num = "" 
