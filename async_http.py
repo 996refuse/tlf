@@ -468,10 +468,10 @@ def convert_chunked(cbuf, normal_stream):
         x = int(num, 16) 
         if not x:
             break
-        chunk = cbuf.read(x)
-        cbuf.seek(2, io.SEEK_CUR)
+        chunk = cbuf.read(x) 
         if len(chunk) != x:
             break
+        cbuf.seek(2, io.SEEK_CUR)
         normal_stream.write(chunk) 
 
 
@@ -500,11 +500,11 @@ def decode_chunk_stream(task):
         if not x:
             done = True
             break
-        chunk = recv.read(x)
-        recv.seek(2, io.SEEK_CUR)
+        chunk = recv.read(x) 
         if len(chunk) != x:
             recv.seek(back_idx, io.SEEK_SET)
             break
+        recv.seek(2, io.SEEK_CUR)
         b.write(chunk) 
     task["chunked_idx"] = recv.tell()
     recv.seek(recv_end, io.SEEK_SET)
@@ -826,7 +826,7 @@ def dispatch_tasks(task_list):
 
 
 
-def loop_until_done(task_list):
+def repeat_tasks(task_list):
     global failed_tasks
     dispatch_tasks(task_list) 
     while len(failed_tasks):

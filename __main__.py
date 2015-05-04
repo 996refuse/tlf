@@ -1,7 +1,9 @@
+#! /usr/bin/env python
+#-*-encoding=utf8-*-
 import os 
 import sys 
-import json
-import shutil
+import pdb
+
 
 if __name__ == "__main__": 
     path = "/".join(os.path.dirname(__file__).split("/")[:-1])
@@ -16,6 +18,9 @@ if __name__ == "__main__":
         spider.debug = True
         spider.run_cat(sys.argv[2], sys.argv[3]) 
     elif arg1 == "test":
-        spider.run_module_test(sys.argv[2], sys.argv[3]) 
+        if sys.argv[2] == "me":
+            spider.test_me()
+        else:
+            spider.run_module_test(sys.argv[2], sys.argv[3]) 
     else: 
         spider.run_cat(sys.argv[1], sys.argv[2]) 
