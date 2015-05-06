@@ -343,8 +343,19 @@ def run_single(rule):
         result = parser(l, c, fromlist[l]) 
         if result and rule.get("price_range"):
             urls = load_price_range(rule["price_range"]) 
-            result = replace_url_with_ranges(result, urls)
+            result = replace_url_with_ranges(result, urls) 
+        if result and rule.get("hotlimit"):
+            result = hotzone_filter(result, rule)
         forward_dst(result, rule) 
+
+
+def hotzone_filter(result, rule):
+    d = result 
+    limit = rule.get("hotlimit")
+    result = []
+    for i in d:
+        result.append((i, limit))
+    return result 
 
 
 def run_single_repeat(rule):
@@ -407,8 +418,8 @@ def load_func(path):
         m, r = path.split(".") 
         __import__("spider.modules.%s" % m)
         module = getattr(spider.modules, m)
-    else: 
-        module = importlib.import_module(".".join(parts[:-1]))
+    else:
+        module = spider.modules
     return getattr(module, parts[-1])  
 
 
@@ -526,7 +537,7 @@ def async_config(rule):
             async_http.config[i] = args[i]
     async_http.debug = args.get("debug") 
     default = ("url", "parser", "to", "origin",
-            "method", "old_url", "payload", "proxy", "cookie", "crc")
+            "method", "old_url", "payload", "proxy", "cookie", "crc", "limit")
     keys = set(args.get("keys", [])).union(set(default)) 
     prev_keys = set(async_http.copy_keys)
     keys = keys.union(prev_keys)
@@ -927,7 +938,7 @@ def log_with_time(obj):
             CONFIG["line_cnt"] = 0 
             CONFIG["line_buffer"] = []
     else:
-        print u"%s: %s" % (time.ctime(), obj)
+        print msg
     if "log_file" in CONFIG and CONFIG["log_file"].tell() > 536870912: 
         fobj = CONFIG["log_file"]
         name = fobj.name
@@ -1341,7 +1352,7 @@ def diff_dps(rule):
     result = dump_urls_from_crcs(target, path) 
     del target
     cnt = 0
-    for i in split_list_iter(result.items(), 1000):
+    for i in split_list(result.items(), 1000):
         cnt += 1000
         log_with_time("final stage: %s/%s" % (cnt, len(result)))
         forward_dst(i, rule)

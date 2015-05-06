@@ -1,5 +1,5 @@
 #-*-encoding=utf-8-*-
-from spider import split_list
+from spider import split_list_iter
 import random
 import time
 import pdb

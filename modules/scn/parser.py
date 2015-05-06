@@ -8,9 +8,9 @@ import pdb
 import re
 import json
 
-def pager(task, rule):
-    burl = task['url']
-    tree = etree.HTML(task["text"])
+def pager(url, content, rule):
+    burl = url
+    tree = etree.HTML(content)
     pgs = tree.xpath(rule)
     
     if not pgs:
@@ -30,14 +30,14 @@ def list_parser(task, rule):
     nodes = tree.xpath(rule["node"])
     ret = []
     for node in nodes:
-        url = node.xpath("dd/a/@href")
-        price = node.xpath("dd/a/ul/li[@class='r1']/i[@class='price']")
-        if not url or not price:
+        gidurl = node.xpath(rule['gidurl'])
+        price = node.xpath(rule['price'])
+        if not gidurl or not price:
             log_with_time("list parser err: %r" % task['url'])
             continue
-        url = url[0]
+        gidurl = gidurl[0]
         price = price[0].text[1:]
-        ret.append((url, price))
+        ret.append((gidurl, price))
         ret = list(set(ret))
     return ret
 
@@ -52,6 +52,6 @@ def stock_parser(task, rule):
         stock = 1
     else:
         stock = 0
-    ret.append((task['url'], task['info'], stock))
+    ret.append((task['url'], task['price'], stock))
     fret = format_price(ret)
     return fret

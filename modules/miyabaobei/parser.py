@@ -70,7 +70,10 @@ def list_parser(task, rule):
 
 
 def stock_parser(task, rule):
-    j = json.loads(task["text"])
+    text = task["text"]
+    if not text.startswith("{"):
+        text = text[text.find("{"):]
+    j = json.loads(text)
     if not j["res"]: 
         log_with_time("bad response: %s" % task["url"])
         return

@@ -2,11 +2,12 @@
 import json
 import re
 import pdb 
-import async_http
+import time
+from spider import async_http
 from lxml import etree
 from spider import format_price
 from spider import log_with_time
-from spider import format_style_group
+from spider import format_style_group 
 
 base = "http://www.gome.com.cn/p/asynSearch"
 
@@ -64,7 +65,7 @@ def pager(task, rule):
             "payload": pt,
             "url": base, 
             "old_url": task["old_url"],
-            })
+            }) 
     return ret
 
 
@@ -110,37 +111,44 @@ def payload(url, page):
     return args
 
 
+def test_list(items):
+    pdb.set_trace()
+
+
+url_pat = re.compile("product/(.*)\.")
+gome_base = "http://item.gome.com.cn/%s.html"
+
 
 def list_parser(task, rule): 
     item = json.loads(task["text"]) 
-    rows = [] 
-    style_groups = [] 
-    if "products" not in item:
+    skus = [] 
+    groups = [] 
+    dp_pairs = [] 
+    if "products" not in item: 
         log_with_time("found nothing: %s" % task["old_url"])
         return
+    now = int(time.time())
+    dps_log = {} 
     for p in item["products"]: 
         try: 
             s = p["skus"] 
             price = s["price"]
-            mainurl = s["sUrl"] 
+            url = gome_base % url_pat.findall(s["sUrl"])[0]
+            title = s["name"]
         except KeyError:
-            print s
+            log_with_time("rule error: %s" % task["text"])
             continue
+        dp_pairs.append((url, title))
         if s["stock"] > 0:
             stock = 1
         else:
             stock = 0 
-        if len(p.get("images", [])) > 1: 
-            style_group = []
-            for j in p["images"]:
-                url = j["sUrl"]
-                style_group.append(url)
-                rows.append((url, price, stock)) 
-            style_groups.append(format_style_group(mainurl, style_group))
-        else: 
-            rows.append((mainurl, price, stock)) 
-    result = format_price(rows) 
+        skus.append((url, price, stock)) 
+    result = format_price(skus)
+    for r in result:
+        dps_log[r[1]] = now
     return {
             "spider": result,
-            "group": style_groups
+            #"dp": dp_pairs,
+            "dps_log": dps_log,
             }

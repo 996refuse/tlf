@@ -1,5 +1,5 @@
 #-*-encoding=utf-8-*-
-from spider import split_list
+from spider import split_list_iter
 import random
 import time
 import pdb
@@ -15,5 +15,11 @@ def list_filter(x):
             "url": x
             } 
 
-def stock_task_filter(items):
-    pass
+def stock_filter(items):
+    ret = []
+    for i in items:
+    	ret.append({
+    		"url": i[0],
+    		"price": i[1],
+    	})
+    return ret

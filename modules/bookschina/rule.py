@@ -72,7 +72,11 @@ rule = (
                 "batch": 10,
                 "filter": "bookschina.list_filter",
                 },
-            "rule": "//div[@class='inright']/div[@class='bookContent']",
+            "rule": {
+                "nodes": "//div[@class='inright']/div[@class='bookContent']",
+                "gid": "div[@class='wordContent']/a[@class='titlein']/@href",
+                "price": "div[@class='wordContent']/span",
+            },
             "dst": {
                 "type": "list",
                 "name": "spider_result",

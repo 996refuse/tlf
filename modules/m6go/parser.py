@@ -31,19 +31,19 @@ def pager(task, rule):
 gid_html = "http://www.m6go.com/product_%s.html"
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
         gid = node.attrib["goodsid"]
         price = node.attrib['price'][1:]
-        ostock = node.xpath("div/input[@class='addCarNone']")
+        ostock = node.xpath(rule['ostock'])
         if not gid or not price:
             log_with_time("bad response %r"%task['url'])
             continue
-        if ostock:
-            stock = 0
-        else:
+        if not ostock:
             stock = 1
+        else:
+            stock = 0
         ret.append((gid_html%gid, price, stock))
     fret = format_price(ret)
     return fret

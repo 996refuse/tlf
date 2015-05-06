@@ -10,7 +10,7 @@ rule = (
             "get": {
                 "type": "simple",
                 "method": "get",
-                "parser": "111.cats_parser", 
+                "parser": "111.cats_parser",
                 },
             "dst": {
                 "name": "111_pager",
@@ -36,13 +36,13 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "111_list", 
+                "name": "111_list",
                 },
             "get": {
                 "method": "get",
                 "parser": "111.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
@@ -58,7 +58,7 @@ rule = (
             },
             {
                 "url": "http://www.111.com.cn/list/955306-0-0-0-0-0-0-1.html",
-                "check": "module_test"
+                "check": "111.test_list"
             },
             ]
         },
@@ -72,7 +72,10 @@ rule = (
                 "batch": 30,
                 "filter": "111.list_filter",
                 },
-            "rule": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
+            "rule": {
+                "nodes": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
+                "stock": "div[@class='buyInfo']/button[@class='buy']",
+            },
             "dst": {
                 "type": "list",
                 "name": "111_price",
@@ -81,22 +84,22 @@ rule = (
                 "method": "get",
                 "parser": "111.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
             },
             "test": [
             {
-                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-934.html",
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-21.html",
                 "check": "module_test"
             },
             {
-                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-913.html",
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-23.html",
                 "check": "module_test"
             },
             {
-                "url": "http://www.111.com.cn/list/964106-0-0-0-0-0-0-55.html",
+                "url": "http://www.111.com.cn/list/964106-0-0-0-0-0-0-23.html",
                 "check": "module_test"
             },
             ]
@@ -109,7 +112,7 @@ rule = (
                 "group": True,
                 "type": "list",
                 "name": "111_price",
-                "batch": 30,
+                "batch": 10,
                 "filter": "111.price_filter",
                 },
             "rule": "",
@@ -118,10 +121,11 @@ rule = (
                 "name": "spider_result",
                 },
             "get": {
+                "not200": "trace",
                 "method": "get",
                 "parser": "111.price_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 5,  
                     "interval": 1,
                     "debug": False
                 }

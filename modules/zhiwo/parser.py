@@ -32,20 +32,22 @@ def pager(task, rule):
         ret.append(burl + str(i) + '.html')
     return ret
 
+re_price = re.compile("\d+\.\d+")
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("div/a/@href")
-        price = node.xpath("p/span")
-        stock = node.xpath("p/a/img/@src")
+        gid = node.xpath(rule['gid'])
+        price = node.xpath(rule['price'])
+        stock = node.xpath(rule['stock'])
         if not gid or not price or not stock:
             log_with_time("bad response: %r" % task['url'])
             continue
         gid = burl + gid[0]
-        price = re.search("\d+\.\d+", price[0].text).group()
-        if re.search("add_to_cart", stock[0]):
+        price = re_price.search(price[0].text).group()
+        stock = stock[0]
+        if stock.find("add_to_cart"):
             stock = 1
         else:
             stock = 0

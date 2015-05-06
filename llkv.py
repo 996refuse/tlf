@@ -58,7 +58,7 @@ class Connection:
         total_size = calcsize(total_fmt) 
         self.send_command(pack(total_fmt,
             self.TYPE_GET, fmt_size, key))
-        b = self.sock.recv(total_size)
+        b = self.get_size_n_from_sock(total_size)
         tp, code, value= unpack(total_fmt, b)
         if not b:
             raise socket.error("connection closed") 
@@ -97,7 +97,7 @@ class Connection:
         while True:
             x = self.sock.recv(n) 
             if not x:
-                break
+                raise ValueError("remote closed")
             b.append(x)
             i += len(x)
             if i >= n:
@@ -110,7 +110,7 @@ class Connection:
         fmt_size = calcsize(fmt) 
         self.send_command(pack(self.hdr_fmt + fmt,
             self.TYPE_SET, fmt_size, key, value)) 
-        b = self.sock.recv(fmt_size + self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -129,7 +129,7 @@ class Connection:
             q.append(item[1]) 
         self.send_command(pack(total_fmt, 
             self.TYPE_SET_BULK, fmt_size, *q))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -144,7 +144,7 @@ class Connection:
         total_size = calcsize(total_fmt) 
         self.send_command(pack(total_fmt,
             self.TYPE_DELETE, fmt_size, key))
-        b = self.sock.recv(total_size)
+        b = self.get_size_n_from_sock(total_size)
         tp, code = unpack(self.hdr_fmt, b)
         if not b:
             raise socket.error("connection closed") 
@@ -159,7 +159,7 @@ class Connection:
         total_size = calcsize(total_fmt) 
         self.send_command(pack(total_fmt, 
             self.TYPE_DELETE_BULK, fmt_size, *keys))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -172,7 +172,7 @@ class Connection:
 
     def reload(self):
         self.send_command(pack("II", self.TYPE_RELOAD, 0))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -182,7 +182,7 @@ class Connection:
 
     def hlen(self): 
         self.send_command(pack("II", self.TYPE_HLEN, 0))
-        b = self.sock.recv(self.hdr_size+8) 
+        b = self.get_size_n_from_sock(self.hdr_size+8) 
         tp, code, value= unpack("IIQ", b) 
         if not b:
             raise socket.error("connection closed") 
@@ -195,7 +195,7 @@ class Connection:
 
     def dump(self):
         self.send_command(pack("II", self.TYPE_DUMP, 0))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -205,7 +205,7 @@ class Connection:
 
     def killall(self):
         self.send_command(pack("II", self.TYPE_KILLALL, 0))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 
@@ -214,7 +214,7 @@ class Connection:
 
     def flush(self):
         self.send_command(pack("II", self.TYPE_FLUSH, 0))
-        b = self.sock.recv(self.hdr_size)
+        b = self.get_size_n_from_sock(self.hdr_size)
         if not b:
             raise socket.error("connection closed")
         tp, code = unpack(self.hdr_fmt, b) 

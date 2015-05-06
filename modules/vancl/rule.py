@@ -33,7 +33,12 @@ rule = (
                 "batch": 30,
                 "filter": "vancl.list_filter"
             },
-            "rule": "//div[@id='vanclproducts']/ul/li",
+            "rule": {
+                "nodes": "//div[@id='vanclproducts']/ul/li",
+                "gid": "p/a/@href",
+                "price1": "div/span[@class='Sprice']",
+                "price2": "div/div[1]",
+            },
             "dst": {
                 "type": "list",
                 "name": "vancl_stock",
@@ -73,7 +78,7 @@ rule = (
                 "group": True,
                 "filter": "vancl.stock_filter"
                 },
-            #"rule": "//p[@class='NowHasGoods']",
+            "rule": "//div[@id='goods-viewer']",
             "get": {
                 "method": "get",
                 "parser": "vancl.stock_parser",
@@ -89,6 +94,13 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
+            "test": [
+            {
+                "url": "http://www.s.cn/puma-82561904.html",
+                "price": "233",
+                "check": "module_test_stock"
+            }
+            ]
         }
 )

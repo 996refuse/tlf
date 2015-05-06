@@ -113,6 +113,13 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
+            "test": [
+            {
+                "url": "http://shop.lenovo.com.cn/srv/getginfo.do?plat=4&gcodes=50145&salestype=0",
+                "price": "233",
+                "check": "module_test_stock"
+            }
+            ]
         }
 )

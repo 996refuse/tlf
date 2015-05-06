@@ -93,7 +93,11 @@ rule = (
                 "batch": 30,
                 "filter": "gjw.list_filter",
                 },
-            "rule": "//div[@id='J_ItemList']/div/div",
+            "rule": {
+                "nodes": "//div[@id='J_ItemList']/div/div",
+                "gid": "p/a/@href",
+                "price": "p/em/@title",
+            },
             "dst": {
                 "type": "list",
                 "name": "gjw_stock",
@@ -148,6 +152,23 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
+            "test": [
+            {
+                "item": ['http://www.gjw.com/product/item-id-4539.htm',33],
+                "url": "http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-4539-Quantity-1.htm",
+                "check": "module_test_stock"
+            },
+            {
+                "item": ['http://www.gjw.com/product/item-id-3097.htm',33],
+                "url": "http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-3097-Quantity-1.htm",
+                "check": "module_test_stock"
+            },
+            {
+                "item": ['http://www.gjw.com/product/item-id-4651.htm',33],
+                "url": "http://www.gjw.com/Ajax/Order/OrderAdd-act-AddPro-ID-4651-Quantity-1.htm",
+                "check": "module_test_stock"
+            },
+            ]
         }
 )

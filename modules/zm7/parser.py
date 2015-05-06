@@ -34,19 +34,20 @@ def pager(task, rule):
         ret.append(burl+pad(i))
     return ret
 
+re_price = re.compile("\d+\.\d+")
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("a/@href")
-        price = node.xpath("p/span")
+        gid = node.xpath(rule['gid'])
+        price = node.xpath(rule['price'])
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
             continue
         gid = burl + gid[0]
         price = price[0].text
-        price = re.search("\d+\.\d+", price).group()
+        price = re_price.search(price).group()
         ret.append((gid, price))
     return ret
 

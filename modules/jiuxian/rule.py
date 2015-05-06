@@ -72,7 +72,11 @@ rule = (
                 "batch": 30,
                 "filter": "jiuxian.list_filter",
                 },
-            "rule": "//div[@class='proListSearch']/ul/li",
+            "rule": {
+                "nodes": "//div[@class='proListSearch']/ul/li",
+                "gid": "div/a[@class='proName']/@href",
+                "ostock": "div/a[contains(@class, 'lack')]",
+            },
             "dst": {
                 "type": "list",
                 "name": "jiuxian_price",
@@ -89,7 +93,7 @@ rule = (
             "test": [
             {
                 "url": "http://list.jiuxian.com/2-0-0-0-0-0-0-0-0-0-0-0.htm?pageNum=23&",
-                "check": "module_test"
+                "check": "jiuxian.test_list"
             },
             {
                 "url": "http://list.jiuxian.com/2-0-0-0-0-0-0-0-0-0-0-0.htm?pageNum=11&",

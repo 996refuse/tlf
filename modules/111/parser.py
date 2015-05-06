@@ -33,11 +33,12 @@ def pager(task, rule):
 
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
+    #pdb.set_trace()
     for node in nodes:
         gid = node.attrib['itemid']
-        stock = node.xpath("div[@class='buyInfo']/button[@class='buy']")
+        stock = node.xpath(rule['stock'])
         if not gid:
             log_with_time("bad response: %r"%task['url'])
             continue
@@ -47,6 +48,9 @@ def list_parser(task, rule):
             stock = 0
         ret.append((gid, stock))
     return ret
+
+def test_list(res):
+    assert(res[0][1])
 
 def price_parser(task, rule):
     try:

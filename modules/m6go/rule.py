@@ -58,7 +58,10 @@ rule = (
                 "batch": 30,
                 "filter": "m6go.list_filter",
                 },
-            "rule": "//ul/li[@goodsid]",
+            "rule": {
+                "nodes": "//ul/li[@goodsid]",
+                "ostock": "div/input[@class='addCarNone']",
+            },
             "dst": {
                 "type": "list",
                 "name": "spider_result",
@@ -71,6 +74,12 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://www.m6go.com/huazhuangpin/0",
+                "check": "module_test_stock"
             }
+            ]
         },
 )

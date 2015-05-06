@@ -72,7 +72,11 @@ rule = (
                 "batch": 30,
                 "filter": "d1.list_filter",
                 },
-            "rule": "//ul[@class='m_t10']/li/div",
+            "rule": {
+                "nodes": "//ul[@class='m_t10']/li/div",
+                "gid": "div[@class='g_title']/span/a/@href",
+                "price": "div[@class='g_price']/span/font",
+            },
             "dst": {
                 "type": "list",
                 "name": "d1_stock1",
@@ -109,11 +113,17 @@ rule = (
                 "type": "list",
                 "name": "d1_stock1",
                 "batch": 30,
+            },
+            "multidst": {
+                "next": {
+                    "type": "list",
+                    "name": "d1_stock2",
                 },
-            "dst": {
-                "type": "list",
-                "name": "d1_stock2",
+                "result": {
+                    "type": "list",
+                    "name": "spider_result"
                 },
+            },
             "get": {
                 "async": True,
                 "method": "post",

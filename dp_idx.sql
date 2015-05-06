@@ -18,7 +18,8 @@ create table data_file (
     id int not null auto_increment primary key,
     data_file char(40) not null,
     site_id int not null,
-    compress tinyint not null,
+    gid tinyint default 0,
+    compress tinyint not null, 
     status tinyint not null,
     update_time datetime not null,
     key query (site_id, compress, status, update_time, data_file)

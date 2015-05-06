@@ -1,5 +1,4 @@
-#-*-encoding=utf-8-*-
-
+#-*-encoding=utf-8-*- 
 
 rule = (
         {
@@ -39,15 +38,12 @@ rule = (
                 "method": "post", 
                 "randua": True, 
                 "args": {
-                    "limit": 10,
-                    "interval": 1, 
-                    "debug": False,
-                    "timeout": 10,
-                    "copy_keys": ("old_url", ),
+                    "limit": 10, 
+                    "copy_keys": ("old_url", ), 
                     }, 
-                "parser": "gome.pager"
-                },
+                "parser": "gome.pager", 
             },
+        },
         {
             "name": "list",
             "type": "fetch",
@@ -57,33 +53,63 @@ rule = (
                 "name": "gome_page",
                 "batch": 30, 
                 }, 
-            "get": {
-                "async": True,
+            "get": { 
                 "method": "post", 
                 "not200": "log",
                 "randua": True,
                 "args": {
-                    "limit": 30,
-                    "interval": 1, 
-                    "debug": False,
-                    "timeout": 10, 
-                    "copy_keys": ("old_url", ),
+                    "limit": 30, 
+                    "copy_keys": ("old_url", ), 
                     },
                 "parser": "gome.list_parser", 
                 }, 
+            "test": (
+                {
+                    "url": "http://www.gome.com.cn/category/cat21455614.html",
+                    "check": "gome.test_list",
+                    },
+                ),
             "multidst": {
                 "spider": {
                     "name": "spider_result",
                     "type": "list", 
-                    "log": False,
                     }, 
-                "group": {
-                    "name": "group_28",
+                "dp": {
+                    "name": "gome_dp",
+                    "type": "list",
+                    "node": "dp_pairs", 
+                    },
+                "dps_log": {
+                    "node": "dps_log",
                     "type": "hash",
-                    "node": "group",
-                    "pack": False,
-                    "log": False,
+                    "name": "gome_dps_log",
                     }
                 }, 
-            } 
+        }, 
+        {
+            "name": "dp",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "name": "gome_dp",
+                "type": "list", 
+                "batch": 30,
+                "qtype": "dp",
+                }, 
+            "get": { 
+                "method": "get", 
+                "not200": "log",
+                "randua": True,
+                "args": {
+                    "limit": 30, 
+                }, 
+            "not200": "log",
+            }, 
+            "dst": { 
+                "node": "default",
+                "qtype": "dp",
+                "type": "",
+                "name": "gome_dp"
+                },
+        }
         )

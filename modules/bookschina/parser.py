@@ -39,21 +39,20 @@ def pager(task, rule):
     return ret
 
 listburl = "http://www.bookschina.com"
+re_price = re.compile("\d+\.\d+")
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("div[@class='wordContent']/a[@class='titlein']/@href")
-        price = node.xpath("div[@class='wordContent']/span")
+        gid = node.xpath(rule['gid'])
+        price = node.xpath(rule['price'])
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
             continue
         gid = gid[0]
         price = price[0].text
-        price = re.search("\d+\.\d+", price).group()
+        price = re_price.search(price).group()
         ret.append((listburl+gid, price, 1))
-    pdb.set_trace()
     fret = format_price(ret)
-    pdb.set_trace()
     return fret

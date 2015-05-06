@@ -1,5 +1,5 @@
 #-*-encoding=utf-8-*-
-from spider import split_list
+from spider import split_list_iter
 import random
 import time
 import pdb
@@ -20,6 +20,6 @@ def stock_task_filter(items):
     for u,p in items:
     	ret.append({
     		"url": u,
-    		"info": p
+    		"price": p
     		})
     return ret

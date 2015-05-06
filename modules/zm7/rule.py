@@ -52,7 +52,11 @@ rule = (
                 "batch": 30,
                 "filter": "zm7.list_filter",
                 },
-            "rule": "//div[@class='goods_table_list']/ul/li/div",
+            "rule": {
+                "nodes": "//div[@class='goods_table_list']/ul/li/div",
+                "gid": "a/@href",
+                "price": "p/span",
+            },
             "dst": {
                 "type": "list",
                 "name": "zm7_stock",
@@ -83,7 +87,7 @@ rule = (
                 "method": "get",
                 "parser": "zm7.stock_parser",
                 "args": {
-                    "limit": 1,
+                    "limit": 5,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 
@@ -94,6 +98,13 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
+            "test": [
+            {
+                "url": "http://www.zm7.cn/goods-8932.html",
+                "price": "233",
+                "check": "module_test_stock"
+            }
+            ]
         }
 )

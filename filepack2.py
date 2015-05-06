@@ -11,7 +11,7 @@ import io
 
 INSERT_IDX = "insert into idx (site_id, url_crc, offset, size, update_time, data_file, url) values (%s, %s, %s, %s, '%s', '%s', '%s')"
 
-INSERT_DATA_FILE = "insert into data_file (site_id, data_file,  status, compress, update_time) values(%s, '%s', %s, %s, '%s')" 
+INSERT_DATA_FILE = "insert into data_file (site_id, data_file,  status, compress, gid, update_time) values(%s, '%s', %s, %s, 0, '%s')" 
 
 class FilePack: 
     def __init__(self, db, site_id, limit=1000, datadir="/tmp/"):

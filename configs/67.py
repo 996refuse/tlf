@@ -104,7 +104,7 @@ SITES = {
         "scn": {
             "site_id": 14,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
+            "workers": ("pager", "list", "stock"),
             "ignore": False,
             },
         "mi": {
@@ -181,6 +181,30 @@ SITES = {
             },
         "lenovo": {
             "site_id": 135,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "dangdang": {
+            "site_id": 136,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "yixun": {
+            "site_id": 137,
+            "reload": 1,
+            "workers": ("channel", "catsentry", "cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "womai": {
+            "site_id": 138,
+            "reload": 1,
+            "workers": ("pager", "list", "stock"),
+            "ignore": False,
+            },
+        "yougou": {
+            "site_id": 139,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
             "ignore": False,

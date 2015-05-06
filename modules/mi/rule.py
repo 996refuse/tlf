@@ -3,7 +3,7 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-            "repeat": 20000,
+            "repeat": 2000,
             "from": {
                 "http://list.mi.com/accessories/ajaxView/0-0-0-0-0-0": ""
             },
@@ -35,13 +35,13 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "mi_list", 
+                "name": "mi_list",
                 },
             "get": {
                 "method": "get",
                 "parser": "mi.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
@@ -63,7 +63,7 @@ rule = (
         },
         {
             "type": "fetch",
-            "name": "list", 
+            "name": "list",
             "wait": 4,
             "src": {
                 "type": "list",
@@ -72,18 +72,29 @@ rule = (
                 "filter": "mi.list_filter",
                 },
             "rule": "",
-            "dst": {
-                "type": "list",
-                "name": "spider_result", 
+            "multidst": {
+                "spider": {
+                    "type": "list",
+                    "name": "spider_result",
+                    },
+                "dp": {
+                    "type": "list",
+                    "name": "mi_dp"
+                    },
                 },
             "get": {
                 "method": "get",
                 "parser": "mi.list_parser",
                 "args": {
-                    "limit": 30,    
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://list.mi.com/accessories/ajaxView/0-0-0-0-1-0",
+                "check": "module_test_stock"
             }
-        }
+            ]
 )

@@ -52,7 +52,12 @@ rule = (
                 "batch": 30,
                 "filter": "zhiwo.list_filter",
                 },
-            "rule": "//ul[@id='bfd_show_fu']/li",
+            "rule": {
+                "nodes": "//ul[@id='bfd_show_fu']/li",
+                "gid": "div/a/@href",
+                "price": "p/span",
+                "stock": "p/a/img/@src",
+            },
             "dst": {
                 "type": "list",
                 "name": "spider_result",
@@ -65,6 +70,12 @@ rule = (
                     "interval": 1,
                     "debug": False
                 }
+            },
+            "test": [
+            {
+                "url": "http://www.zhiwo.com/products/0-159-0-10/28.html",
+                "check": "module_test_stock"
             }
+            ]
         },
 )

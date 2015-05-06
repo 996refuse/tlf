@@ -40,11 +40,11 @@ def pager(task, rule):
 
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("p/a/@href")
-        price = node.xpath("p/em/@title")
+        gid = node.xpath(rule['gid'])
+        price = node.xpath(rule['price'])
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
             continue
@@ -69,7 +69,5 @@ def stock_parser(task, rule):
         stock = 0
 
     ret.append((info[0], info[1], stock))
-
     fret = format_price(ret)
-    
     return fret

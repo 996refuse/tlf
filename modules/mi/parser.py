@@ -33,29 +33,33 @@ def pager(task, rule):
 
 def list_parser(task, rule):
     ret = []
+
+    dps = []
     rr = re.search("items\(", task['text'])
     if not rr:
         log_with_time("bad response: %r" % task['url'])
         return ret
 
-    j = json.loads(task['text'][rr.end():-1])
+    j = json.loads(task['text'][ritems.end():-1])
 
     if not 'data' in j:
         log_with_time("bad response: %r" % task['url'])
         return ret
 
     for i in j['data']['product']:
-        stock = i['is_cos']
-        if stock:
-            stock = 0
-        else:
+        if not i['is_cos']:
             stock = 1
+        else:
+            stock = 0
         price = i['price_min']
         if not price:
             log_with_time("bad response: %r %r" % (task['url'], i['commodity_id']))
             continue
-
+        dps.append((i["url"], ""))
         ret.append((i['url'], price, stock))
 
     fret = format_price(ret)
-    return fret
+    return {
+            "spider": fret,
+            "dp": dps
+            }

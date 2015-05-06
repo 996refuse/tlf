@@ -14,20 +14,21 @@ def cats_parser(url, content, rule):
     return [catsburl+i for i in t.xpath(rule) ]
 
 pagerburl = 'http://www.360kxr.com/category/'
+re_cat = re.compile("(?<=category/)[0-9]+(?=-)")
 def pager(task, rule):
     bpath = '-1-4-2-2-0,999999-all-9-all-all-all-'
-    rr = re.search("(?<=category/)[0-9]+(?=-)", task['url'])
+    cat = re_cat.search(task['url'])
 
     t = etree.HTML(task['text'])
     pagenum = t.xpath(rule)
 
     ret = []
 
-    if not rr:
+    if not cat:
         log_with_time("bad response %r" % task['url'])
         return ret
 
-    cat = rr.group()
+    cat = cat.group()
 
     if not pagenum:
         pagenum = 1
@@ -41,11 +42,11 @@ def pager(task, rule):
 listburl = "http://www.360kxr.com"
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("dl/div/dt/a/@href")
-        stock = node.xpath("dl/div/dd/div/p[@class='cart']")
+        gid = node.xpath(rule['gid'])
+        stock = node.xpath(rule['stock'])
         if not gid:
             log_with_time("bad response %r"%task['url'])
             continue
@@ -55,6 +56,9 @@ def list_parser(task, rule):
             stock = 0
         ret.append((listburl+gid[0], stock))
     return ret
+
+def test_list(res):
+    assert(res[0][1])
 
 def price_parser(task, rule):
     t = etree.HTML(task["text"])

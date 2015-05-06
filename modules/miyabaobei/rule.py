@@ -4,7 +4,7 @@ rule = (
             "type": "fetch",
             "repeat": 1200,
             "from": {
-                "http://www.miyabaobei.com": ["//div[contains(@class, 'ccon')]/a/@href"]},
+                "http://www.miyabaobei.com/promotion/main.html": ["//div[contains(@class, 'ccon')]/a/@href"]},
             "get": {
                 "type": "simple",
                 "method": "get",

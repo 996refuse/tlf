@@ -31,7 +31,7 @@ site_template=  {
      25: 'm.suning.com/product/@.html;/snupgbpv_10052_10051_@_;product.suning.com/0[0-9]+/@.html;product.suning.com/@-;product.suning.com/@.html;_-[0-9]+_@_;/sprd_10052_[0-9]+_@__.html;productId=@&;productId=@;_10052_[0-9]+_@_',
      26: 'product/@.html',
      27: '/product-@.html;ProductInfo.aspx\\?id=@&;ProductInfo.aspx\\?id=@;ProductInfo.aspx\\?g@',
-     28: '/product-@-1-0.html;/product-@-0-0.html;/product/@.html;product/@-',
+     28: 'item.gome.com.cn/@.html;/product-@-1-0.html;/product-@-0-0.html;/product/@.html;product/@-',
      29: 'product-[0-9]+-@.htm',
      30: '/d-@.html',
      31: 's.yhd.com/item/[0-9]+_@?;s.yhd.com/item/[0-9]+_@/;s.yhd.com/item/[0-9]+_@;item/lp/[0-9]+_@?;item/lp/[0-9]+_@/;item/lp/[0-9]+_@;/item/@?;/item/@_;/item/@&;/item/@;productID=@&;productID=@;product/@_;product/@?;product/@;/mw/productsquid/@/',
@@ -131,7 +131,7 @@ site_template=  {
      132: '/item/@-',
      133: '&id=@;&Id@',
      134: '/product/@.html;/item-[^-]+-@,;/item-@,;/item-[^-]+-@&;/item-[^-]+-@?;/item-[^-]+-@;/item-@&;/item-@?;/item-@',
-     135: 'product/@.html',
+     135: 'product-@.html',
      136: '/product/@/;/product/@?;/product/@', 
      138: '/goods-@.html',
      139: 'miqi.cn/[^/]+/p@.htm;id=@',
@@ -194,7 +194,11 @@ def gen_urlcrc(site_id, url):
     return pid.replace("&", "")
 
 
+sp_site = set((25, 1025, 2025, 3025, 31, 1031, 2031, 3031, 4031)) 
+
 def get_urlcrc(site_id, url):
+    if site_id in sp_site:
+        return url
     pid = gen_urlcrc(site_id, url)
     if site_id in (1, 7, 66):
         pid = pid.upper() 

@@ -17,18 +17,18 @@ def pager_parser(url, content, rule):
 murl = 'http://m.vancl.com/style/index/'
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
-    nodes = t.xpath(rule)
+    nodes = t.xpath(rule['nodes'])
     ret = []
     for node in nodes:
-        gid = node.xpath("p/a/@href")
-        price = node.xpath("div/span[@class='Sprice']")
+        gid = node.xpath(rule['gid'])
+        price = node.xpath(rule['price1'])
         if not gid or not price:
             log_with_time("bad response %r"%task['url'])
             return ret
         gid = re.search("\d+", gid[0]).group()
         price = re.search("\d+", price[0].text)
         if not price:
-            price = node.xpath("div/div[1]")
+            price = node.xpath(rule['price2'])
             if not price:
                 log_with_time("bad response %r"%task['url'])
                 continue
@@ -40,7 +40,9 @@ def list_parser(task, rule):
     return ret
 
 def stock_parser(task, rule):
-    if '售罄' in task['text']:
+    t = etree.HTML(task['text'])
+    s = etree.tostring(t)
+    if '售罄' in s:
         stock = 0
     else:
         stock = 1

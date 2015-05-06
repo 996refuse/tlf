@@ -31,7 +31,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "360kxr_page",
-                "batch": 30,
+                "batch": 10,
                 "filter": "360kxr.pager_filter"
                 },
             "dst": {
@@ -42,7 +42,7 @@ rule = (
                 "method": "get",
                 "parser": "360kxr.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 4,    
                     "interval": 1,
                     "debug": False
                 }
@@ -69,10 +69,14 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "360kxr_list",
-                "batch": 30,
+                "batch": 10,
                 "filter": "360kxr.list_filter"
             },
-            "rule": "//div[@class='hunt-list-box']/ul[@class='ul-list0']/li",
+            "rule": {
+                "nodes": "//div[@class='hunt-list-box']/ul[@class='ul-list0']/li",
+                "gid": "dl/div/dt/a/@href",
+                "stock": "dl/div/dd/div/p[@class='cart']",
+            },
             "dst": {
                 "type": "list",
                 "name": "360kxr_price",
@@ -82,7 +86,7 @@ rule = (
                 "method": "get",
                 "parser": "360kxr.list_parser",
                 "args": {
-                    "limit": 10,
+                    "limit": 4,
                     "interval": 1,
                     "debug": False
                 }
@@ -98,7 +102,7 @@ rule = (
             },
             {
                 "url": "http://www.360kxr.com/category/328-1-4-2-2-0,999999-all-9-all-all-all-9.html",
-                "check": "module_test"
+                "check": "360kxr.test_list"
             },
             ]
         },
@@ -109,7 +113,7 @@ rule = (
             "src": {
                 "name": "360kxr_price",
                 "type": "list",
-                "batch": 30,
+                "batch": 10,
                 "group": True,
                 "filter": "360kxr.price_filter"
                 },
@@ -120,7 +124,7 @@ rule = (
                 "method": "get",
                 "parser": "360kxr.price_parser",
                 "args": { 
-                    "limit": 30,
+                    "limit": 4,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 

@@ -3,30 +3,19 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
-            "rule": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                "http://www.s.cn/list": ""
-            },
-            "src": {
-                "type": "list",
-                "name": "scn_pager",
-                "batch": 30,
-                "filter": "scn.pager_filter"
+                "http://www.s.cn/list": "//div[@class='clearfix']/table/tr/td[@class='pagernum']/a[last()]",
             },
             "dst": {
                 "type": "list",
                 "name": "scn_list", 
                 },
             "get": {
+                "type": "simple",
                 "method": "get",
                 "parser": "scn.pager",
-                "args": {
-                    "limit": 30,    
-                    "interval": 1,
-                    "debug": False
-                }
             },
             "test": [
             {
@@ -47,7 +36,9 @@ rule = (
                 },
             "rule": {
                 "node": "//div[@class='product_list']/dl",
-                },
+                "gidurl": "dd/a/@href",
+                "price": "dd/a/ul/li[@class='r1']/i[@class='price']",
+            },
             "dst": {
                 "type": "list",
                 "name": "scn_stock", 
@@ -103,6 +94,13 @@ rule = (
             "dst": {
                 "name": "spider_result",
                 "type": "list",
-                }
+            },
+            "test": [
+            {
+                "url": "http://www.s.cn/kappa-K0422TD04-990.html",
+                "price": "233",
+                "check": "module_test_stock"
+            }
+            ]
         }
 )

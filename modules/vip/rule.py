@@ -24,17 +24,21 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "vip_list",
-                "batch": 1, 
+                "batch": 60, 
                 "filter": "vip.task_filter" 
                 },
             "dst": {
                 "type": "list",
                 "name": "vip_page", 
                 },
-            "get": {
-                "async": True,
+            "get": { 
                 "method": "get", 
-                "parser": "vip.page_parser"
+                "parser": "vip.page_parser",
+                "args": {
+                        "limit": 20,  
+                        "interval": 1,
+                        "debug": False, 
+                    } 
                 }
             },
         {
@@ -49,7 +53,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "vip_page",
-                "batch": 1, 
+                "batch": 60, 
                 },
             "dst": {
                 "type": "list",

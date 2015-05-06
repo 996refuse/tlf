@@ -4,6 +4,7 @@ from spider import format_price
 import re
 import json
 import pdb 
+import traceback
 
 
 base = "http://category.vip.com/search-1-0-1.html?%s" 
@@ -34,7 +35,11 @@ def meizhuang_cats_parser(url, content, rule):
 
 
 def page_parser(task, rule): 
-    t = etree.HTML(task["text"])
+    try:
+        t = etree.HTML(task["text"])
+    except:
+        traceback.print_exc()
+        return 
     ret = t.xpath(rule) 
     total = re.findall("/([0-9]+)", "".join(ret)) 
     if not total:
@@ -64,7 +69,11 @@ def list_parser(task, rule):
         link = item_base % item["id"]
         price = item["sell_price"] 
         ret.append((link, price, 1)) 
-    t = etree.HTML(task["text"])
+    try:
+        t = etree.HTML(task["text"])
+    except:
+        traceback.print_exc()
+        return
     nodes = t.xpath(rule["node"])
     for node in nodes:
         link = node.xpath(rule["link"])

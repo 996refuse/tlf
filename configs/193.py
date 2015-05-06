@@ -11,7 +11,17 @@ CLIENT = {
                 "host": "192.168.1.191",
                 "port": 6379,
                 "db": 0,
-                }
+                },
+            "dps_log": {
+                "host": "192.168.1.192",
+                "port": 6379,
+                "db": 0
+                }, 
+            "diff_dps": {
+                "host": "192.168.1.193",
+                "port": 6380,
+                "db": 0
+            }
             }, 
         "mysql": {
             "host": "192.168.1.168",
@@ -35,11 +45,11 @@ CLIENT = {
             "passwd": "MiniShop!@#"
             },
         "llkv_list": {
-            "host": "192.168.1.191",
+            "host": "192.168.1.194",
             "port": 8000,
             },
         "llkv_dp": {
-            "host": "192.168.1.191",
+            "host": "192.168.1.194",
             "port": 8001 
             },
         "server_id": 170,
@@ -47,9 +57,24 @@ CLIENT = {
 
 
 SITES = { 
+        "jd": {
+            "site_id": 3,
+            "workers": ("list", "styles", "offshelf", "dp", "price", "stock"),
+            "ignore": False
+            }, 
+        "jd_book": {
+            "site_id": 3,
+            "workers": ("list", ),
+            "ignore": False
+            }, 
+        "gome": {
+            "site_id": 28,
+            "workers": ("dp", ), 
+            "ignore": False
+            }, 
         "suning.nanjing": {
             "site_id": 25,
-            "workers": ("pager", "list", "price"),
+            "workers": ("pager", "list", "price", "dp"),
             "ignore": False,
             },
         "suning.beijing": {
