@@ -10,7 +10,7 @@ rule = (
             "get": {
                 "type": "simple",
                 "method": "get",
-                "parser": "d1.cats_parser", 
+                "parser": "d1.cats_parser",
                 },
             "dst": {
                 "name": "d1_pager",
@@ -36,13 +36,13 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "d1_list", 
+                "name": "d1_list",
                 },
             "get": {
                 "method": "get",
                 "parser": "d1.pager",
                 "args": {
-                    "limit": 30,    
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
@@ -85,7 +85,7 @@ rule = (
                 "method": "get",
                 "parser": "d1.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
@@ -117,9 +117,11 @@ rule = (
             "multidst": {
                 "next": {
                     "type": "list",
+                    "node": "d1_stock2",
                     "name": "d1_stock2",
                 },
                 "result": {
+                    "node": "spider_result",
                     "type": "list",
                     "name": "spider_result"
                 },
@@ -129,7 +131,7 @@ rule = (
                 "method": "post",
                 "parser": "d1.stock1_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
@@ -154,7 +156,7 @@ rule = (
                 "method": "get",
                 "parser": "d1.stock2_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
