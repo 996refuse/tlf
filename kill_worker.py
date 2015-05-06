@@ -15,6 +15,9 @@ if __name__ == "__main__":
         try:
             line = open(os.path.join(base, i, "cmdline")).read()
         except:
+            continue 
+        comm = open(os.path.join(base, i, "comm")).read() 
+        if "python" not in comm: 
             continue
         if "kill_worker" in line:
             continue
