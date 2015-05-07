@@ -18,14 +18,15 @@ def pager(task, rule):
     burl = task['url'][:-6]
     t = etree.HTML(task['text'])
 
-    pagenum = t.xpath(rule)
+    try:
+        #pdb.set_trace()
+        pagenum = ''.join(t.xpath(rule))
+        pagenum = re.search("\d+", pagenum).group()
+        pagenum = int(pagenum)
+    except:
+        pagenum = 1
 
     ret = []
-
-    if not pagenum:
-        pagenum = 1
-    else:
-        pagenum = int(pagenum[0])
 
     for i in range(1, pagenum+1):
         ret.append(burl + str(i) + '.html')
@@ -34,7 +35,8 @@ def pager(task, rule):
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule['nodes'])
-    ret = []
+    prices = []
+    items = []
     #pdb.set_trace()
     for node in nodes:
         gid = node.attrib['itemid']
@@ -42,15 +44,28 @@ def list_parser(task, rule):
         if not gid:
             log_with_time("bad response: %r"%task['url'])
             continue
-        if stock:
-            stock = 1
+        if not stock:
+            items.append(gid)
         else:
-            stock = 0
-        ret.append((gid, stock))
-    return ret
+            if stock[0].attrib.get('class') != 'buy':
+                stock = 0
+            else:
+                stock = 1
+            prices.append((gid, stock))
+    return {"prices": prices, "items": items}
 
 def test_list(res):
     assert(res[0][1])
+
+def item_parser(task, rule):
+    try:
+        t = etree.HTML(task['text'])
+        btn = t.xpath(rule)[0]
+        stock = 0 if btn.attrib.get('disabled') else 1
+    except:
+        log_with_time("bad response: %s"%task['url'])
+        return
+    return [(task['gid'], stock)]
 
 def price_parser(task, rule):
     try:

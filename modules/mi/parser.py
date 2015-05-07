@@ -23,7 +23,7 @@ def pager(task, rule):
     if not 'data' in j:
         log_with_time("bad response: %r" % task['url'])
         return ret
-    
+
     pagenum = int(j['data']['total_pages'])
 
     for i in range(1, pagenum+1):
@@ -40,7 +40,7 @@ def list_parser(task, rule):
         log_with_time("bad response: %r" % task['url'])
         return ret
 
-    j = json.loads(task['text'][ritems.end():-1])
+    j = json.loads(task['text'][rr.end():-1])
 
     if not 'data' in j:
         log_with_time("bad response: %r" % task['url'])
@@ -61,5 +61,5 @@ def list_parser(task, rule):
     fret = format_price(ret)
     return {
             "spider": fret,
-            "dp": dps
+            #"dp": dps
             }

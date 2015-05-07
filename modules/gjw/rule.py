@@ -133,7 +133,7 @@ rule = (
             "src": {
                 "name": "gjw_stock",
                 "type": "list",
-                "batch": 40,
+                "batch": 20,
                 "group": True,
                 "filter": "gjw.stock_filter"
                 },
@@ -141,7 +141,7 @@ rule = (
                 "method": "get",
                 "parser": "gjw.stock_parser",
                 "args": { 
-                    "limit": 1,
+                    "limit": 15,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10,

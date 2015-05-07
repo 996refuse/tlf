@@ -17,7 +17,6 @@ def list_filter(x):
             }
 
 def stock2_filter(items):
-	#pdb.set_trace()
 	if not items:
 		return []
 	ret = []

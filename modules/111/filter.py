@@ -16,6 +16,13 @@ def list_filter(x):
             "url": x
             }
 
+itemurl = "http://www.111.com.cn/product/%s.html"
+def item_filter(items):
+    ret = []
+    for g in items:
+        ret.append({"url": itemurl%g, "gid":g})
+    return ret
+
 gprice_url = 'http://www.111.com.cn/interfaces/item/itemPrice.action?itemids=%s'
 def price_filter(items):
     ret = []

@@ -27,7 +27,8 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "wait": 4,
-            "rule": "//div[@class='turnPageBottom']/a[@id='page_']/@pageno",
+            #"rule": "//div[@class='turnPageBottom']/a[@id='page_']/@pageno",
+            "rule": "//li[@class='pageNum']/text()",
             "src": {
                 "type": "list",
                 "name": "111_pager",
@@ -74,12 +75,18 @@ rule = (
                 },
             "rule": {
                 "nodes": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
-                "stock": "div[@class='buyInfo']/button[@class='buy']",
+                "stock": "div[@class='buyInfo']/button[contains(@class, 'buy')]",
             },
-            "dst": {
-                "type": "list",
-                "name": "111_price",
+            "multidst": {
+                "prices": {
+                    "type": "list",
+                    "name": "111_price",
                 },
+                "items": {
+                    "type": "list",
+                    "name": "111_item",
+                }
+            },
             "get": {
                 "method": "get",
                 "parser": "111.list_parser",
@@ -91,7 +98,7 @@ rule = (
             },
             "test": [
             {
-                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-21.html",
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-59.html",
                 "check": "module_test"
             },
             {
@@ -106,13 +113,48 @@ rule = (
         },
         {
             "type": "fetch",
+            "name": "item",
+            "wait": 4,
+            "src": {
+                "group": True,
+                "type": "list",
+                "name": "111_item",
+                "batch": 10,
+                "filter": "111.item_filter",
+                },
+            "rule": "//input[@id='seriesCartButton']",
+            "dst": {
+                "type": "list",
+                "name": "111_price",
+                },
+            "get": {
+                "not200": "trace",
+                "method": "get",
+                "parser": "111.item_parser",
+                "args": {
+                    "limit": 5,  
+                    "interval": 1,
+                    "debug": False
+                }
+            },
+            "test": [
+            {
+                "url": "http://www.111.com.cn/interfaces/item/itemPrice.action?itemids=50066756",
+                "gid": "http://www.111.com.cn/product/50066756.html",
+                "stock": 1,
+                "check": "module_test"
+            }
+            ]
+        },
+        {
+            "type": "fetch",
             "name": "price",
             "wait": 4,
             "src": {
                 "group": True,
                 "type": "list",
                 "name": "111_price",
-                "batch": 10,
+                "batch": 20,
                 "filter": "111.price_filter",
                 },
             "rule": "",
@@ -125,10 +167,18 @@ rule = (
                 "method": "get",
                 "parser": "111.price_parser",
                 "args": {
-                    "limit": 5,  
+                    "limit": 10,  
                     "interval": 1,
                     "debug": False
                 }
             },
+            "test": [
+            {
+                "url": "http://www.111.com.cn/interfaces/item/itemPrice.action?itemids=50066756",
+                "gid": "http://www.111.com.cn/product/50066756.html",
+                "stock": 1,
+                "check": "module_test"
+            }
+            ]
         },
 )

@@ -73,7 +73,7 @@ rule = (
                 "filter": "360kxr.list_filter"
             },
             "rule": {
-                "nodes": "//div[@class='hunt-list-box']/ul[@class='ul-list0']/li",
+                "nodes": "//div[@id='search_table']//ul/li",
                 "gid": "dl/div/dt/a/@href",
                 "stock": "dl/div/dd/div/p[@class='cart']",
             },
@@ -118,7 +118,7 @@ rule = (
                 "filter": "360kxr.price_filter"
                 },
             "rule": {
-                "kxrprice": "//div[@class='right-intro']/div/div/div/div/span | //ul[@class='introduc']/li/span/i/span",
+                "kxrprice": "//span[@id='pro_mall_price']",
             },
             "get": {
                 "method": "get",
@@ -136,5 +136,12 @@ rule = (
                 "name": "spider_result",
                 "type": "list",
             },
+            "test": [
+            {
+                "url": "http://www.360kxr.com/product/8726.html",
+                "stock": 1,
+                "check": "module_test"
+            }
+            ]
         }
 )

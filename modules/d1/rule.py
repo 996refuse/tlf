@@ -115,13 +115,11 @@ rule = (
                 "batch": 30,
             },
             "multidst": {
-                "next": {
+                "stock2": {
                     "type": "list",
-                    "node": "d1_stock2",
                     "name": "d1_stock2",
                 },
-                "result": {
-                    "node": "spider_result",
+                "spider": {
                     "type": "list",
                     "name": "spider_result"
                 },

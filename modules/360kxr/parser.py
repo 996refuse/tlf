@@ -55,6 +55,7 @@ def list_parser(task, rule):
         else:
             stock = 0
         ret.append((listburl+gid[0], stock))
+    pdb.set_trace()
     return ret
 
 def test_list(res):

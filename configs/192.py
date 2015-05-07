@@ -96,7 +96,25 @@ SITES = {
         "111": {
             "site_id": 94,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "price"),
+            "workers": ("cats", "pager", "list", "item", "price"),
             "ignore": False,
         },
+        "360kxr": {
+            "site_id": 50,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "price"),
+            "ignore": False,
+            },
+        "bookschina": {
+            "site_id": 61,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "bookuu": {
+            "site_id": 110,
+            "reload": 1,
+            "workers": ("cats", "list"),
+            "ignore": False,
+            },
 }

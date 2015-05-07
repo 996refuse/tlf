@@ -69,20 +69,20 @@ def stock1_parser(task, rule):
     message = j['message']
 
     url = ""
-    ret = {"result":[], 'next':[]}
+    ret = {"spider":[], 'stock2':[]}
 
     if code == 3 and message:
         try:
-            skuid = re.search("\d+", message.group()).group()
+            skuid = re.search("\d+", message).group()
             url = surl2(task['gid'], skuid)
         except:
             return []
     if url == "":
-        print(task['text'])
+        #print(task['text'])
         stock = 1 if j.get('totalAmount') else 0
-        ret['result'] = format_price([(itemurl+task['gid'], task['price'], stock)])
+        ret['spider'] = format_price([(itemurl+task['gid'], task['price'], stock)])
     else:
-        ret['next'] = [(url, task['gid'], task['price'])]
+        ret['stock2'] = [(url, task['gid'], task['price'])]
 
     return ret
 

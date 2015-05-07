@@ -19,6 +19,7 @@ def cats_parser(url, content, rule):
         ret += [node + str(i) + '.html' for i in range(1, 51)]
     return ret
 
+itemurl = 'http://detail.bookuu.com/%s.html'
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule)

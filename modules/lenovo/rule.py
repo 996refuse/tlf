@@ -94,7 +94,7 @@ rule = (
             "src": {
                 "name": "lenovo_stock",
                 "type": "list",
-                "batch": 10,
+                "batch": 20,
                 "group": True,
                 "filter": "lenovo.stock_filter"
                 },
@@ -102,7 +102,7 @@ rule = (
                 "method": "get",
                 "parser": "lenovo.stock_parser",
                 "args": { 
-                    "limit": 5,
+                    "limit": 15,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 

@@ -77,10 +77,10 @@ rule = (
                     "type": "list",
                     "name": "spider_result",
                     },
-                "dp": {
-                    "type": "list",
-                    "name": "mi_dp"
-                    },
+                #"dp": {
+                #    "type": "list",
+                #    "name": "mi_dp"
+                #    },
                 },
             "get": {
                 "method": "get",
@@ -97,4 +97,5 @@ rule = (
                 "check": "module_test_stock"
             }
             ]
+        }
 )
