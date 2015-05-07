@@ -1,0 +1,48 @@
+<html>
+<head>
+<title>页面节点定位</title> 
+</head> 
+<body>
+	<div>
+		<form action="/" method="post" id="qform">
+			<p>
+				<label></label>
+				<input name="sfile" value="list.html" />
+				<select name="stype">
+					<option value="xpath">xpath</option>
+					<option value="text">text</option>
+					<option value="line">line</option>
+					<option value="attr">attr</option>
+					<option value="tag">tag</option>
+                    <option value='parent'>parent</option>
+				</select>
+			<p>
+				<input type="text" name="sexpr" value=""/>
+				<input type= "submit" id="submit_query"/>
+			</p>
+		</form>
+	</div>
+	<div>
+		<div id="output"></div>
+	</div>
+</body> 
+<script> 
+
+function submit_form(e) { 
+    e.preventDefault(); 
+	var formElement = document.getElementById("qform"); 
+	var formData = new FormData(formElement);
+	var rq = new XMLHttpRequest();
+	rq.open("POST", "/"); 
+	rq.send(formData); 
+	rq.onreadystatechange = function() { 
+        if(rq.readyState === 4 && rq.status === 200) { 
+            document.getElementById("output").innerHTML = rq.responseText;
+        }
+	}
+} 
+
+var q = document.getElementById("submit_query");
+q.addEventListener("click", submit_form, false); 
+</script>
+</html>
