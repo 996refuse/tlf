@@ -1,0 +1,1592 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head >
+    <title>
+【抗肿瘤药专区】网上购买常用抗肿瘤用药、癌症药,低于线下药店20%-40%,正规发票,货到付款!
+    -开心人网上药店</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="Robots" content="All" />
+    <meta name="Author" content="开心人网上药店 www.360kxr.com" />
+    <meta name="Generator" content="360kxr cms" />
+    <meta name="Language" content="zh-CN" />
+    <meta name="Copyright" content="开心人网上药店 All Rights Reserved" />
+    <meta name="Designer" content="开心人网上药店 www.360kxr.com" />
+    <meta name="Publisher" content="开心人网上药店 www.360kxr.com" />
+    <meta name="Distribution" content="Global" />
+    
+     
+    <meta name="keywords" content="肿瘤用药" />
+    <meta name="description" content="开心人网上药店-国家认证合法网上药店,抗肿瘤用药促销中,注册送10元,满200元免运费,300城市货到付款!" />
+
+    <link href="http://css.360kxr.com/Content/styleV4.css" rel="stylesheet"
+        type="text/css" />
+    <link href="http://css.360kxr.com/Content/styleV3_1.css" rel="stylesheet"
+        type="text/css" />
+    <link href="http://css.360kxr.com/Content/topBottomV4.css" rel="stylesheet"
+        type="text/css" />
+    <script src="http://script.360kxr.com/Scripts/jquery-1.6.4.min.js"
+        type="text/javascript"></script>
+    <script src="http://script.360kxr.com/Scripts/indexChange.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://script.360kxr.com/Scripts/jquery.cookie.js"></script>
+    
+
+<script type="text/javascript" src="http://a.tbcdn.cn/app/tc/taobao.min.js" charset="gb2312"></script>
+<script src="../../Script/regionall2.js" type="text/javascript"></script>
+
+    <!--内容页特有的CSS或Script开始-->
+    
+<link href="http://css.360kxr.com/content/second-class.css" rel="stylesheet" type="text/css"/>
+<link href="http://css.360kxr.com/content/guide-and-tj.css" rel="stylesheet" type="text/css"/>
+<script src="http://css.360kxr.com/js/second-class-cs.js" type="text/javascript" language="javascript"></script>
+    <script src="http://script.360kxr.com/Scripts/order.js" type="text/javascript"></script>
+ <script src="../../Script/UserInteraction_category.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        //关闭处方药提示窗
+        function Closechufang() {
+            $("#preAlert").hide();
+
+        }
+        //显示处方药提示窗
+        function OpenChufang(o) {
+            $("#preAlert").css("position", "absolute");
+            $("#preAlert").css("z-index", "9999");
+            $("#preAlert").css({ top: $(o).offset().top, left: $(o).offset().left - 230 });
+            $("#preAlert").show();
+        }
+        $(function () {
+            $(".kxr-R_t3").toggle(function () {
+                $(this).html("收起");
+                $(".kxr-R_bot").css("display", "none");
+                $(".kxr-hid_ul").css("display", "block");
+                $(".kxr-R_t2").addClass("addkxr-R_t2");
+
+
+
+
+
+            }, function () {
+                $(this).html("展开");
+                $(".kxr-R_bot").css("display", "block");
+                $(".kxr-hid_ul").css("display", "none");
+                $(".kxr-R_t2").removeClass("addkxr-R_t2");
+
+            })
+        });
+
+        //截取文字
+        function SubstringWords(container, len) {
+            var str = $.trim(container.text());
+            if (str.length > len) {
+                container.text(str.substr(0, len - 1) + "...");
+            }
+        }
+        // 排序事件
+        function OrederClick(orderName) {
+            var param = '937-1-4-2-2-0,999999-all-9-all-all-all-1';
+            var orderFX = 1;
+            if (orderName == 2) {
+                orderFX = param.split('-')[3] == 1 ? 2 : 1;
+
+            }
+            param = ReplaceParam(param, 4, orderFX);
+            param = ReplaceParam(param, 3, orderName);
+            param = ReplaceParam(param, 2, 2);
+            param = ReplaceParam(param, 12, 1);
+            location.href = '/category/' + param + '.html';
+        }
+        //是否处方药
+        function ir(isRX) {
+            var param = '937-1-4-2-2-0,999999-all-9-all-all-all-1';
+            param = ReplaceParam(param, 8, isRX);
+            param = ReplaceParam(param, 1, "2");
+            location.href = '/category/' + param + '.html';
+
+        }
+        function ReplaceParam(param, position, replace) {
+            var returnStr = "";
+            var params = param.split('-');
+            for (var i = 1; i <= params.length; i++) {
+                if (i != position) {
+                    returnStr += "-" + params[i - 1];
+                }
+                else {
+                    returnStr += "-" + replace;
+                }
+            }
+            if (returnStr.length > 1) {
+                returnStr = returnStr.substr(1, returnStr.length - 1);
+            }
+            return returnStr;
+        }
+        function ChangeDisplayMode(mode) {
+            var param = '937-1-4-2-2-0,999999-all-9-all-all-all-1';
+            param = ReplaceParam(param, 5, mode);
+            location.href = '/category/' + param + '.html';
+        }
+        //其他的显示和隐藏
+        function Othters(id) {
+            document.getElementById(id).style.display == "block" ? document.getElementById(id).style.display = "none" : document.getElementById(id).style.display = "block";
+        }
+        //获取三级分类
+        $(document).ready(function () {
+            $.getJSON("/Category/GetListByParentId/937", function (result) {
+                if (result != null && result.length > 0) {
+                    var htmlStr = "";
+                    htmlStr += "<ul>";
+                    $.each(result, function (i, n) {
+
+                        htmlStr += "<li>";
+                        htmlStr += "<a href=" + n.n_id + "-0-2-1-15-1.html>" + n.n_name + "</a>";
+                        htmlStr += "</li>";
+
+                    });
+                    htmlStr += "<div class='clear'></div>";
+                    htmlStr += "</ul>";
+                    $("#PresentBox").html(htmlStr);
+                }
+                else {
+                    $("#PresentBox").hide();
+                }
+            });
+            $.getJSON("/Category/GetListByParentId/119", function (result) {
+                if (result != null && result.length > 0) {
+                    var htmlStr = "";
+                    var Count = result.length;
+                    if (Count != 0) {
+                        var Counti = Count % 2;
+                        if (Counti != 0) {
+                            htmlStr += "<ul class=\"yp-title\">";
+                            $.each(result, function (i, n) {
+
+                                htmlStr += "<li>";
+                                htmlStr += "<a href=" + n.n_id + "-0-2-1-15-1.html>" + n.n_name + "</a>";
+                                htmlStr += "</li>";
+                                
+                            });
+                            htmlStr += "<li>";
+                            htmlStr += "<a  href=\"#\">&nbsp</a>";
+                            htmlStr += "</li>";
+                            htmlStr += "<div class='clear'></div>";
+                            htmlStr += "</ul>";
+                        } else {
+                            htmlStr += "<ul class=\"yp-title\">";
+                            $.each(result, function (i, n) {
+
+                                htmlStr += "<li>";
+                                htmlStr += "<a href=" + n.n_id + "-0-2-1-15-1.html>" + n.n_name + "</a>";
+                                htmlStr += "</li>";
+                            });
+                            htmlStr += "</ul>";
+                        }
+                    }
+                    $("#div7").html(htmlStr);
+                }
+                else {
+                    $("#div7").hide();
+                }
+            });
+        });
+    </script>
+
+    <!--内容页特有的CSS或Script结束-->
+    <script type="text/javascript">
+        var _bdhm_top = 0;
+        var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+        var _bdhm_tim = new Image(1, 1);
+        _bdhm_tim.id = "bdhmPerimg";
+        _bdhm_tim.src = _bdhmProtocol + "hm.baidu.com/_tt.gif?si=e0598337ea3c84b150a9c23898cf9fbe&rnd=" + Math.round(Math.random() * 2147483647);
+        _bdhm_tim.onload = function () { _bdhm_top = 1; }
+    </script>
+
+</head>
+<body>
+    <!--页面头部开始-->
+    
+<script src="http://script.360kxr.com/Scripts/jquery-1.6.4.min.js" type="text/javascript"></script>
+
+<link href="http://css.360kxr.com/Content/fahui.css" rel="stylesheet" type="text/css" />
+
+<link  href="http://css.360kxr.com/content/initialise.css" rel="stylesheet" type="text/css"/>
+<link href="http://css.360kxr.com/content/top-bottom.css" rel="stylesheet" type="text/css"/>
+<style type="text/css">
+    #search
+    {
+        text-align: center;
+        position: relative;
+    }
+    .autocomplete
+    {
+        border: 0px solid #9ACCFB;
+        background-color: white;
+        text-align: left;
+        z-index: 999;
+        padding-left:10px;
+    }
+    .autocomplete li
+    {
+        list-style-type: none;
+        height: 25px;
+        font-size: inherit;
+    }
+    .clickable
+    {
+        cursor: default;
+    }
+    .highlight
+    {
+        background-color: #e6e4e8;
+    }
+</style>
+
+<script type="text/javascript" src="http://script.360kxr.com/Scripts/regionall2.js"></script>
+
+<script type="text/javascript" src="http://script.360kxr.com/Scripts/jquery.cookie.js"></script>
+ <a id="returnTop" href="javascript:void(0);" hidefocus="hidefocus"></a> 
+<script src="http://script.360kxr.com/Scripts/huiding.js" type="text/javascript"></script>
+<script src="http://script.360kxr.com/Scripts/searchLike.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        registerSearch("search", "keyWord", "searchbutton", "/Search/Search", "post");
+    });
+</script>
+<div class="header-box">
+ <!--头部顶导航部分开始-->
+ 
+  <div class="head-store">
+    <div class="store-left"></div>
+    <div class="store-content">
+      <p class="login-box"><span id="logoName"></span></p>
+      <ul id="top-nav">  
+      <li><a href="/product/productmap.html" looyu_bound="1">网站导航</a></li>     
+      </ul>  
+      <p class="consult-ico" id="consult-ico"></p>
+    </div>
+    <div class="store-right"></div>
+  </div>
+  <!--头部顶导航部分结束-->
+  <!--logo部分开始-->
+  <div class="logo-box">
+   <div class="logo-box-cont">
+     <a href="http://www.360kxr.com/"><h1 style="width:257px;"></h1></a>
+     
+     <div class="search-container" style="margin-left:141px;">
+     <div class="search-box" id="search">
+        <input id="keyWord" value="请输入汇仁肾宝片或hrsbp" /><span class="ss-btn" id="searchbutton"></span>   
+        <p class="hot-search">
+          <span class="hot-search">热门搜索：<span><a href="http://www.360kxr.com/notice/detail/2307.html" target="_blank" onclick="KeyWordClick(1304)" title="开心人防诈骗公告">开心人防诈骗公告</a></span><span><a href="http://www.360kxr.com/zhuanti/shimian/" target="_blank" onclick="KeyWordClick(1340)" title="失眠">失眠</a></span><span><a href="http://www.360kxr.com/product/7854.html" target="_blank" onclick="KeyWordClick(1357)" title="万艾可">万艾可</a></span><span><a href="http://www.360kxr.com/Search_V2/?id=%E9%87%91%E6%88%88" target="_blank" onclick="KeyWordClick(1225)" title="金戈">金戈</a></span><span><a href="http://www.360kxr.com/product/28003.html" target="_blank" onclick="KeyWordClick(1214)" title="汇仁肾宝">汇仁肾宝</a></span><span><a href="http://www.360kxr.com/product/30126.html" target="_blank" onclick="KeyWordClick(1213)" title="必利劲">必利劲</a></span><span><a href="http://www.360kxr.com/product/20430.html" target="_blank" onclick="KeyWordClick(1205)" title="优思明">优思明</a></span><span><a href="http://www.360kxr.com/zhuanti/yiyuzheng/" target="_blank" onclick="KeyWordClick(647)" title="心情抑郁">心情抑郁</a></span><span><a href="http://www.360kxr.com/product/31172.html" target="_blank" onclick="KeyWordClick(557)" title="福牌阿胶">福牌阿胶</a></span><span><a href="http://www.360kxr.com/zhuanti/qianjinzhidaiwan/" target="_blank" onclick="KeyWordClick(453)" title="千金止带丸">千金止带丸</a></span></span>
+        </p>       
+     </div>
+     </div>
+       <p  class="tele-img"></p>
+   </div>
+   
+  </div>
+ <!-- logo部分结束-->
+ <!--主导航开始-->
+ <div class="main-nav">
+   <div class="nav-box">
+  <!--商品分类开始-->
+    <!--商品分类开始-->
+      <div class="categories-box">
+       <h2><b></b><a  target="_blank">全部商品分类</a></h2>
+        <div class="categories-content display-none" id="categories-content">        
+        </div>
+      </div>
+      <!--商品分类结束-->
+  <!--商品分类结束-->
+      
+     <ul  class="nav-list">
+         <li><a href="/"  rel="NOFOLLOW" class ='active'>首&nbsp;&nbsp;页</a></li>
+          <li><a href="/drugs.html" class =''>药&nbsp;&nbsp;品</a></li>
+          <li><a href="/healthfood.html" class =''>健康养生</a></li>   
+          <li><a href="/adult.html" class =''>两性健康</a></li>
+          <li><a href="/instrument.html" class =''>医疗器械</a></li>
+          <li><a href="/category/1055-0-2-1-15-1.html" class =''>隐形眼镜</a></li>
+         <li class="kxrthzq"><a href="http://360kxr.com/zhuanti/temai" target="_blank" rel="nofollow">特惠专区</a><span></span></li>
+          <li><a href="http://www.360kxr.com/yongyao/" class ='' style='color:#fef597'>健康资讯</a></li>
+               
+      </ul>
+     <div class="cart-tishi" >
+                <div id="cartShop"></div>
+      </div>
+  </div>
+ </div>
+ <!--主导航结束-->
+</div>
+<!--头部结束-->
+<!--头部结束-->
+
+<script src="/content/js/login.js" language="javascript" type="text/javascript"></script>
+<script src="http://script.360kxr.com/Scripts/AdManage.js" type="text/javascript"></script>
+
+
+<!--发布时注意注释和取消注释-->
+<script src="http://css.360kxr.com/js/top-nav-seo-cs.js" type="text/javascript"></script>
+
+
+<script src="http://css.360kxr.com/js/head-nav.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://script.360kxr.com/Scripts/Head_JS_V1.js"></script>
+<script src="http://script.360kxr.com/Scripts/indexChange.js" type="text/javascript"></script>
+
+<!-- QQ访客管理 Begin -->
+
+<!-- QQ访客管理 END -->
+<script src="http://script.360kxr.com/Scripts/jquery.cookie.js" type="text/javascript"></script>
+
+
+    <!--页面头部结束--> 
+    <!-- 通栏 -->
+   
+    <!--页面主体部分开始-->
+    
+    <!--面包屑开始-->
+    
+<div class="position-box"><span class="p"> 您现在的位置：</span><span><a class="" href="/" rel="NOFOLLOW">首页</a><span>&gt;</span><span><a class="" href="/drugs.html">药品</a></span><span>&gt;</span><span class="redFont">肿瘤药品</span></span> 
+ 
+      <span style="float: right;">药品监管部提示：如发现本网站有任何直接或变相销售处方药行为，请保留证据，拨打12331举报，举报查实给予奖励。</span>
+    
+</div>
+<!--面包屑结束-->
+<!--二级页面开始-->
+
+<div class="main-box second-class-box">
+<div class="main-content">
+  <!--左侧栏目开始-->
+  <div class="second-left-box">
+    <!--左侧导航开始-->
+    <!--左侧导航开始-->
+    <div class="second-nav-box">
+      <h3>药品</h3>
+      <div  class="nav-cont">
+        <div class="active">
+          <h4>肿瘤药品</h4>
+           
+          <ul>
+            
+            <li><a href='/category/938-0-2-1-15-1.html'   >睾丸肿瘤</a></li>
+            <li><a href='/category/939-0-2-1-15-1.html'   >其他</a></li>
+            <li><a href='/category/941-0-2-1-15-1.html'   >辅助用药</a></li>
+            <li><a href='/category/942-0-2-1-15-1.html'   >白血病（血癌）</a></li>
+            <li><a href='/category/943-0-2-1-15-1.html'   >广谱抗肿瘤药</a></li>
+            <li><a href='/category/944-0-2-1-15-1.html'   >前列腺癌</a></li>
+            <li><a href='/category/952-0-2-1-15-1.html'   >乳腺癌</a></li>
+            <li><a href='/category/953-0-2-1-15-1.html'   >肠癌</a></li>
+            <li><a href='/category/961-0-2-1-15-1.html'   >胃癌</a></li>
+            <li><a href='/category/963-0-2-1-15-1.html'   >肺癌</a></li>
+            <li><a href='/category/964-0-2-1-15-1.html'   >肝癌</a></li>
+            <li><a href='/category/1032-0-2-1-15-1.html'   >乳腺疾病</a></li>
+            <li><a href='/category/1044-0-2-1-15-1.html'   >食道癌</a></li>
+            <div class="clear"></div>
+          </ul>
+          <div class="clear"></div>
+           
+        </div>
+          <!--商品二级分类页面商品列表开始-->
+                    
+        <ul class="yp-title">
+          
+          <li><a href="/category/201-0-2-1-15-1.html">感冒发热</a></li>
+          <li><a href="/category/208-0-2-1-15-1.html">减肥瘦身</a></li>
+          <li><a href="/category/210-0-2-1-15-1.html">解热镇痛</a></li>
+          <li><a href="/category/213-0-2-1-15-1.html">肌肤健康</a></li>
+          <li><a href="/category/263-0-2-1-15-1.html">妇科用药</a></li>
+          <li><a href="/category/312-0-2-1-15-1.html">呼吸系统</a></li>
+          <li><a href="/category/328-0-2-1-15-1.html">滋补用药</a></li>
+          <li><a href="/category/343-0-2-1-15-1.html">筋骨疼痛</a></li>
+          <li><a href="/category/375-0-2-1-15-1.html">消化系统</a></li>
+          <li><a href="/category/394-0-2-1-15-1.html">儿童用药</a></li>
+          <li><a href="/category/427-0-2-1-15-1.html">神经系统</a></li>
+          <li><a href="/category/439-0-2-1-15-1.html">维矿物质</a></li>
+          <li><a href="/category/445-0-2-1-15-1.html">抗菌消炎</a></li>
+          <li><a href="/category/466-0-2-1-15-1.html">心脑血管</a></li>
+          <li><a href="/category/483-0-2-1-15-1.html">口腔用药</a></li>
+          <li><a href="/category/486-0-2-1-15-1.html">泌尿系统</a></li>
+          <li><a href="/category/502-0-2-1-15-1.html">糖尿病</a></li>
+          <li><a href="/category/681-0-2-1-15-1.html">血液系统</a></li>
+          <li><a href="/category/684-0-2-1-15-1.html">精神用药</a></li>
+          <li><a href="/category/688-0-2-1-15-1.html">特殊病症</a></li>
+          <li><a href="/category/890-0-2-1-15-1.html">清热消炎</a></li>
+          <li><a href="/category/907-0-2-1-15-1.html">生殖健康</a></li>
+          <li><a href="/category/931-0-2-1-15-1.html">性病</a></li>
+          <li><a href="/category/965-0-2-1-15-1.html">头发健康</a></li>
+          <li><a href="/category/977-0-2-1-15-1.html">肝病用药</a></li>
+          <li><a href="/category/978-0-2-1-15-1.html">胆病用药</a></li>
+          <li><a href="/category/981-0-2-1-15-1.html">耳鼻用药</a></li>
+          <li><a href="/category/992-0-2-1-15-1.html">眼科</a></li>
+          <li><a href="/category/1003-0-2-1-15-1.html">肾病</a></li>
+          <li><a href="/category/1017-0-2-1-15-1.html">甲状腺</a></li>
+          <div class="clear"></div>        
+        </ul>
+        
+      </div>
+    </div>
+    <!--左侧导航结束-->
+    <!--左侧导航结束-->
+    <!--用户最近浏览开始-->
+<!--您最近浏览的商品-->
+  <script type="text/javascript" src="http://script.360kxr.com/Scripts/UserHistory.js  "></script>
+ <!--您最近浏览的商品-->
+ <!--用户最近浏览开始-->
+    <div class="common-box browse-box">
+      <h3><span>[<a href="javascrip:void(0)" onclick="ClearViewHistory('MyViewHistory')">清空</a>]</span>你最近浏览的商品</h3>
+      <div class="common-cont">
+       <ul id="MyViewHistory" class="lastViewCon">
+      </div>
+    </div>
+    <!--用户最近浏览结束-->
+<script type="text/javascript">
+    //显示历史记录
+    ShowViewHistory("MyViewHistory");
+</script>
+    <!--用户最近浏览结束-->
+    <!--购买还购买开始-->
+    <!--购买还购买结束-->
+    <!--浏览还浏览开始-->
+    
+<div class="common-box yh-browse-box">
+      <h3>新品上市</h3>
+      <div class="common-cont">
+        <!--因为政府检查，屏蔽万艾可-2013.10.12-->
+         
+           
+             <!--获取默认主图图片-->
+                
+          <dl>
+          
+            <dt><a href="/product/31294.html" title="方晨喷必净生理性海水鼻腔喷雾器" target="_blank"><img onerror="this.src='/images/default.gif'" src="http://img.360kxr.com/product/2015/04/8b00a2cd02034de9a6cb527d00154108_310x233.jpg" /></a></dt>
+           
+          <dd class="title"><a href="/product/31294.html" target="_blank">方晨喷必净生理性...</a></dd>
+          <dd class="kxj"><span class="tag">
+          开心价：
+          </span><span class="dollor">￥</span><span class="price-num"><img alt="" style=" vertical-align:middle; height:24px; display:block; float:left; margin-top:-3px;margin-left:-5px;" src="http://jprice.360kxr.com/PriceImg.aspx?price=AE6805FAB8460CC7&width=16&height=24&size=9&bold=bold" /></span></dd>
+        </dl>
+           
+             <!--获取默认主图图片-->
+                
+          <dl>
+          
+            <dt><a href="/product/31325.html" title="法国乐慕 德妮娅按摩棒 深紫色" target="_blank"><img onerror="this.src='/images/default.gif'" src="http://img.360kxr.com/product/2015/05/a6156573951842ddaf49de0072f2256c_310x233.jpg" /></a></dt>
+           
+          <dd class="title"><a href="/product/31325.html" target="_blank">法国乐慕 德妮娅...</a></dd>
+          <dd class="kxj"><span class="tag">
+          开心价：
+          </span><span class="dollor">￥</span><span class="price-num"><img alt="" style=" vertical-align:middle; height:24px; display:block; float:left; margin-top:-3px;margin-left:-5px;" src="http://jprice.360kxr.com/PriceImg.aspx?price=F40C24B4648CBB47&width=16&height=24&size=9&bold=bold" /></span></dd>
+        </dl>
+           
+             <!--获取默认主图图片-->
+                
+          <dl>
+          
+            <dt><a href="/product/31319.html" title="法国乐慕 珞莎按摩棒 宝蓝色" target="_blank"><img onerror="this.src='/images/default.gif'" src="http://img.360kxr.com/product/2015/05/4b53faf675ca4338a7bf68a3ffcec6df_310x233.jpg" /></a></dt>
+           
+          <dd class="title"><a href="/product/31319.html" target="_blank">法国乐慕 珞莎按...</a></dd>
+          <dd class="kxj"><span class="tag">
+          开心价：
+          </span><span class="dollor">￥</span><span class="price-num"><img alt="" style=" vertical-align:middle; height:24px; display:block; float:left; margin-top:-3px;margin-left:-5px;" src="http://jprice.360kxr.com/PriceImg.aspx?price=33E68719A0BF8AF1&width=16&height=24&size=9&bold=bold" /></span></dd>
+        </dl>
+           
+             <!--获取默认主图图片-->
+                
+          <dl>
+          
+            <dt><a href="/product/31266.html" title="金戈枸橼酸西地那非片" target="_blank"><img onerror="this.src='/images/default.gif'" src="http://img.360kxr.com/product/2015/03/4375f25c63d5456cbe7ce961eae54a70_310x233.JPG" /></a></dt>
+           
+          <dd class="title"><a href="/product/31266.html" target="_blank">金戈枸橼酸西地那...</a></dd>
+          <dd class="kxj"><span class="tag">
+          大药房价：
+          </span><span class="dollor">￥</span><span class="price-num"><img alt="" style=" vertical-align:middle; height:24px; display:block; float:left; margin-top:-3px;margin-left:-5px;" src="http://jprice.360kxr.com/PriceImg.aspx?price=E473DCA7506DE948&width=16&height=24&size=9&bold=bold" /></span></dd>
+        </dl>
+      </div>
+    </div>
+
+    <!--浏览还浏览结束-->
+  </div>
+  <!-- 左侧栏目结束-->
+  <!--右侧栏目开始-->
+  <div class="second-right-box">
+    <!--轮播开始-->
+    <div class="lunbo-box"  id="divAdLunbo"></div>
+    <!--轮播结束-->
+    <!--热门搜索开始-->
+    <div class="hot-hunt">热门搜索：<a href="http://www.360kxr.com/zhuanti/fuke/" target="_blank">妇科</a>|<a href="http://www.360kxr.com/zhuanti/fupaiej/" target="_blank">福牌阿胶</a>|<a href="http://www.360kxr.com/product/16618.html" target="_blank">龟鹿二胶丸</a>|<a href="http://www.360kxr.com/product/17845.html" target="_blank">神威健阳片</a></div>
+    <!-- 热门搜索结束-->
+   <!-- 检索开始-->
+    <div class="right-js">
+      <!--检索框开始-->
+      <div class="hunt-box">
+       <!--3开始-->
+      <dl class="first">
+        <dt><span>价格区间：</span></dt>
+        <dd>
+          <div class="content">
+          <!--1开始-->
+           
+                       <a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-1.html" class='all' rel="NOFOLLOW">全部</a><a href="/category/937-1-4-2-2-0,100-all-9-all-all-all-1.html"  rel="NOFOLLOW">0-100</a>
+                             <a href="/category/937-1-4-2-2-100.1,500-all-9-all-all-all-1.html"  rel="NOFOLLOW">100-500</a>
+                            <a href="/category/937-1-4-2-2-500.1,999999-all-9-all-all-all-1.html"  rel="NOFOLLOW">500以上</a><!--1结束-->
+           <!--2开始--><!--2结束-->
+          </div>
+        </dd>
+        <div class="clear"></div>
+      </dl>
+     <div class="clear"></div>
+      <dl>
+        <dt><span>药品属性：</span></dt>
+        <dd>
+          <div class="content">
+          
+                            <a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-1.html" class='all' rel="NOFOLLOW">全部</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-中成药-all-1.html"  rel="NOFOLLOW">中成药</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-西药-all-1.html"  rel="NOFOLLOW">西药</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-进口药-all-1.html"  rel="NOFOLLOW">进口药</a>
+          </div>
+        </dd>
+        <div class="clear"></div>
+      </dl> <div class="clear"></div>
+       <dl>
+        <dt><span>药品剂型：</span></dt>
+        <dd>
+          <div class="content">
+           <a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-1.html" class='all' rel="NOFOLLOW">全部</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-片剂-1.html"  rel="NOFOLLOW">片剂</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-胶囊剂-1.html"  rel="NOFOLLOW">胶囊剂</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-口服液-1.html"  rel="NOFOLLOW">口服液</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-丸剂-1.html"  rel="NOFOLLOW">丸剂</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-丸剂（糊丸）-1.html"  rel="NOFOLLOW">丸剂（糊丸）</a><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-颗粒剂-1.html"  rel="NOFOLLOW">颗粒剂</a>
+          </div>
+        </dd>
+        <div class="clear"></div>
+      </dl> <div class="clear"></div>
+       <dl>
+        <dt><span>品　　牌：</span></dt>
+        <dd>
+       <div class="content">
+          <p><a class="others-ico">更多</a></p><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-1.html" class='all' rel="NOFOLLOW">全部</a><a href="/category/937-1-4-2-2-0,999999-all-9-同仁堂-all-all-1.html"  rel="NOFOLLOW" > 同仁堂</a><a href="/category/937-1-4-2-2-0,999999-all-9-胡庆余堂-all-all-1.html"  rel="NOFOLLOW" > 胡庆余堂</a><a href="/category/937-1-4-2-2-0,999999-all-9-神源-all-all-1.html"  rel="NOFOLLOW" > 神源</a><a href="/category/937-1-4-2-2-0,999999-all-9-金花-all-all-1.html"  rel="NOFOLLOW" > 金花</a><a href="/category/937-1-4-2-2-0,999999-all-9-复旦复华-all-all-1.html"  rel="NOFOLLOW" > 复旦复华</a><a href="/category/937-1-4-2-2-0,999999-all-9-宏远-all-all-1.html"  rel="NOFOLLOW" > 宏远</a><a href="/category/937-1-4-2-2-0,999999-all-9-赣南海欣-all-all-1.html"  rel="NOFOLLOW" > 赣南海欣</a>
+         <div class="clear"></div>
+         <div class="others display-none">
+              <a href="/category/937-1-4-2-2-0,999999-all-9-西安正大-all-all-1.html"  rel="NOFOLLOW">西安正大</a><a href="/category/937-1-4-2-2-0,999999-all-9-朝晖药业-all-all-1.html"  rel="NOFOLLOW">朝晖药业</a><a href="/category/937-1-4-2-2-0,999999-all-9-拜耳-all-all-1.html"  rel="NOFOLLOW">拜耳</a><a href="/category/937-1-4-2-2-0,999999-all-9-金蟾-all-all-1.html"  rel="NOFOLLOW">金蟾</a><a href="/category/937-1-4-2-2-0,999999-all-9-上海信谊-all-all-1.html"  rel="NOFOLLOW">上海信谊</a><a href="/category/937-1-4-2-2-0,999999-all-9-延安常泰-all-all-1.html"  rel="NOFOLLOW">延安常泰</a><a href="/category/937-1-4-2-2-0,999999-all-9-上海复旦复华-all-all-1.html"  rel="NOFOLLOW">上海复旦复华</a><a href="/category/937-1-4-2-2-0,999999-all-9-德天-all-all-1.html"  rel="NOFOLLOW">德天</a><a href="/category/937-1-4-2-2-0,999999-all-9-平原-all-all-1.html"  rel="NOFOLLOW">平原</a><a href="/category/937-1-4-2-2-0,999999-all-9-盖天力-all-all-1.html"  rel="NOFOLLOW">盖天力</a><a href="/category/937-1-4-2-2-0,999999-all-9-西安德天-all-all-1.html"  rel="NOFOLLOW">西安德天</a>
+          <div class="clear"></div>
+          </div><div class="clear"></div>
+          </div>
+        </dd>
+        <div class="clear"></div>
+      </dl><div class="clear"></div>
+    </div>
+      <!-- 检索框结束-->
+     <!-- 检索出的产品展示开始-->
+     <div class="hunt-list-box">
+      <!--三级-->
+      
+                      <!--二级-->
+       <div class="hunt-list-top">
+       
+       <div class="pages"><span  rel="nofollow">&lt;上一页</span><span><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-2.html"  rel="nofollow">下一页</a>&gt;</span> </div>
+      
+         <h3>肿瘤药品</h3>
+         <div class="goods-total">共<b>25</b>个商品<span>1/2</span></div>
+       </div>
+       <!--二级-->
+        <!--通用名展示结束-->
+      
+       <ul class="ul-list0">
+           
+<!--搜索结果列表开始-->
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/7669.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="同仁堂西黄丸(天然牛黄)" src="http://img.360kxr.com/product/2013/04/26c22efcf6024163bb8056c845f4b858_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/7669.html" target="_blank" class="fortext productName" title="同仁堂西黄丸(天然牛黄)">
+                        同仁堂西黄丸(天然牛黄)
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=6152C0A508054D4C&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/15846.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="同仁堂西黄丸(天然牛黄)2盒疗程装" src="http://img.360kxr.com/product/2013/04/97c01c982c8845ec8882746adde18448_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/15846.html" target="_blank" class="fortext productName" title="同仁堂西黄丸(天然牛黄)2盒疗程装">
+                        同仁堂西黄丸(天然牛黄)
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=FE5D68D859EE0558&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/18371.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="胡庆余堂胃复春片" src="http://img.360kxr.com/product/2014/04/d059d28e309e42f09a23a4cfd51cfe59_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/18371.html" target="_blank" class="fortext productName" title="胡庆余堂胃复春片">
+                        胡庆余堂胃复春片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=95167E263B1FE5CA&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/29224.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="同仁堂西黄丸(天然牛黄)6盒优惠装" src="http://img.360kxr.com/product/2014/05/1a5608e3c104442393f4b4c3f30b65a9_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/29224.html" target="_blank" class="fortext productName" title="同仁堂西黄丸(天然牛黄)6盒优惠装">
+                        同仁堂西黄丸(天然牛黄)
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=16C08C043F183E1D&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/12826.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="金花转移因子胶囊." src="http://img.360kxr.com/product/2013/01/191fd074c5174a5b8246a6d0a9324cec_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/12826.html" target="_blank" class="fortext productName" title="金花转移因子胶囊.">
+                        金花转移因子胶囊.
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=45BD138C7FE03BFF&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/14622.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="氟他胺片" src="http://img.360kxr.com/product/2013/01/a41223ec77e249b99b473544bcaf35a8_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/14622.html" target="_blank" class="fortext productName" title="氟他胺片">
+                        氟他胺片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=35A81A1ADA285DBF&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/7834.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="甘露聚糖肽片多抗甲素片." src="http://img.360kxr.com/product/2014/05/7d5eaae80b3f44cf825f6e40ceeefc23_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/7834.html" target="_blank" class="fortext productName" title="甘露聚糖肽片多抗甲素片.">
+                        甘露聚糖肽片多抗甲素片.
+        </a>
+    </dd>
+    
+             <dd class="ms">
+              
+                             <a href="/product/7834.html" target="_blank" title="用于免疫功能低下、反复呼吸道感染、白细胞减少症和再生障碍性贫血及肿瘤的辅助治疗，减轻放、化疗对造血系统的副作用和胃肠道反应。">
+                           用于免疫功能低下、反复呼吸道感
+                           </a>
+                      
+        </dd>
+       <dd class="price-box"><span class="kxj">开心人价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=15C456C536D278BC&width=16&height=30&size=14" /></span></dd>
+   
+               
+        <dd><div class="btn-box">
+ 
+                        
+                                <p class="cart" id="put6"  alt="放入购物车" onclick="AddToCart(7834,1,1,false,'put6')" ></p>
+                         
+                         <p class="favorite margin0" onclick="javascript:addfavorite(7834,'put6')"></p>
+                     
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/15713.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="转移因子口服溶液" src="http://img.360kxr.com/product/2014/05/db3cf85ae967406ca1b616b95b94ac5f_310x233.jpg" /> 
+              
+              </a>
+             
+                <span class="broken"></span>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/15713.html" target="_blank" class="fortext productName" title="转移因子口服溶液">
+                        转移因子口服溶液
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=A4BE0C7823139441&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/8469.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="平消胶囊" src="http://img.360kxr.com/product/2014/04/5e922cef5bd944649660f97819780c92_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/8469.html" target="_blank" class="fortext productName" title="平消胶囊">
+                        平消胶囊
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=518E8FE0A165231D&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/21662.html" target="_blank"> 
+        
+                 <img onerror="this.src='/images/default.gif'" title="比卡鲁胺片" src="http://img.360kxr.com/product/20120629/B01010150y_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/21662.html" target="_blank" class="fortext productName" title="比卡鲁胺片">
+                        比卡鲁胺片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=6E2808B0C69FFC49&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/22523.html" target="_blank"> 
+        
+                 <img onerror="this.src='/images/default.gif'" title="固令氯膦酸二钠胶囊" src="http://img.360kxr.com/product/20120917/B01009665y_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/22523.html" target="_blank" class="fortext productName" title="固令氯膦酸二钠胶囊">
+                        固令氯膦酸二钠胶囊
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=7C8F3AC7EB0A09D9&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/18678.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="华蟾素片" src="http://img.360kxr.com/product/2013/02/ae31ba2816af4ae698972d0e342e7475_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/18678.html" target="_blank" class="fortext productName" title="华蟾素片">
+                        华蟾素片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=B226A8F5BE65E643&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/7950.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="信谊甲氨蝶呤片" src="http://img.360kxr.com/product/2013/01/c55d945c78ce49c5b9e45acc7bf0ef68_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/7950.html" target="_blank" class="fortext productName" title="信谊甲氨蝶呤片">
+                        信谊甲氨蝶呤片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=C779543FA7E652FC&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/18884.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="鸦胆子油口服乳液" src="http://img.360kxr.com/product/2013/03/f764ca3242e14cd49abfc9f70a86bb78_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/18884.html" target="_blank" class="fortext productName" title="鸦胆子油口服乳液">
+                        鸦胆子油口服乳液
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=64F7080709AB0169&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/7236.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="胃复春片" src="http://img.360kxr.com/product/2014/04/ce2392ba1a4e4025821b4d04bd63b0b4_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/7236.html" target="_blank" class="fortext productName" title="胃复春片">
+                        胃复春片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=2BA7FFEB862622AE&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/14262.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="消癌平片*" src="http://img.360kxr.com/product/2013/01/c172a86efb324a8593e58a3f9adafe82_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/14262.html" target="_blank" class="fortext productName" title="消癌平片*">
+                        消癌平片*
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=8024C4B2994214B3&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/7889.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="枸橼酸他莫昔芬片" src="http://img.360kxr.com/product/2013/01/b8eb0ce6b8b1471880f2d16c360c5563_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/7889.html" target="_blank" class="fortext productName" title="枸橼酸他莫昔芬片">
+                        枸橼酸他莫昔芬片
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=812CE82C16362973&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/18807.html" target="_blank"> 
+        
+                 <img onerror="this.src='/images/default.gif'" title="生血宝合剂" src="http://img.360kxr.com/product/20110530/B01008969_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/18807.html" target="_blank" class="fortext productName" title="生血宝合剂">
+                        生血宝合剂
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=4F8DA8DBD451F957&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/14244.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="艾诺克" src="http://img.360kxr.com/product/2013/01/2265aa2698d64c0b900e9c9437a38285_310x233.JPG" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/14244.html" target="_blank" class="fortext productName" title="艾诺克">
+                        艾诺克
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=83B51105280EF8AD&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+<li>
+    <dl>
+           
+          
+            <div style="position:relative">
+            <div style="position:absolute;left:0;top:0;z-index:2">
+            
+           </div>    
+        <dt><a href="/product/14258.html" target="_blank"> 
+            
+              <img onerror="this.src='/images/default.gif'" title="龙源惠康" src="http://img.360kxr.com/product/2014/05/e31c48e0c52d444280b32ff5e4c18798_310x233.jpg" /> 
+              
+              </a>
+             
+        </dt>
+
+     <dd class="title">
+      <a href="/product/14258.html" target="_blank" class="fortext productName" title="龙源惠康">
+                        龙源惠康
+        </a>
+    </dd>
+         
+        <dd class="ms"></dd>  
+        <dd class="price-box"><span class="kxj">大药房价：</span><span class="priceSign dollor">￥</span><span class="price"> <img alt="" style=" vertical-align:middle; margin-top:-5px" src="http://jprice.360kxr.com/PriceImg.aspx?price=5F1A776408190992&width=16&height=30&size=14" /></span></dd>
+             
+        <dd><div class="btn-box">
+ 
+           </div>
+        </dd>
+    </dl>
+</li>
+
+           <div class="clear"></div>
+       </ul>
+         <!--翻页开始-->
+                    
+                    <div class="pages-box"><div class="page-num"><a class="sure" onclick="onclickPageHref()"></a><span>共2页</span>到第 <input type="text" id="pageIndexs" />页</div><div class="page-turning"><span class="disabled">首页</span><span class="disabled">上一页</span><span class="disabled current">1</span><span><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-2.html">2</a></span><span><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-2.html">下一页</a></span><span><a href="/category/937-1-4-2-2-0,999999-all-9-all-all-all-2.html">末页</a></span></div>
+                    
+                     <div class="clear"></div>
+                    </div>
+                    
+                    <!--翻页结束-->
+     </div>
+      <!--检索出的产品展示结束-->
+    </div>
+    <!-- 检索结束-->
+         <!--搜索框开始-->
+      <div class="search-box">
+      
+ <input id="keyWords" value="请输入汇仁肾宝片或hrsbp" /><span class="ss-btn" id="searchbuttons"></span>
+ <script type="text/javascript">
+     //搜索JS
+     function searchactions() {
+         var keyword = $("#keyWords").val();
+         if ($.trim(keyword) != "" && keyword.indexOf("*") == -1 && keyword.indexOf("/") == -1 && keyword.indexOf(".") == -1 && keyword.indexOf("-") == -1) {
+             if (keyword == "请输入汇仁肾宝片或hrsbp") {
+                 window.location.href = "http://www.360kxr.com/drugs.html"; return false;
+             } else {
+                 keyword = keyword.replace("-", "").replace(".", "").replace("|", "").replace("=", "").replace(",", "").replace('"', "");
+                 keyword = $.trim(keyword);
+                 window.location.href = "/Search_V2/?id=" + encodeURIComponent(keyword); return true;
+             }
+         }
+         else {
+             alert("请输入关键词！");
+             return false;
+         }
+     }
+     $("#searchbuttons").click(function () { searchactions(); });
+     $("#keyWords").keypress(function (e) { if (e.keyCode == 13) { $("#searchbuttons").click(); return false; } });
+     var url = window.location.href.toLowerCase();
+     if (url.indexOf("/Search_V2/?id=") > -1) {
+         url = url.substr(url.indexOf("/Search_V2/?id=") + 8);
+         var result = url.split('-');
+         if (result.length == 1) {
+             $("#keyWords").val(decodeURI(result));
+         }
+         else {
+             $("#keyWords").val(decodeURI(result[8]));
+         }
+     }
+
+     //搜索提示
+     $("#keyWords").css("color", "#999");
+     $("#keyWords:not('#searchbuttons')").focus(function () {
+         if ($("#keyWords").val() == "请输入汇仁肾宝片或hrsbp") {
+             $("#keyWords").val("");
+             $("#keyWords").css("color", "#000000");
+         }
+
+     });
+     $("#keyWords").blur(function () {
+         if ($("#keyWords").val() == "") {
+             $("#keyWords").val("请输入汇仁肾宝片或hrsbp");
+             $("#keyWords").css("color", "#999");
+         }
+     });
+
+     $("#selcetValue").click(function () {
+         $("ul.selcetDownMenu").slideDown('fast').show();
+         $("div.selcetDown").hover(function () { }, function () { $("ul.selcetDownMenu").slideUp('slow'); });
+     });
+
+     $("ul.selcetDownMenu li").click(
+					           function () {
+					               $("#selcetValue").text($(this).text());
+					               $("ul.selcetDownMenu").css("display", "none");
+					           });
+</script> 
+     </div>
+    <!--搜索框结束-->
+  </div>
+<!-- 右侧栏目结束-->
+<div class="clear"></div>
+</div>
+ <!--新手指南部分开始-->
+  
+<div class="help-box">
+    <div class="tele-img-box">
+        <img src=" http://css.360kxr.com/Images/gb-img-v1/first-tele-online.jpg" border="0"
+            usemap="#Map" />
+        <map name="Map" id="Map">
+            <area shape="rect" coords="90,98,170,122" href="#" onclick="ShowTaker('频道页底部','在线客服')" />
+            
+        </map>
+    </div>
+    <!--帮助中心开始-->
+    <div class="help-cont" id="help-cont">
+    </div>
+    <!--帮助中心结束-->
+    <div class="clear">
+    </div>
+</div>
+
+  <!--新手指南部分结束-->
+   <!--重点推荐部分开始-->
+ 
+  <!--重点推荐部分结束-->
+</div>
+  <!--二级页面结束-->
+    <!--弹出窗口提示部分开始-->
+    
+
+<!--【放入购物车】弹出窗口提示部分开始--> 
+
+<link href="http://css.360kxr.com/content/add-cart.css" rel="stylesheet" type="text/css"/>
+<!--加入购物车弹窗开始-->
+<div class="add-cart-box display-none" id="alertBox">
+  <div class="close-box"><span class="close" id="close-ico" onclick="CloseAlert()"></span></div>
+  <div class="cart-cont">
+    <div class="cart-success" id="sucPutInCart">
+      <h3>此商品已成功加入到购物车</h3>
+    </div>
+    <div class="cart-text">
+      购物车共有<span class="num"  id="alertNum">1</span>件商品&nbsp;&nbsp;合计：<span id="alertMoney">￥00.00</span>
+    </div>
+    <div class="cart-btn">    
+       <a href="/shoppingcart.aspx" class="add-ico"></a><p  class="continue-ico" onclick="CloseAlert()" ></p>
+    </div>     
+  </div>
+</div>
+<!--加入购物车弹窗结束-->
+<!--【放入购物车】弹出窗口提示部分结束--> 
+
+
+    <!--弹出窗口提示部分结束-->
+    <!--收藏弹窗开始-->
+<div class="add-cart-box favorite-box display-none" id="favorite">
+  <div class="close-box"><span class="close" onclick="Close();"></span></div>
+  <div class="cart-cont">
+    <div class="cart-success">
+      <h3 id="tipText">该商品已经加入到您的收藏夹中。</h3>
+    </div>    
+    <div class="cart-btn">    
+       <a href="/private/favorite.aspx" class="favorite-ico"></a><a href="#" class="continue-ico" onclick="Close();"></a>
+    </div>     
+  </div>
+</div>
+<!--收藏弹窗结束-->
+    <!--弹出窗口提示部分结束-->
+    <div id="preAlert" style="display: none;">
+        <div class="preAlertHead">
+            <a onclick="Closechufang();" class="preAlertClose" title="关闭">关闭</a></div>
+        <div class="preAlertCon">
+            <p id="chufang">
+                本商品为处方药，不能在网上直接下订单购买。请您拨打我们的订购热线&nbsp;&nbsp;&nbsp;&nbsp;400-999-0999 咨询订购！</p>
+            <span class="triangle"></span><span class="alertTel"></span>
+        </div>
+    </div>
+
+<script src="http://css.360kxr.com/js/user-guide.js" type="text/javascript" language="javascript"></script>
+
+ <script type="text/javascript">
+     //输入页数跳转
+     function onclickPageHref() {
+         var links = "/category/937-1-4-2-2-0,999999-all-9-all-all-all-";//链接地址
+         var TotalPage = "2"; //总得的页数
+         var objs = $("#pageIndexs").val();
+         for (var i = 0; i < objs.length; i++) {
+             //charAt()获取指定位置字符串,charCodeAt()返回该字符串的编码  
+             //0的ASCII是48,9的ASCII是57  
+             var code = objs.charAt(i).charCodeAt(0);//编译成ASCCII的格式的
+             if (code < 48 || code > 57) {
+                 window.location = "" + links + 1 + ".html"; //不是数字类型的跳入第一页
+                 break;
+             } else {
+             if (parseInt(objs) >= 1 && parseInt(objs) <= (TotalPage)) {
+                 window.location = "" + links + parseInt(objs) + ".html"; //输入为数字的跳转正确的页面
+             } else if (parseInt(objs) <= 0) {
+                 window.location = "" + links + 1 + ".html"; //是数字类型的跳入第一页小于等于零
+             } else {
+                 window.location = "" + links + TotalPage + ".html"; //是数字类型的跳入第后一页大于最大的页数的值
+             }
+             }
+         } 
+     }
+     $(".productName").each(function () { SubstringWords($(this), 12) });
+     $(".greenColor").each(function () { SubstringWords($(this), 15) });
+     //顶部轮播
+     $().ready(function(){
+     var PageId = parseInt('2') + 1;
+     ZyLunbo("divAdLunbo", PageId, 11, '937');
+     });
+    </script>
+
+
+<script type="text/javascript">
+    window["BFD"] = window["BFD"] || {};
+    BFD.BFD_ITEM_INFO = {
+        cat_name: "肿瘤药品",  //当前列表页的类别名称，string类型；
+
+        user_id: "0"	//  当前用户的user_id，string类型。注意：user_id不是用户的真实注册名，而是其注册名的编号,此用户包括注册用户以及匿名用户等所有用户；如果匿名用户 则为空
+    };
+
+    BFD.script = document.createElement("script");
+    BFD.script.setAttribute("src", "http://static1.baifendian.com/service/kaixinren/kaixinren_list_new.js");
+    BFD.script.setAttribute('type', 'text/javascript');
+    BFD.script.setAttribute("charset", "utf-8");
+    document.getElementsByTagName("head")[0].appendChild(BFD.script);
+</script>
+
+
+
+    <!--页面主体部分结束-->
+    <!--页面底部开始-->
+    <!--底部导航-->
+<!--网站底部开始-->
+<div class="footer-box">
+  <div class="footer-nav">
+    <div class="contact-cont">
+      <a title="开心人介绍" target="_blank" href="http://www.360kxr.com/aboutus/101.html" looyu_bound="1" rel="nofollow">开心人介绍</a> |
+      <a title="城市分布" target="_blank" href="http://www.360kxr.com/aboutus/126.html" looyu_bound="1" rel="nofollow">城市分布</a>  |
+      <a title="联系我们" target="_blank" href="http://www.360kxr.com/aboutus/102.html" looyu_bound="1" rel="nofollow">联系我们</a> |
+      <a title="加入我们" target="_blank" href="http://www.360kxr.com/aboutus/550.html?class=71&amp;class1=98" looyu_bound="1" rel="nofollow">加入我们</a> |
+      <a title="网站资质" target="_blank" href="http://www.360kxr.com/aboutus/qualification/105.html" looyu_bound="1" rel="nofollow">网站资质</a> |
+      <a title="友情链接" target="_blank" href="http://www.360kxr.com/aboutus/104.html" looyu_bound="1">友情链接</a> |
+      <a target="_blank" href="http://www.360kxr.com/sitemap/index1" looyu_bound="1">网站地图</a> |
+      <a title="商品地图" target="_blank" href="http://www.360kxr.com/product/productmap.html" looyu_bound="1" >商品地图</a> |
+      <a href="#" onclick="ShowTaker('网站底部','在线客服');;" looyu_bound="1" rel="nofollow">在线客服</a> |  |
+    <a href="http://www.360kxr.com/MemberAction/Register.aspx"  looyu_bound="1" rel="nofollow">免费注册</a> | 
+      <a href="/qiye/" rel="nofollow">企业目录</a>
+      <p>
+        按字母索引商品：<a href="/product/tags?zimu=A" looyu_bound="1">A</a>
+        <a href="/product/tags?zimu=B" looyu_bound="1">B</a>
+        <a href="/product/tags?zimu=C" looyu_bound="1">C</a>
+        <a href="/product/tags?zimu=D" looyu_bound="1">D</a>
+        <a href="/product/tags?zimu=E" looyu_bound="1">E</a>
+        <a href="/product/tags?zimu=F" looyu_bound="1">F</a>
+        <a href="/product/tags?zimu=G" looyu_bound="1">G</a>
+        <a href="/product/tags?zimu=H" looyu_bound="1">H</a>
+        <a href="/product/tags?zimu=I" looyu_bound="1">I</a>
+        <a href="/product/tags?zimu=J" looyu_bound="1">J</a>
+        <a href="/product/tags?zimu=K" looyu_bound="1">K</a>
+        <a href="/product/tags?zimu=L" looyu_bound="1">L</a>
+        <a href="/product/tags?zimu=M" looyu_bound="1">M</a>
+        <a href="/product/tags?zimu=N" looyu_bound="1">N</a>
+        <a href="/product/tags?zimu=O" looyu_bound="1">O</a>
+        <a href="/product/tags?zimu=P" looyu_bound="1">P</a>
+        <a href="/product/tags?zimu=Q" looyu_bound="1">Q</a>
+        <a href="/product/tags?zimu=R" looyu_bound="1">R</a>
+        <a href="/product/tags?zimu=S" looyu_bound="1">S</a>
+        <a href="/product/tags?zimu=T" looyu_bound="1">T</a>
+        <a href="/product/tags?zimu=U" looyu_bound="1">U</a>
+        <a href="/product/tags?zimu=V" looyu_bound="1">V</a>
+        <a href="/product/tags?zimu=W" looyu_bound="1">W</a>
+        <a href="/product/tags?zimu=X" looyu_bound="1">X</a>
+        <a href="/product/tags?zimu=Y" looyu_bound="1">Y</a>
+        <a href="/product/tags?zimu=Z" looyu_bound="1">Z</a>
+      </p>
+    </div>
+  </div>
+  <!--证书部分开始-->
+  <div class="licence-box" id="licence-box">
+  </div>
+  <!--证书部分结束-->
+  <!--底部logo开始-->
+  <ul class='bottom-ico' id="bottom-ico">
+  </ul>
+  <!--底部logo结束-->
+  <div class="copy-box">
+    <p>
+      Copyright@2010-2015 <a href="http://www.360kxr.com/" target="_blank">开心人网上药店</a>(www.360kxr.com)　赣ICP证B2--20090025-2号
+    </p>
+  </div>
+</div>
+<!--网站底部结束-->
+<script type="text/javascript"  language="javascript1.1">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-15765481-1']);
+  _gaq.push(['_setDomainName', '.360kxr.com']);
+  _gaq.push(['_addOrganic', 'baidu', 'word']);
+  _gaq.push(['_addOrganic', 'baidu', 'q1']);
+  _gaq.push(['_addOrganic', 'soso', 'w']);
+  _gaq.push(['_addOrganic', 'yodao', 'q']);
+  _gaq.push(['_addOrganic', 'sogou', 'query']);
+  _gaq.push(['_addOrganic', 'so.com', 'q']);
+  _gaq.push(['_addOrganic', '360', 'q']);
+  _gaq.push(['_trackPageview']);
+</script>
+
+
+<script type="text/javascript">
+  var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+  document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F25be7f863c8455a50b95e7d541d4442a' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+<div style="display:none;">
+<script type="text/javascript">
+  var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+  document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3Fe0598337ea3c84b150a9c23898cf9fbe' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F9e78f4721eecdbc1fd1d3ae2290b7d9e' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</div>
+<!-- Google Code for &#25152;&#26377;&#39029;&#38754; Remarketing List -->
+    <script type="text/javascript">
+  /* <![CDATA[ */
+var google_conversion_id = 1006129378;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "666666";
+var google_conversion_label = "HPLUCOaw-QEQ4qHh3wM";
+var google_conversion_value = 0;
+/* ]]> */
+    </script>
+    <script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+    </script>
+    <noscript>
+        <div style="display: inline;">
+            <img height="1" width="1" style="border-style: none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1006129378/?label=HPLUCOaw-QEQ4qHh3wM&amp;guid=ON&amp;script=0" />
+        </div>
+    </noscript>
+
+    <!--页面底部结束-->
+    <!-- 跟踪代码开始 -->
+    
+
+<!-- Start LK Wise Attribution System Tracker-->
+
+<script type="text/javascript">
+//<![CDATA[
+    var lk_cmds = [];
+    lk_cmds.push(['setSiteId', 'F973J6YZ']);
+    lk_cmds.push(['trackPageView']);
+    (function () {
+        var _lk = document.createElement('script'); _lk.type = 'text/javascript'; _lk.async = true;
+        _lk.src = 'http://www.zikker.com/lk_t_compress.js';
+        var _lk_s = document.getElementsByTagName('script')[0]; _lk_s.parentNode.insertBefore(_lk, _lk_s);
+    } ());
+//]]>
+</script>
+<!-- End LK Wise Attribution System Code -->
+
+    <!-- 跟踪代码结束 -->
+    <script src="../../Script/OnlineCustomer.js" type="text/javascript"></script>
+   <script language="javascript" src="https://v2.live800.com/live800/chatClient/monitor.js?jid=1194017325&companyID=125125&configID=122964&codeType=custom"></script>
+</body>
+</html>

@@ -5,6 +5,11 @@ import time
 import pdb
 import async_http
 
+def cats_filter(x):
+    return {
+            "url": x
+            }
+
 def pager_filter(x):
     return {
             "url": x
@@ -17,9 +22,10 @@ def list_filter(x):
 
 def price_filter(items):
     ret = []
-    for g,s in items:
+    for g,p,s in items:
     	ret.append({
-    		"url": g,
+    		"url": p,
+            "gid": g,
             "stock": s
     	})
     return ret

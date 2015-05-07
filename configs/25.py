@@ -129,20 +129,5 @@ SITES = {
             "workers": ("dp", "ips", "guard"),
             "ignore": False
             },
-        "winxuan": {
-            "site_id": 62,
-            "workers": ("dp", ),
-            "ignore": False
-            }, 
-        "amazon": {
-            "site_id": 1,
-            "workers": ("dp", "guard", "ips"),
-            "ignore": False
-            },
-        "jd_isbn": {
-            "site_id": 3,
-            "workers": ("desc", "dp"),
-            "ignore": False 
-            }
         } 
 

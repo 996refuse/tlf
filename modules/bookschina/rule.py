@@ -19,7 +19,7 @@ rule = (
             "test": [
             {
                 "url": "http://www.bookschina.com/books/kind/sort.asp",
-                "check": "module_test"
+                "check": "bookschina.test_cats"
             },
             ]
         },

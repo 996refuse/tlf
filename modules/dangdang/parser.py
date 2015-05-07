@@ -30,6 +30,9 @@ def cats_parser(url, content, rule):
         ret.append(i)
     return list(set(ret))
 
+def test_cats(res):
+    assert(len(res) > 1500)
+
 #f = open("/home/cc/log", "a")
 def pager(task, rule):
     try:

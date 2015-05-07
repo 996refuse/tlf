@@ -102,7 +102,7 @@ SITES = {
         "360kxr": {
             "site_id": 50,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "price"),
+            "workers": ("mcats", "scats", "pager", "list", "price"),
             "ignore": False,
             },
         "bookschina": {
@@ -114,7 +114,7 @@ SITES = {
         "bookuu": {
             "site_id": 110,
             "reload": 1,
-            "workers": ("cats", "list"),
+            "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
 }

@@ -14,9 +14,7 @@ import spider
 import getpass
 
 
-_tess.set_config({
-"datadir": "/home/%s/project/tess-build/bin" % getpass.getuser(),
-"lang": "eng"})
+_tess.set_config({"datadir": "/usr/share/tessdata", "lang": "eng"})
 
 
 site_id = 25

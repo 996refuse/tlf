@@ -15,9 +15,27 @@ def cats_parser(url, content, rule):
     ret = []
 
     for node in nodes:
-        node = node.replace(".html", '-p_')
-        ret += [node + str(i) + '.html' for i in range(1, 51)]
+        node = node.replace(".html", '-pager_80.html')
+        ret.append(node)
+        #ret += [node + str(i) + '.html' for i in range(1, 51)]
     return ret
+
+def test_cats(res):
+    pdb.set_trace()
+
+def pager(task, rule):
+    t = etree.HTML(task['text'])
+    pages = t.xpath(rule)
+    if not pages:
+        pages = 1
+    else:
+        try:
+            pages = int(re.search("(?<=/)\d+", pages[0]).group())
+        except:
+            pages = 1
+    u = task['url']
+    u = u.replace(".html", "-p_")
+    return [u + str(i) + '.html' for i in range(1, pages+1)]
 
 itemurl = 'http://detail.bookuu.com/%s.html'
 def list_parser(task, rule):

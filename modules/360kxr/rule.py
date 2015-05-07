@@ -1,16 +1,40 @@
 #-*-encoding=utf-8-*-
 rule = (
         {
-            "name": "cats",
+            "name": "mcats",
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.360kxr.com/drugs.html': "//div[@class='left-nav-cont']/ul/li/h4/a/@href",
+                'http://www.360kxr.com': "//div[@class='nav-box']//ul/li[position()>1 and position()<last()-2]/a/@href",
             },
             "get": {
                 "type": "simple",
                 "method": "get",
-                "parser": "360kxr.cats_parser", 
+                "parser": "360kxr.mcats_parser", 
+            },
+            "dst": {
+                "name": "360kxr_scats",
+                "type": "list",
+            },
+        },
+        {
+            "name": "scats",
+            "type": "fetch",
+            "wait": 4,
+            "rule": {
+                "subcats": "//div[@class='left-nav-box']//ul/li/h4/a/@href",
+                "maincats": "//div[@class='left-nav-box']//h4/a/@href",
+            },
+            "src": {
+                "type": "list",
+                "name": "360kxr_scats",
+                "batch": 10,
+                "filter": "360kxr.cats_filter"
+            },
+            "get": {
+                "type": "simple",
+                "method": "get",
+                "parser": "360kxr.scats_parser", 
             },
             "dst": {
                 "name": "360kxr_page",
@@ -73,9 +97,11 @@ rule = (
                 "filter": "360kxr.list_filter"
             },
             "rule": {
-                "nodes": "//div[@id='search_table']//ul/li",
-                "gid": "dl/div/dt/a/@href",
-                "stock": "dl/div/dd/div/p[@class='cart']",
+                "nodes1": "//dl/div[1][@style]",
+                "nodes2": "//div[@id='search_table']//ul/li",
+                "gid": "dd[@class='title']/a/@href",
+                "priceimg": "dd[@class='price-box']/span[@class='price']/img/@src",
+                "stock": "dd/div/p[@class='cart']",
             },
             "dst": {
                 "type": "list",
@@ -113,18 +139,18 @@ rule = (
             "src": {
                 "name": "360kxr_price",
                 "type": "list",
-                "batch": 10,
+                "batch": 40,
                 "group": True,
                 "filter": "360kxr.price_filter"
-                },
-            "rule": {
-                "kxrprice": "//span[@id='pro_mall_price']",
             },
+            #"rule": {
+            #    "kxrprice": "//span[@id='pro_mall_price']",
+            #},
             "get": {
                 "method": "get",
                 "parser": "360kxr.price_parser",
                 "args": { 
-                    "limit": 4,
+                    "limit": 20,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 

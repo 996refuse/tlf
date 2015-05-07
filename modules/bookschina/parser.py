@@ -20,6 +20,9 @@ def cats_parser(url, content, rule):
 
     return ret
 
+def test_cats(res):
+    assert(len(res) > 30)
+
 def pager(task, rule):
     burl = task['url']
     if burl[-1] == '/':

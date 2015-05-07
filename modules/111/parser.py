@@ -37,22 +37,34 @@ def list_parser(task, rule):
     nodes = t.xpath(rule['nodes'])
     prices = []
     items = []
+    gids = dict()
     #pdb.set_trace()
     for node in nodes:
         gid = node.attrib['itemid']
-        stock = node.xpath(rule['stock'])
+        buyinfo = node.xpath(rule['buyinfo'])
         if not gid:
             log_with_time("bad response: %r"%task['url'])
             continue
-        if not stock:
+        stock = 1
+        if not buyinfo:
             items.append(gid)
         else:
-            if stock[0].attrib.get('class') != 'buy':
+            buyinfo = buyinfo[0]
+            if buyinfo.xpath(rule['sellout']):
                 stock = 0
             else:
-                stock = 1
+                hrate = node.xpath(rule['hrate'])
+                if not hrate:
+                    stock = 0
+                else:
+                    try:
+                        hrate = int(re.search("\d+", hrate[0]).group())
+                        stock = 1 if hrate else 0
+                    except:
+                        stock = 0
             prices.append((gid, stock))
-    return {"prices": prices, "items": items}
+        gids[gid] = stock
+    return {"prices": prices, "items": items, "gids": gids}
 
 def test_list(res):
     assert(res[0][1])
