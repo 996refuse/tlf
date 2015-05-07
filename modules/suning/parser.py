@@ -159,7 +159,7 @@ def extract_normal(url, tree, rule):
             result.append((link, qid, p_img[0], s))
     return {
             "price": result,
-            #"dp": dps,
+            "dp": dps,
             "dps_log": dps_log
             } 
 
@@ -190,7 +190,7 @@ def extract_book(url, tree, rule):
         result.append((link, qid, price[0], s)) 
     return {
             "price": result,
-            #"dp": dps,
+            "dp": dps,
             "dps_log": dps_log,
             } 
 

@@ -80,7 +80,7 @@ def list_parser(task, rule):
             prices.append(sku)
     return {
             "dps_log": dps_log,
-            #"dp": dps,
+            "dp": dps,
             "price": prices
             }
 

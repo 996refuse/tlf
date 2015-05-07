@@ -149,6 +149,6 @@ def list_parser(task, rule):
         dps_log[r[1]] = now
     return {
             "spider": result,
-            #"dp": dp_pairs,
+            "dp": dp_pairs,
             "dps_log": dps_log,
             }
