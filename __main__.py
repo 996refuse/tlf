@@ -21,6 +21,6 @@ if __name__ == "__main__":
         if sys.argv[2] == "me":
             spider.test_me()
         else:
-            spider.run_module_test(sys.argv[2], sys.argv[3]) 
+            spider.load_worker_and_test(sys.argv[2], sys.argv[3]) 
     else: 
         spider.run_cat(sys.argv[1], sys.argv[2]) 

@@ -105,42 +105,21 @@ def forward_dst():
     assert r.get("1-1111") == "2" and r.get("2-1111") == "4"
 
 
+def is_worker_alive():
+    import os
+    assert spider.is_worker_alive(os.getpid(), "test", "me")
+    assert not spider.is_worker_alive(0xfffffff, "bug", "bug") 
+
+
 
 all_cases = (
         ("write to file", forward_file),
         ("split price range", load_price_range),
         ("load function", load_func),
         ("redis nodes",redis_nodes),
-        ("forward data", forward_dst)
+        ("forward data", forward_dst),
+        ("is worker alive", is_worker_alive)
         )
 
         
-
-class bcolors:
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    DARKCYAN = '\033[36m' 
-    BLUE = '\033[94m'
-    GREEN = '\033[92m' 
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m' 
-    UNDERLINE = '\033[4m' 
-        
-
-
-def run_test_cases():
-    import traceback
-    spider.load_config()
-    for i, v in enumerate(all_cases):
-        name, func = v
-        prefix = "%d [test for %s]" % (i+1, name)
-        try:
-            func()
-            print prefix, bcolors.BLUE, "pass", bcolors.ENDC
-        except:
-            traceback.print_exc()
-            print prefix, bcolors.RED, " failed", bcolors.ENDC 
 
