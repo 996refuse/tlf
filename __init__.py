@@ -1891,9 +1891,17 @@ def stop_worker(pid):
     del CONFIG["workers"][pid] 
 
 
+
 def start_worker(site, worker): 
+    l = set()
+    for v in CONFIG["workers"].values():
+        l.add("%s-%s" % v)
+    if "%s-%s" % (site, worker) in l:
+        log_with_time("already running %s, %s" % site, worker)
+        return
     pid = detach_worker(site, worker)
     CONFIG["workers"][pid] = (site, worker)
+
 
 
 def print_workers(workers): 
@@ -1906,6 +1914,7 @@ def command_stopall(**kwargs):
     kill_workers()
 
         
+
 def command_stop(**kwargs): 
     s = kwargs.get("site")
     w = kwargs.get("worker")
@@ -2114,5 +2123,4 @@ def run_master(workers):
             log_with_time("%s %s die with exception: %s" % (site, worker, status)) 
         del workers[pid] 
         log_with_time("reloading %s %s" % (site, worker))
-        pid = detach_worker(site, worker)
-        workers[pid] = (site, worker) 
+        start_worker(site, worker) 
