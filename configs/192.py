@@ -90,7 +90,7 @@ SITES = {
         "mi": {
             "site_id": 167,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "dp"),
+            "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
         "111": {

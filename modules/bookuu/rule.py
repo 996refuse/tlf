@@ -30,7 +30,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookuu_pager",
-                "batch": 30,
+                "batch": 10,
                 "filter": "bookuu.pager_filter",
             },
             "rule": "//div[@id='page']/ul/li[3]/text()",
@@ -42,7 +42,7 @@ rule = (
                 "method": "get",
                 "parser": "bookuu.pager",
                 "args": {
-                    "limit":15,  
+                    "limit":5,  
                     "interval": 1,
                     "debug": False
                 }
@@ -55,7 +55,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookuu_list",
-                "batch": 30,
+                "batch": 10,
                 "filter": "bookuu.list_filter",
                 },
             "rule": "//div[@class='main-wrap']/div[contains(@class, 'books-list')]",
@@ -67,7 +67,7 @@ rule = (
                 "method": "get",
                 "parser": "bookuu.list_parser",
                 "args": {
-                    "limit":15,  
+                    "limit":5,  
                     "interval": 1,
                     "debug": False
                 }

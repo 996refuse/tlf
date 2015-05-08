@@ -70,14 +70,12 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "111_list",
-                "batch": 15,
+                "batch": 30,
                 "filter": "111.list_filter",
                 },
             "rule": {
-                "nodes": "//ul[@id='itemSearchList']/li/div[contains(@class, 'itemSearchResultCon')]",
-                "buyinfo": "div[@class='buyInfo']",
-                "sellout": "button[contains(@class, 'sellout')]",
-                "hrate": "p[@class='comment']/span[@class='popularity']/text()"
+                "nodes": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
+                "stock": "div[@class='buyInfo']/button[contains(@class, 'buy')]",
             },
             "multidst": {
                 "prices": {
@@ -87,24 +85,20 @@ rule = (
                 "items": {
                     "type": "list",
                     "name": "111_item",
-                },
-                "gids": {
-                    "type": "hash",
-                    "name": "111_gids"
                 }
             },
             "get": {
                 "method": "get",
                 "parser": "111.list_parser",
                 "args": {
-                    "limit": 5,
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
             },
             "test": [
             {
-                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-58.html",
+                "url": "http://www.111.com.cn/list/953710-0-0-0-0-0-0-59.html",
                 "check": "module_test"
             },
             {
@@ -160,7 +154,7 @@ rule = (
                 "group": True,
                 "type": "list",
                 "name": "111_price",
-                "batch": 20,
+                "batch": 15,
                 "filter": "111.price_filter",
                 },
             "rule": "",
@@ -173,7 +167,7 @@ rule = (
                 "method": "get",
                 "parser": "111.price_parser",
                 "args": {
-                    "limit": 10,  
+                    "limit": 6,  
                     "interval": 1,
                     "debug": False
                 }

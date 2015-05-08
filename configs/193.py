@@ -96,24 +96,24 @@ SITES = {
             "site_id": 103,
             "reload": 1,
             "workers": ("cats", "pager", "list", "price"),
-            "ignore": False,
+            "ignore": True,
             },
         "gjw": {
             "site_id": 108,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
-            "ignore": False,
+            "ignore": True,
             },
         "d1": {
             "site_id": 115,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock1", "stock2"),
-            "ignore": False,
+            "ignore": True,
             },
         "lenovo": {
             "site_id": 135,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
-            "ignore": False,
+            "ignore": True,
             },
         }
