@@ -8,6 +8,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 yougou = 'http://www.yougou.com'
 
@@ -77,4 +78,7 @@ def stock_parser(task, rule):
 	if stock: stock = 1
 	ret.append((task['gurl'], task['price'], stock))
 	fret = format_price(ret)
-	return fret
+	dps = {}
+	for i in fret:
+		dps[i[1]] = time.time()
+	return {"result":fret, "dps":dps}

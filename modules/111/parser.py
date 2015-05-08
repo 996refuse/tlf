@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 def cats_parser(url, content, rule):
     t = etree.HTML(content)
@@ -37,22 +38,26 @@ def list_parser(task, rule):
     nodes = t.xpath(rule['nodes'])
     prices = []
     items = []
+    dps = {}
     #pdb.set_trace()
     for node in nodes:
         gid = node.attrib['itemid']
-        stock = node.xpath(rule['stock'])
+        buyinfo = node.xpath(rule['buyinfo'])
         if not gid:
             log_with_time("bad response: %r"%task['url'])
             continue
-        if not stock:
-            items.append(gid)
-        else:
-            if stock[0].attrib.get('class') != 'buy':
-                stock = 0
-            else:
-                stock = 1
+        if buyinfo:
+            buyinfo = buyinfo[0]
+            buycart = buyinfo.xpath(rule['buycart'])
+            stock = 1
+            if not buycart:
+                if buyinfo.xpath(rule['sellout']) or not node.xpath(rule['comment']):
+                    stock = 0
             prices.append((gid, stock))
-    return {"prices": prices, "items": items}
+        else:
+            items.append(gid)
+        dps[gid] = time.time()
+    return {"prices": prices, "items": items, "dps": dps}
 
 def test_list(res):
     assert(res[0][1])

@@ -97,11 +97,18 @@ rule = (
                 "price1": "div/p[@class='proPrice']/em",
                 "price2": "div[contains(@class, 'pricebox')]/span[1]",
             },
-            "dst": {
-                "type": "list",
-                "name": "yhd_stock",
-                "subsite": True,
+            "multidst": {
+                "stock": {
+                    "type": "list",
+                    "name": "yhd_stock",
+                    "subsite": True,
                 },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "yhd_dps_log"
+                },
+            },
             "get": {
                 "method": "get",
                 "parser": "yhd.list_parser",

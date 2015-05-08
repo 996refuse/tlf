@@ -8,6 +8,7 @@ import pdb
 import re
 import json
 import _tess
+import time
 
 _tess.set_config({"datadir": "/usr/share/tessdata", "lang": "eng"})
 
@@ -87,4 +88,7 @@ def price_parser(task, rule):
         return
     ret = [(task['gid'], price, task['stock'])]
     fret = format_price(ret)
-    return fret
+    dps = {}
+    for i in fret:
+        dps[i[1]] = time.time()
+    return {"result":fret, "dps": dps}

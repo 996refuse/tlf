@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 def cats_parser(url, content, rule):
     t = etree.HTML(content)
@@ -33,6 +34,7 @@ def list_parser(task, rule):
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule['nodes'])
     ret = []
+    dps = {}
     for node in nodes:
         gid = node.attrib["goodsid"]
         price = node.attrib['price'][1:]
@@ -45,5 +47,6 @@ def list_parser(task, rule):
         else:
             stock = 0
         ret.append((gid_html%gid, price, stock))
+        dps[gid] = time.time()
     fret = format_price(ret)
-    return fret
+    return {"result":fret, "dps": dps}

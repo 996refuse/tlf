@@ -22,8 +22,8 @@ rule = (
             "type": "fetch",
             "wait": 4,
             "rule": {
-                "subcats": "//div[@class='left-nav-box']//ul/li/h4/a/@href",
-                "maincats": "//div[@class='left-nav-box']//h4/a/@href",
+                "subcats": "//div[contains(@class, 'left-nav-box')]//ul/li/h4/a/@href",
+                "maincats": "//div[contains(@class,'left-nav-box')]//h4/a/@href",
             },
             "src": {
                 "type": "list",
@@ -42,7 +42,7 @@ rule = (
             },
             "test": [
             {
-                "url": "http://www.360kxr.com/drugs.html",
+                "url": "http://www.360kxr.com/instrument.html",
                 "check": "module_test",
             },
             ]
@@ -106,7 +106,8 @@ rule = (
             "dst": {
                 "type": "list",
                 "name": "360kxr_price",
-                },
+            },
+
             "get": {
                 "type": "simple",
                 "method": "get",
@@ -158,9 +159,16 @@ rule = (
                 "not200": "log", 
                 "randua": True
                 },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
+            "multidst": {
+                "result": {
+                    "name": "spider_result",
+                    "type": "list",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "360kxr_dps_log"
+                },
             },
             "test": [
             {

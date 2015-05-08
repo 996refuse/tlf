@@ -9,6 +9,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 cookie_table = {
         31: 5,
@@ -92,6 +93,7 @@ def list_parser(task, rule):
         log_with_time("bad response: json decode error %s"%task['url'])
         return []
     ret = []
+    dps = {}
     nodes = t.xpath(rule['nodes1'])
     if not nodes:
         nodes = t.xpath(rule['nodes2'])
@@ -121,9 +123,10 @@ def list_parser(task, rule):
                 continue
             price = price.group()
         ret.append((pid, price))
+        dps[gid] = time.time()
     #pr.disable()
     #pr.print_stats()
-    return ret
+    return {"stock":ret, "dps":dps}
 
 
 

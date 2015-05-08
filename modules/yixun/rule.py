@@ -95,10 +95,17 @@ rule = (
                 "batch": 30,
                 "filter": "yixun.stock_filter",
                 },
-            "dst": {
-                "type": "list",
-                "name": "spider_result",
+            "multidst": {
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
                 },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "yixun_dps_log"
+                },
+            },
             "get": {
                 "method": "get",
                 "parser": "yixun.stock_parser",

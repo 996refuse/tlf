@@ -77,10 +77,17 @@ rule = (
                 "gid": "div[@class='wordContent']/a[@class='titlein']/@href",
                 "price": "div[@class='wordContent']/span",
             },
-            "dst": {
-                "type": "list",
-                "name": "spider_result",
+            "multidst": {
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
                 },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "bookschina_dps_log"
+                },
+            },
             "get": {
                 "method": "get",
                 "parser": "bookschina.list_parser",

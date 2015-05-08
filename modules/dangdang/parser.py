@@ -8,6 +8,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 import cProfile as profile
 
@@ -149,7 +150,10 @@ def list_parser(task, rule):
     #pr.disable()
     #pr.print_stats()
     fret = format_price(ret)
-    return {"result": fret, "stock": []}
+    dps = {}
+    for i n fret:
+        dps[i[1]] = time.time()
+    return {"result": fret, "stock": [], "dps": dps}
 
 def stock_parser(task, rule):
     try:

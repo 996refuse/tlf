@@ -74,8 +74,11 @@ rule = (
                 "filter": "111.list_filter",
                 },
             "rule": {
-                "nodes": "//ul[@id='itemSearchList']/li/div[not(contains(@class, 'none'))]",
-                "stock": "div[@class='buyInfo']/button[contains(@class, 'buy')]",
+                "nodes": "//ul[@id='itemSearchList']/li/div[contains(@class, 'itemSearchResultCon')]",
+                "buyinfo": "div[@class='buyInfo']",
+                "sellout": "button[contains(@class, 'sellout')]",
+                "buycart": "button[@class='buy']",
+                "comment": "div[@class='comment']/a",
             },
             "multidst": {
                 "prices": {
@@ -85,7 +88,12 @@ rule = (
                 "items": {
                     "type": "list",
                     "name": "111_item",
-                }
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "111_dps_log"
+                },
             },
             "get": {
                 "method": "get",

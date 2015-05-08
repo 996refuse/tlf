@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 purl = 'http://s.vancl.com/p'
 def pager_parser(url, content, rule):
@@ -35,7 +36,6 @@ def list_parser(task, rule):
             price = price[0].text
         else:
             price = price.group()
-
         ret.append((murl+gid, price))
     return ret
 
@@ -48,4 +48,8 @@ def stock_parser(task, rule):
         stock = 1
     ret = [(task['url'], task['price'], stock)]
     fret = format_price(ret)
-    return fret
+    dps = {}
+    for i in fret:
+        dps[gid] = time.time()
+
+    return {"result":fret, "dps":dps}

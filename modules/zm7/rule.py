@@ -95,9 +95,16 @@ rule = (
                 "not200": "log", 
                 "randua": True
                 },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
+            "multidst": {
+                "result": {
+                    "name": "spider_result",
+                    "type": "list",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "zm7_dps_log"
+                },
             },
             "test": [
             {

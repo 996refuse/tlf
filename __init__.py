@@ -1897,7 +1897,7 @@ def start_worker(site, worker):
     for v in CONFIG["workers"].values():
         l.add("%s-%s" % v)
     if "%s-%s" % (site, worker) in l:
-        log_with_time("already running %s, %s" % site, worker)
+        log_with_time("already running %s, %s" % (site, worker))
         return
     pid = detach_worker(site, worker)
     CONFIG["workers"][pid] = (site, worker)

@@ -30,9 +30,16 @@ rule = (
             "rule": {
                 "item": "//div[@class='product_list']/div[contains(@class, 'product_item')]",
             },
-            "dst": {
-                "type": "list",
-                "name": "womai_stock",
+            "multidst": {
+                "stock": {
+                    "type": "list",
+                    "name": "womai_stock",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "womai_dps_log"
+                },
             },
             "get": {
                 "method": "get",

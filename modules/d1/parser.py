@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import demjson
+import time
 
 def cats_parser(url, content, rule):
     t = etree.HTML(content)
@@ -38,6 +39,7 @@ def list_parser(task, rule):
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule['nodes'])
     ret = []
+    dps = {}
     for node in nodes:
         gid = node.xpath(rule['gid'])
         price = node.xpath(rule['price'])
@@ -56,7 +58,8 @@ def list_parser(task, rule):
                 "count": "1"
             }
         })
-    return ret
+        dps[gid] = time.time()
+    return {"stock": ret, "dps": dps}
 
 surl2 = lambda g,s: 'http://m.d1.cn/ajax/flow/InCartnew.jsp?gdsid=%s&count=1&skuId=%s'%(g,s)
 def stock1_parser(task, rule):
@@ -86,7 +89,7 @@ def stock1_parser(task, rule):
 
     return ret
 
-itemurl = 'http://www.d1.com.cn/product/'
+itemurl = 'http://m.d1.cn/wap/product.html?id=%.8d'
 def stock2_parser(task, rule):
     success = re.search("(?<=success\":).+(?=,)", task['text'])
 
@@ -95,6 +98,6 @@ def stock2_parser(task, rule):
     else:
         stock = 0
 
-    ret = [(itemurl+task['gid'], task['price'], stock)]
+    ret = [(itemurl % int(task['gid']), task['price'], stock)]
     fret = format_price(ret)
     return fret

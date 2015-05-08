@@ -89,14 +89,19 @@ rule = (
                 }
             },
             "multidst": {
-            "stock": {
-                "type": "list",
-                "name": "dangdang_stock",
-            },
-            "result": {
-                "type": "list",
-                "name": "spider_result",
-            }
+                "stock": {
+                    "type": "list",
+                    "name": "dangdang_stock",
+                },
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "dangdang_dps_log"
+                }
             },
             "get": {
                 "method": "get",

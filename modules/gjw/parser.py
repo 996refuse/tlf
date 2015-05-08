@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 def boot_parser(burl, content, rule):
     if 'www.yundun.cn' in content:
@@ -70,4 +71,8 @@ def stock_parser(task, rule):
 
     ret.append((info[0], info[1], stock))
     fret = format_price(ret)
-    return fret
+    dps = {}
+    for i in fret:
+        dps[i[1]] = time.time()
+
+    return {"result":fret, "dps":dps}

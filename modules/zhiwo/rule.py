@@ -58,10 +58,17 @@ rule = (
                 "price": "p/span",
                 "stock": "p/a/img/@src",
             },
-            "dst": {
-                "type": "list",
-                "name": "spider_result",
+            "multidst": {
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
+                    },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "zhiwo_dps_log"
                 },
+            },
             "get": {
                 "method": "get",
                 "parser": "zhiwo.list_parser",

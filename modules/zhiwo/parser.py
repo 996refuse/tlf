@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 burl = "http://www.zhiwo.com"
 def cats_parser(url, content, rule):
@@ -53,4 +54,7 @@ def list_parser(task, rule):
             stock = 0
         ret.append((gid, price, stock))
     fret = format_price(ret)
-    return fret
+    dst = {}
+    for i in fret:
+        dst[i[1]] = time.time()
+    return {"result":fret, "dst":dst}

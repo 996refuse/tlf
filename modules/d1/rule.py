@@ -77,10 +77,17 @@ rule = (
                 "gid": "div[@class='g_title']/span/a/@href",
                 "price": "div[@class='g_price']/span/font",
             },
-            "dst": {
-                "type": "list",
-                "name": "d1_stock1",
+            "multidst": {
+                "stock": {
+                    "type": "list",
+                    "name": "d1_stock1",
                 },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "d1_dps_log"
+                },
+            },
             "get": {
                 "method": "get",
                 "parser": "d1.list_parser",

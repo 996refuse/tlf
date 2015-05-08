@@ -40,8 +40,8 @@ rule = (
                 "price2": "div/div[1]",
             },
             "dst": {
-                "type": "list",
-                "name": "vancl_stock",
+                    "type": "list",
+                    "name": "vancl_stock",
                 },
             "get": {
                 "type": "simple",
@@ -91,9 +91,16 @@ rule = (
                 "not200": "log", 
                 "randua": True
                 },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
+            "multidst": {
+                "result": {
+                    "name": "spider_result",
+                    "type": "list",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "vancl_dps_log"
+                },
             },
             "test": [
             {

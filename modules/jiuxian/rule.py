@@ -78,9 +78,9 @@ rule = (
                 "ostock": "div/a[contains(@class, 'lack')]",
             },
             "dst": {
-                "type": "list",
-                "name": "jiuxian_price",
-                },
+                    "type": "list",
+                    "name": "jiuxian_price",
+            },
             "get": {
                 "method": "get",
                 "parser": "jiuxian.list_parser",
@@ -128,9 +128,16 @@ rule = (
                 "not200": "log", 
                 "randua": True
                 },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
-                }
+            "multidst": {
+                "result": {
+                    "name": "spider_result",
+                    "type": "list",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "jiuxian_dps_log"
+                },
+            },
         }
 )

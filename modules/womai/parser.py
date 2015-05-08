@@ -8,6 +8,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 itemurl = 'http://sh.womai.com/Product-100-%s.htm'
 
@@ -44,6 +45,7 @@ def list_parser(task, rule):
 		log_with_time("bad rule %s"%task['url'])
 		return
 	ret = []
+	dps = {}
 	for node in nodes:
 		gid = re_gid.search(node.attrib.get('id', ""))
 		if not gid:
@@ -51,7 +53,8 @@ def list_parser(task, rule):
 			continue
 		gid = gid.group()
 		ret.append(gid)
-	return ret
+		dps[gid] = time.time()
+	return {"stock": ret, "dps": dps}
 
 def stock_parser(task, rule):
 	try:

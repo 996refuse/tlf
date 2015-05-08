@@ -8,6 +8,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 def cats(url, content, rule):
 	t = etree.HTML(content)
@@ -75,4 +76,7 @@ def stock_parser(task, rule):
 		stock = 0
 	ret = [(task['url'], price, stock)]
 	fret = format_price(ret)
-	return fret
+	dps = {}
+	for i in fret:
+		dps[i[1]] = time.time()
+	return {"result":fret, "dps": dps}

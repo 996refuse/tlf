@@ -101,7 +101,7 @@ rule = (
             "dst": {
                 "type": "list",
                 "name": "gjw_stock",
-                },
+            },
             "get": {
                 "method": "get",
                 "parser": "gjw.list_parser",
@@ -149,9 +149,16 @@ rule = (
                 "not200": "log", 
                 "randua": True
                 },
-            "dst": {
-                "name": "spider_result",
-                "type": "list",
+            "multidst": {
+                "result": {
+                    "name": "spider_result",
+                    "type": "list",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "gjw_dps_log"
+                },
             },
             "test": [
             {

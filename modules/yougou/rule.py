@@ -103,9 +103,16 @@ rule = (
                 "batch": 10,
                 "filter": "yougou.stock_filter",
             },
-            "dst": {
-                "type": "list",
-                "name": "spider_result",
+            "multidst": {
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
+                },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "yougou_dps_log"
+                },
             },
             "get": {
                 "method": "get",

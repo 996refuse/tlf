@@ -62,10 +62,17 @@ rule = (
                 "nodes": "//ul/li[@goodsid]",
                 "ostock": "div/input[@class='addCarNone']",
             },
-            "dst": {
-                "type": "list",
-                "name": "spider_result",
+            "multidst": {
+                "result": {
+                    "type": "list",
+                    "name": "spider_result",
                 },
+                "dps": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "m6go_dps_log"
+                },
+            },
             "get": {
                 "method": "get",
                 "parser": "m6go.list_parser",

@@ -7,6 +7,7 @@ from spider import format_price
 import pdb
 import re
 import json
+import time
 
 gurl = 'http://shop.lenovo.com.cn/search/getproduct.do?plat=4&categorycode=%s&keyword=&sorder=0&spage=%d&sarry=1'
 
@@ -54,4 +55,7 @@ def stock_parser(task, rule):
     code = re.search("(?<=gcodes=)\d+", task['url']).group()
     ret = [(itemburl%code, task['price'], stock)]
     fret = format_price(ret)
-    return fret
+    dps = {}
+    for i in fret:
+        dps[i[1]] = time.time()
+    return {"result": fret, "dps": dps}
