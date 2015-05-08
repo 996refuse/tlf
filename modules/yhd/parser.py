@@ -123,7 +123,7 @@ def list_parser(task, rule):
                 continue
             price = price.group()
         ret.append((pid, price))
-        dps[gid] = time.time()
+        dps[gid] = int(time.time())
     #pr.disable()
     #pr.print_stats()
     return {"stock":ret, "dps":dps}

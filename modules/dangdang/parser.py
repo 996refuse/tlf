@@ -152,7 +152,7 @@ def list_parser(task, rule):
     fret = format_price(ret)
     dps = {}
     for i n fret:
-        dps[i[1]] = time.time()
+        dps[i[1]] = int(time.time())
     return {"result": fret, "stock": [], "dps": dps}
 
 def stock_parser(task, rule):

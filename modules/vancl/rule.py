@@ -30,7 +30,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "vancl_list",
-                "batch": 30,
+                "batch": 10,
                 "filter": "vancl.list_filter"
             },
             "rule": {
@@ -48,7 +48,7 @@ rule = (
                 "method": "get",
                 "parser": "vancl.list_parser",
                 "args": {
-                    "limit": 10,
+                    "limit": 2,
                     "interval": 1,
                     "debug": False
                 }
@@ -83,7 +83,7 @@ rule = (
                 "method": "get",
                 "parser": "vancl.stock_parser",
                 "args": { 
-                    "limit": 5,
+                    "limit": 2,
                     "interval": 2, 
                     "debug": False, 
                     "timeout": 10, 

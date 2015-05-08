@@ -90,5 +90,5 @@ def price_parser(task, rule):
     fret = format_price(ret)
     dps = {}
     for i in fret:
-        dps[i[1]] = time.time()
+        dps[i[1]] = int(time.time())
     return {"result":fret, "dps": dps}

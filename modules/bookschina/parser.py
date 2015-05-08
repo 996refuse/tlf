@@ -61,5 +61,5 @@ def list_parser(task, rule):
         ret.append((itemurl+gid, price, 1))
     fret = format_price(ret)
     for i in fret:
-        dps[i[1]] = time.time()
+        dps[i[1]] = int(time.time())
     return {"result":fret, "dps":dps}

@@ -47,6 +47,6 @@ def list_parser(task, rule):
         else:
             stock = 0
         ret.append((gid_html%gid, price, stock))
-        dps[gid] = time.time()
+        dps[gid] = int(time.time())
     fret = format_price(ret)
     return {"result":fret, "dps": dps}

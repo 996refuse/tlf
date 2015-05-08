@@ -56,7 +56,7 @@ def list_parser(task, rule):
             prices.append((gid, stock))
         else:
             items.append(gid)
-        dps[gid] = time.time()
+        dps[gid] = int(time.time())
     return {"prices": prices, "items": items, "dps": dps}
 
 def test_list(res):

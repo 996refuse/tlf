@@ -53,7 +53,7 @@ def list_parser(task, rule):
 			continue
 		gid = gid.group()
 		ret.append(gid)
-		dps[gid] = time.time()
+		dps[gid] = int(time.time())
 	return {"stock": ret, "dps": dps}
 
 def stock_parser(task, rule):

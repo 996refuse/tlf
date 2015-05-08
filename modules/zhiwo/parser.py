@@ -56,5 +56,5 @@ def list_parser(task, rule):
     fret = format_price(ret)
     dst = {}
     for i in fret:
-        dst[i[1]] = time.time()
+        dst[i[1]] = int(time.time())
     return {"result":fret, "dst":dst}

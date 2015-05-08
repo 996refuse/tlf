@@ -114,4 +114,10 @@ SITES = {
             "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
+        "vancl": {
+            "site_id": 19,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
 }
