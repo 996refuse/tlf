@@ -32,7 +32,8 @@ cmd = {
         "stop": (2, True),
         "stopall": (0, False), 
         "get": (2, True),
-        "getall": (0, True)
+        "getall": (0, True),
+        "refresh": (0, True)
         } 
 
 

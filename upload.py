@@ -16,7 +16,7 @@ def upload():
     if not os.path.exists("./spider"):
         raise ValueError("can't find spider")
     x("mkdir temp")
-    x("rsync -r spider temp/ --exclude spider/.git") 
+    x("rsync -r spider temp/ --exclude .git") 
     x("cd temp; find spider | grep .*pyc |xargs rm") 
     x("cd temp; find spider | grep .*sw. |xargs rm") 
     x("cd temp; tar -cjf spider.tar.bz2 spider")

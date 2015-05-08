@@ -112,12 +112,16 @@ def start(site, worker):
     single_command("start", site, worker) 
 
 
-
 def get_all(): 
     resp = single_command("getall", response=True)
     print "host", env.host
     pprint.pprint(resp)
 
+
+def refresh():
+    resp = single_command("refresh", response=True)
+    print "host", env.host
+    pprint.pprint(resp) 
 
 
 def setup():
