@@ -117,7 +117,7 @@ SITES = {
         "vancl": {
             "site_id": 19,
             "reload": 1,
-            "workers": ("cats", "pager", "list"),
+            "workers": ("pager", "list"),
             "ignore": False,
             },
 }

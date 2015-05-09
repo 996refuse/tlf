@@ -45,7 +45,7 @@ def pager(task, rule):
 itemurl = "http://www.bookschina.com"
 re_price = re.compile("\d+\.\d+")
 def list_parser(task, rule):
-    t = etree.HTML(task['text'])
+    t = etree.HTML(task['text'].decode('gbk', 'replace'))
     nodes = t.xpath(rule['nodes'])
     ret = []
     dps = {}

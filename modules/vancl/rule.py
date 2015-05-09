@@ -71,6 +71,7 @@ rule = (
         {
             "name": "stock",
             "type": "fetch",
+            "wait": 4,
             "src": {
                 "name": "vancl_stock",
                 "type": "list",
@@ -83,13 +84,10 @@ rule = (
                 "method": "get",
                 "parser": "vancl.stock_parser",
                 "args": { 
-                    "limit": 2,
-                    "interval": 2, 
+                    "limit": 10,
+                    "interval": 1, 
                     "debug": False, 
-                    "timeout": 10, 
                     }, 
-                "not200": "log", 
-                "randua": True
                 },
             "multidst": {
                 "result": {

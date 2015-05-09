@@ -13,7 +13,8 @@ purl = 'http://s.vancl.com/p'
 def pager_parser(url, content, rule):
     t = etree.HTML(content)
     pagenum = int(re.search("\d+", t.xpath(rule)[0].text).group())
-    return [purl + str(i) + '.html' for i in range(1, pagenum+1)]
+    pages = [purl + str(i) + '.html' for i in range(1, pagenum+1)]
+    return [i+'?page='+str(j) for i in pages for j in (1, 2)]
 
 murl = 'http://m.vancl.com/style/index/'
 def list_parser(task, rule):

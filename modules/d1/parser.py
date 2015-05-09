@@ -89,7 +89,7 @@ def stock1_parser(task, rule):
 
     return ret
 
-itemurl = 'http://m.d1.cn/wap/product.html?id=%.8d'
+itemurl = 'http://www.d1.com.cn/product/'
 def stock2_parser(task, rule):
     success = re.search("(?<=success\":).+(?=,)", task['text'])
 
@@ -98,6 +98,6 @@ def stock2_parser(task, rule):
     else:
         stock = 0
 
-    ret = [(itemurl % int(task['gid']), task['price'], stock)]
+    ret = [(itemurl%task['gid'], task['price'], stock)]
     fret = format_price(ret)
     return fret

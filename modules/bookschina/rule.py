@@ -98,9 +98,16 @@ rule = (
                 }
             },
             "test": [
-
             {
-                "url": "http://www.bookschina.com/kinder/64000000_5_1_22/",
+                "url": "http://www.bookschina.com/kinder/63000000_5_1_92/",
+                "check": "module_test",
+            },
+            {
+                "url": "http://www.bookschina.com/kinder/63000000_5_1_523/",
+                "check": "module_test",
+            },
+            {
+                "url": "http://www.bookschina.com/kinder/63000000_5_1_317/",
                 "check": "module_test",
             },
             ]
