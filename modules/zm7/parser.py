@@ -66,7 +66,7 @@ def stock_parser(task, rule):
 
     ret = [(gid, price, stock)]
     fret = format_price(ret)
-    dst = {}
+    dps = {}
     for i in fret:
-        dst[i[1]] = int(time.time())
-    return {"result":fret, "dst":dst}
+        dps[i[1]] = int(time.time())
+    return {"result":fret, "dps":dps}

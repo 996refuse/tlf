@@ -49,11 +49,12 @@ def list_parser(task, rule):
     nodes = t.xpath(rule['nodes'])
     ret = []
     dps = {}
+
     for node in nodes:
         gid = node.xpath(rule['gid'])
         price = node.xpath(rule['price'])
         if not gid or not price:
-            log_with_time("bad response: %r" % task['url'])
+            log_with_time("bad rules: %r" % task['url'])
             continue
         gid = gid[0]
         price = price[0].text
@@ -63,3 +64,6 @@ def list_parser(task, rule):
     for i in fret:
         dps[i[1]] = int(time.time())
     return {"result":fret, "dps":dps}
+
+def test_list(res):
+    assert(res['result'] > 20)

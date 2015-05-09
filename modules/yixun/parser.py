@@ -11,6 +11,7 @@ import json
 import time
 
 def cats(url, content, rule):
+	content = content.decode("gbk", "replace")
 	t = etree.HTML(content)
 	return t.xpath(rule)
 

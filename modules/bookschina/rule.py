@@ -31,7 +31,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookschina_page",
-                "batch": 10,
+                "batch": 20,
                 "filter": "bookschina.pager_filter"
                 },
             "dst": {
@@ -42,7 +42,7 @@ rule = (
                 "method": "get",
                 "parser": "bookschina.pager",
                 "args": {
-                    "limit": 2,
+                    "limit": 10,
                     "interval": 1,
                     "debug": False
                 }
@@ -69,7 +69,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "bookschina_list",
-                "batch": 10,
+                "batch": 30,
                 "filter": "bookschina.list_filter",
                 },
             "rule": {
@@ -92,23 +92,23 @@ rule = (
                 "method": "get",
                 "parser": "bookschina.list_parser",
                 "args": {
-                    "limit": 2,
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
                 }
             },
             "test": [
             {
-                "url": "http://www.bookschina.com/kinder/63000000_5_1_92/",
-                "check": "module_test",
+                "url": "http://www.bookschina.com/kinder/24000000_5_1_458/",
+                "check": "bookschina.test_list",
+            },
+            {
+                "url": "http://www.bookschina.com/kinder/63000000_5_1_173/",
+                "check": "bookschina.test_list",
             },
             {
                 "url": "http://www.bookschina.com/kinder/63000000_5_1_523/",
-                "check": "module_test",
-            },
-            {
-                "url": "http://www.bookschina.com/kinder/63000000_5_1_317/",
-                "check": "module_test",
+                "check": "bookschina.test_list",
             },
             ]
         },

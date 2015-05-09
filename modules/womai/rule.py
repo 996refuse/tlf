@@ -80,7 +80,7 @@ rule = (
             },
             "test": [
             {
-                "url": "http://price.womai.com/PriceServer/open/productlist.do?prices=buyPrice&ids=572427,576411,572440,572438,572424,572425,576400,576396,576401,576399",
+                "url": "http://price.womai.com/PriceServer/open/productlist.do?prices=buyPrice&ids=554014,554013,553897,542301,542308,542300,539461,539141,538381,538423",
                 "check": "module_test_stock",
             }
             ]

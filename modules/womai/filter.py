@@ -15,7 +15,7 @@ def list_filter(x):
             "url": x
             } 
 
-api = 'http://price.womai.com/PriceServer/open/productlist.do?prices=buyPrice&ids='
+api = 'http://price.womai.com/PriceServer/open/productlist.do?mid=100&usergroupid=100&prices=buyPrice&ids='
 def stock_filter(items):
     ret = []
     inum = len(items)

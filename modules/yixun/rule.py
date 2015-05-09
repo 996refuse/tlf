@@ -117,9 +117,9 @@ rule = (
             },
             "test": [
             {
-                "url": "http://item.yixun.com/item-1892037.html",
+                "url": "http://item.yixun.com/item-1971655.html",
                 "price": "233",
-                "check": "module_test_stock"
+                "check": "module_test"
             }
             ]
         },

@@ -18,9 +18,9 @@ def list_filter(x):
 
 def stock_filter(items):
 	ret = []
-	for g,p in items:
+	for i in items:
 		ret.append({
-			"url": g,
-			"price": p
+			"url": i[0],
+			"price": i[1]
 		})
 	return ret

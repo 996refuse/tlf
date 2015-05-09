@@ -116,4 +116,23 @@ SITES = {
             "workers": ("pager", "list", "stock"),
             "ignore": False,
             },
+
+        "yougou": {
+            "site_id": 93,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "zm7": {
+            "site_id": 138,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "zhiwo": {
+            "site_id": 140,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
 }

@@ -78,7 +78,7 @@ rule = (
             "src": {
                 "name": "zm7_stock",
                 "type": "list",
-                "batch": 16,
+                "batch": 20,
                 "group": True,
                 "filter": "zm7.stock_filter"
                 },
@@ -87,13 +87,13 @@ rule = (
                 "method": "get",
                 "parser": "zm7.stock_parser",
                 "args": {
-                    "limit": 5,
-                    "interval": 2, 
+                    "limit": 20,
+                    "interval": 1, 
                     "debug": False, 
-                    "timeout": 10, 
+                    "timeout": 10,
+                    "keys": ["price"]
                     },
                 "not200": "log", 
-                "randua": True
                 },
             "multidst": {
                 "result": {
