@@ -120,4 +120,22 @@ SITES = {
             "workers": ("pager", "list"),
             "ignore": False,
             },
+        "m6go": {
+            "site_id": 51,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
+        "yixun": {
+            "site_id": 137,
+            "reload": 1,
+            "workers": ("channel", "catsentry", "cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
+        "womai": {
+            "site_id": 138,
+            "reload": 1,
+            "workers": ("pager", "list", "stock"),
+            "ignore": False,
+            },
 }

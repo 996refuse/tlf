@@ -11,7 +11,7 @@ import time
 
 def cats_parser(url, content, rule):
     t = etree.HTML(content)
-    return ["http://www.m6go.com" + i for i in t.xpath(rule)]
+    return ["http://www.gou.com" + i for i in t.xpath(rule)]
 
 def pager(task, rule):
     burl = task['url']
@@ -29,7 +29,7 @@ def pager(task, rule):
         ret.append(burl + '/' + str(i))
     return ret
 
-gid_html = "http://www.m6go.com/product_%s.html"
+gid_html = "http://www.gou.com/product_%s.html"
 def list_parser(task, rule):
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule['nodes'])

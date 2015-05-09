@@ -5,7 +5,7 @@ rule = (
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.m6go.com/baobaoshipin': "//section/div/div/div[1]/div/h3/a/@href",
+                'http://www.gou.com/baobaoshipin': "//section/div/div/div[1]/div/h3/a/@href",
             },
             "get": {
                 "type": "simple",
