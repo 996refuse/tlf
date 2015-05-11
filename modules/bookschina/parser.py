@@ -9,17 +9,17 @@ import re
 import json
 import time
 
+burl = "http://www.bookschina.com"
 def cats_parser(url, content, rule):
-    burl = "http://www.bookschina.com"
     t = etree.HTML(content)
     ret = [burl + i for i in t.xpath(rule)]
 
     # a bug from www.bookschina.com
     # 2015/03/19
-    if 'kinderwj' in ret[-1]:
-        ret[-1] = burl + '/kinder/' + re.search("\d+", ret[-1]).group() +'/'
+    #if 'kinderwj' in ret[-1]:
+    #    ret[-1] = burl + '/kinder/' + re.search("\d+", ret[-1]).group() +'/'
 
-    return ret
+    return ret[:-1]
 
 def test_cats(res):
     assert(len(res) > 30)
@@ -39,7 +39,7 @@ def pager(task, rule):
         pagenum = int(re.search("(?<=_5_1_)\d+(?=/)", lastpage[0]).group())
 
     for i in range(1, pagenum+1):
-        ret.append(burl + '_5_1_' + str(i) + '/')
+        ret.append(burl + '_AA_5_1_' + str(i) + '/')
     return ret
 
 itemurl = "http://www.bookschina.com"

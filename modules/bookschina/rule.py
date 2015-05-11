@@ -5,7 +5,7 @@ rule = (
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.bookschina.com/books/kind/sort.asp': "//div[@class='categories']/h3/a/@href",
+                'http://www.bookschina.com/Books/allbook/publisher.asp': "//tr/td/a/@href",
             },
             "get": {
                 "type": "simple",
@@ -26,7 +26,7 @@ rule = (
         {
             "type": "fetch",
             "name": "pager",
-            "rule": "//div[@class='bottompage']/a[last()]/@href",
+            "rule": "//div[@class='pages'][1]/a[last()]/@href",
             "wait": 4,
             "src": {
                 "type": "list",

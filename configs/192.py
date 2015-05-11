@@ -126,7 +126,7 @@ SITES = {
         "yixun": {
             "site_id": 15,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
+            "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
         "womai": {

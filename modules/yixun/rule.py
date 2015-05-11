@@ -62,39 +62,8 @@ rule = (
                 "nodes": "//ul[@id='itemList']/li/div/div[@class='mod_goods_info']",
                 "gid": "p[@class='mod_goods_tit']/a/@href",
                 "price": "p[@class='mod_goods_price']/span[@class='mod_price']/span",
+                "stock": "div[@class='goods_more']//a[@class='goods_buy']"
             },
-            "dst": {
-                "type": "list",
-                "name": "yixun_stock",
-            },
-            "get": {
-                "method": "get",
-                "parser": "yixun.list_parser",
-                "args": {
-                    "limit": 30,  
-                    "interval": 1,
-                    "debug": False
-                }
-            },
-            "test": [
-            {
-                "url": "http://searchex.yixun.com/705775-1-/all/------5---------.html#list",
-                "check": "module_test",
-            },
-            ]
-        },
-        {
-            "type": "fetch",
-            "name": "stock",
-            "wait": 4,
-            "rule": "//div[@id='sea_buy_wrap']/a",
-            "src": {
-                "group": True,
-                "type": "list",
-                "name": "yixun_stock",
-                "batch": 30,
-                "filter": "yixun.stock_filter",
-                },
             "multidst": {
                 "result": {
                     "type": "list",
@@ -108,7 +77,7 @@ rule = (
             },
             "get": {
                 "method": "get",
-                "parser": "yixun.stock_parser",
+                "parser": "yixun.list_parser",
                 "args": {
                     "limit": 30,  
                     "interval": 1,
@@ -117,10 +86,9 @@ rule = (
             },
             "test": [
             {
-                "url": "http://item.yixun.com/item-1971655.html",
-                "price": "233",
-                "check": "module_test"
-            }
+                "url": "http://searchex.yixun.com/705798t706810-1-/55e5707?YTAG=3.2144315120020",
+                "check": "module_test",
+            },
             ]
         },
 )

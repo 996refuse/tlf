@@ -13,6 +13,7 @@ import time
 def cats(url, content, rule):
 	content = content.decode("gbk", "replace")
 	t = etree.HTML(content)
+	return ['http://searchex.yixun.com/705798t706810-1-/']
 	return t.xpath(rule)
 
 padurl = "all/------%s---------.html#list"
@@ -51,33 +52,15 @@ def list_parser(task, rule):
 	for node in nodes:
 		gid = node.xpath(rule["gid"])
 		price = node.xpath(rule["price"])
+		stock = 1 if node.xpath(rule["stock"]) else 0
 		if not gid or not price:
 			log_with_time("bad rule %s"%task['url'])
 			continue
 		gid = gid[0]
 		price = price[0].text
-		ret.append((gid, price))
-	return ret
-
-def stock_parser(task, rule):
-	try:
-		t = etree.HTML(task['text'])
-		node = t.xpath(rule)
-		price = task['price']
-	except:
-		log_with_time("bad response %s"%task['url'])
-		return
-	if not node:
-		log_with_time("bad rule %s"%task['url'])
-		return
-	node = node[0]
-	if node.attrib.get('id') == 'btnAddCart':
-		stock = 1
-	else:
-		stock = 0
-	ret = [(task['url'], price, stock)]
+		ret.append((gid, price, stock))
 	fret = format_price(ret)
 	dps = {}
 	for i in fret:
 		dps[i[1]] = int(time.time())
-	return {"result":fret, "dps": dps}
+	return {"result":fret, "dps":dps}
