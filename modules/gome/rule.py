@@ -26,20 +26,18 @@ rule = (
                 "type": "list",
                 "name": "gome_list",
                 "batch": 10,
-                "filter": "gome.task_filter",
+                "filter": "gome.pager_filter",
                 },
             "dst": {
                 "type": "list",
                 "name": "gome_page"
                 }, 
-            "not200": "log",
-            "get": {
-                "async": True,
-                "method": "post", 
+            "get": { 
+                "not200": "log",
+                "method": "get", 
                 "randua": True, 
                 "args": {
                     "limit": 10, 
-                    "copy_keys": ("old_url", ), 
                     }, 
                 "parser": "gome.pager", 
             },
@@ -54,7 +52,7 @@ rule = (
                 "batch": 30, 
                 }, 
             "get": { 
-                "method": "post", 
+                "method": "get",
                 "not200": "log",
                 "randua": True,
                 "args": {
