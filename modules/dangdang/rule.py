@@ -16,7 +16,7 @@ rule = (
                 "name": "dangdang_pager",
                 "type": "list",
             },
-            "price_range": "price_range",
+            #"price_range": "price_range",
         },
         {
             "type": "fetch",

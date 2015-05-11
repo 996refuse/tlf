@@ -135,4 +135,10 @@ SITES = {
             "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
+        "dangdang": {
+            "site_id": 136,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
 }

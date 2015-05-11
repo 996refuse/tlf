@@ -109,7 +109,7 @@ config = {
 failed_tasks = { }
 
 
-copy_keys = ("url", "parser", "method")
+copy_keys = ("url", "parser", "method", "retry")
 
 
 possible_methods = set(("GET", "POST", "HEAD", "PUT", "DELETE"))
@@ -854,10 +854,9 @@ def repeat_tasks(task_list):
         failed_tasks = {}
         for key,v in items:
             if v["retry"] > config["retry_limit"]:
-                del failed_tasks[key]
                 continue
-            t = default_copy(v)
             v["retry"] += 1
+            t = default_copy(v)
             ret.append(t)
         dispatch_tasks(ret)
 

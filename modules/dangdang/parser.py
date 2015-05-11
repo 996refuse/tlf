@@ -44,6 +44,7 @@ def pager(task, rule):
         log_with_time("bad response %s"%task['url'].decode('utf-8', 'replace'))
         return
     ret = []
+    #pdb.set_trace()
 
     url = task['url']
     url = url[:url.find(".htm")]
@@ -59,7 +60,7 @@ def pager(task, rule):
     if not pagecount:
         pagecount = t.xpath(urule2)
         if not pagecount:
-            log_with_time("bad rule %s"%task['url'])
+            log_with_time("bad rule %s"%task['url'].decode('utf-8', 'replace'))
             return
     pagecount = pagecount[0]
     if type(pagecount) == lxml.etree._Element:
@@ -67,7 +68,7 @@ def pager(task, rule):
     #pdb.set_trace()
     pagecount = re.search("\d+", pagecount)
     if not pagecount:
-        log_with_time("bad rule %s"%task['url'])
+        log_with_time("bad rule %s"%task['url'].decode('utf-8', 'replace'))
         return
     pagecount = int(pagecount.group())
     for i in range(1, pagecount+1):
@@ -151,7 +152,7 @@ def list_parser(task, rule):
     #pr.print_stats()
     fret = format_price(ret)
     dps = {}
-    for i n fret:
+    for i in fret:
         dps[i[1]] = int(time.time())
     return {"result": fret, "stock": [], "dps": dps}
 
