@@ -135,4 +135,10 @@ SITES = {
             "workers": ("pager", "list", "stock"),
             "ignore": False,
             },
+        "lenovo": {
+            "site_id": 135,
+            "reload": 1,
+            "workers": ("cats", "pager", "list", "stock"),
+            "ignore": False,
+            },
 }
