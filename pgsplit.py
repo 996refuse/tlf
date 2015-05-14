@@ -64,7 +64,7 @@ class pagespliter(object):
 		return cid, ret
 
 	@asyncio.coroutine
-	def split(self, cid, hmax = 5000):
+	def split(self, cid, hmax = 10000):
 		@asyncio.coroutine
 		def stepget(cid):
 			sg = stepget

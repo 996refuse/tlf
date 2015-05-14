@@ -34,7 +34,7 @@ def cats_parser(url, content, rule):
 def test_cats(res):
     assert(len(res) > 1500)
 
-#f = open("/home/cc/log", "a")
+f = open("/home/luxck/log", "a")
 def pager(task, rule):
     try:
         content = task['text'].decode("gbk", 'replace')
@@ -71,6 +71,12 @@ def pager(task, rule):
         log_with_time("bad rule %s"%task['url'].decode('utf-8', 'replace'))
         return
     pagecount = int(pagecount.group())
+    # if pagecount == 100:
+    #     cat = re.search("(?<=com/).+(?=\.htm)", task['url']).group()
+    #     itc = t.xpath("//div[@class='page' or @class='data']/span[1]/text()")
+    #     itc = int(re.search("\d+", itc[0]).group()) if itc else 0
+    #     f.write(cat + ';' + str(itc) + '\n')
+    #     f.flush()
     for i in range(1, pagecount+1):
         ret.append(padmethod % str(i))
     return ret

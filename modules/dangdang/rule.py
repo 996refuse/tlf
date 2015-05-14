@@ -16,7 +16,7 @@ rule = (
                 "name": "dangdang_pager",
                 "type": "list",
             },
-            #"price_range": "price_range",
+            "price_range": "price_range",
         },
         {
             "type": "fetch",
@@ -24,12 +24,13 @@ rule = (
             "wait": 4,
             "rule": {
                 "norm": "//ul[@class='paging']/li[@class='page_input']/span[1]",
-                "book": "//div[@class='page']/input[@name='totalPage']/@value"
+                "book": "//div[@class='page']/input[@name='totalPage']/@value",
+                "base": "//div[@class='page' or @class='data']/span[3]/text()",
             },
             "src": {
                 "type": "list",
                 "name": "dangdang_pager",
-                "batch": 50,
+                "batch": 500,
                 "filter": "dangdang.pager_filter"
             },
             "dst": {
@@ -40,7 +41,7 @@ rule = (
                 "method": "get",
                 "parser": "dangdang.pager",
                 "args": {
-                    "limit": 50,    
+                    "limit": 500,
                     "interval": 1,
                     "debug": False
                 }
@@ -67,7 +68,7 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "dangdang_list",
-                "batch": 30,
+                "batch": 500,
                 "filter": "dangdang.list_filter",
             },
             "rule": {
@@ -107,7 +108,7 @@ rule = (
                 "method": "get",
                 "parser": "dangdang.list_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 500,  
                     "interval": 1,
                     "debug": False
                 }
@@ -135,7 +136,7 @@ rule = (
                 "group": True,
                 "type": "list",
                 "name": "dangdang_stock",
-                "batch": 30,
+                "batch": 500,
                 "filter": "dangdang.stock_filter",
                 },
             "dst": {
@@ -146,7 +147,7 @@ rule = (
                 "method": "get",
                 "parser": "dangdang.stock_parser",
                 "args": {
-                    "limit": 30,  
+                    "limit": 500,
                     "interval": 1,
                     "debug": False
                 }

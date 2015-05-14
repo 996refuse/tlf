@@ -138,7 +138,7 @@ SITES = {
         "dangdang": {
             "site_id": 2,
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
+            "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
 }
