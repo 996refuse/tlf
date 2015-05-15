@@ -112,7 +112,7 @@ failed_tasks = { }
 
 copy_keys = ("url", "parser", "method",
     "retry", "redirect", "session", "chain",
-    "prev", "chain_idx", "ssl", "urlsset") 
+    "prev", "chain_idx", "ssl", "urlsset", "header", "cookie") 
 
 
 possible_methods = set(("GET", "POST", "HEAD", "PUT", "DELETE")) 
@@ -148,8 +148,10 @@ def generate_request(task):
         port = 80 
         header["Host"] = host
     if url_parts.get("schema") == "https":
-        task["ssl"] = True
+        task["ssl"] = True 
         port = 443
+    else:
+        task["ssl"] = False
     if "port" in url_parts:
         port = int(url_parts["port"])
     #没代理
@@ -236,11 +238,12 @@ def auto_redirect(task):
 
 
 
-def call_chain_filter(task):
+def call_chain_filter(task): 
     flt = chain_next(task)
     if not flt:
+        pdb.set_trace()
         return 
-    next = flt(task)
+    next = flt(task) 
     insert_task(next) 
 
 
@@ -251,7 +254,7 @@ def assign_key(d1, d2, *keys):
 
 
 def call_parser(task): 
-    res_header = task["res_header"]
+    res_header = task["res_header"] 
     status = task["res_status"]["status"]
     if task["redirect"] > 0 and 400 > status > 300:
         auto_redirect(task)
@@ -259,11 +262,11 @@ def call_parser(task):
     if task.get("chain"):
         if call_chain_filter(task): 
             return 
-        prev = task["prev"]
+        prev = task["prev"] 
         assign_key(prev, task, 
                 "res_status", "res_cookie",
-                "res_header", "res_text") 
-        task = prev
+                "res_header", "recv") 
+        task = prev 
     enc =  task["res_header"].get("Content-Encoding") 
     text = task["recv"].getvalue() 
     task["recv"].truncate(0) 
@@ -591,7 +594,7 @@ def read_to_buffer(task):
             buf.write(con.recv(409600)) 
             if buf.tell() == mark:
                 parse_http_buffer(task) 
-                break
+                raise socket.error("stream end") 
         except socket.error as e:
             if e.errno == errno.EAGAIN: 
                 break
@@ -637,10 +640,13 @@ def read_to_buffer_ssl(task):
         try: 
             mark = buf.tell()
             buf.write(con.recv(409600)) 
+            if buf.tell() == mark: 
+                parse_http_buffer(task)
+                raise ssl.SSLError("stream end") 
         except ssl.SSLError as e: 
             if e.errno == ssl.SSL_ERROR_ZERO_RETURN: 
                 parse_http_buffer(task) 
-                break
+                raise ssl.SSLError("stream end")
             handle_ssl_exception(task, e)
             break
 
@@ -851,12 +857,13 @@ def internal_timer(signum, frame):
 
 
 def fill_task(task): 
-    if task.get("chain"):
+    if task.get("chain") and not task.get("chain_idx"): 
+        task["chain_idx"] = 0 
         flt = chain_next(task)
         prev = task
         task = flt(prev)
         assert id(task) != id(prev)
-        task["prev"] = prev
+        task["prev"] = prev 
     task["send"] = StringIO() 
     task["recv"] = StringIO() 
     copy = {
@@ -878,7 +885,10 @@ def fill_task(task):
         if k not in task:
             task[k] = v
     if task["redirect"] and "urlsset" not in task:
-        task["urlsset"] = {task["url"]: 1}
+        task["urlsset"] = {task["url"]: 1} 
+    if task.get("chain") and not task.get("chain_idx"):
+        task["chain_idx"] = 1
+    return task
 
 
 def preset_dns(task_list): 
@@ -913,8 +923,8 @@ def log_with_time(msg):
 def dispatch_tasks(task_list): 
     g["ep"] = epoll() 
     #补全任务缺少的
-    for i in task_list: 
-        fill_task(i) 
+    for i,v in enumerate(task_list): 
+        task_list[i] = fill_task(v) 
     #初始化任务管理 
     preset_dns(task_list)
     space = config["limit"]
@@ -968,8 +978,8 @@ def batch_request(urls, parser):
 
 
 def insert_task(task):
-    task = default_copy(task)
-    fill_task(task)
+    task = default_copy(task) 
+    task = fill_task(task) 
     while True:
         random = get_random()
         if random not in tasks: 
