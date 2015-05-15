@@ -33,6 +33,7 @@ class pagespliter(object):
 
 	@asyncio.coroutine
 	def get(self, url, cb, *args, **kwargs):
+		empty_html = '<html><body></body></html>'
 		@asyncio.coroutine
 		def _get(url):
 			retry = 8
@@ -44,7 +45,7 @@ class pagespliter(object):
 					break
 				except Exception as e:
 						print('Exception:', e, url)
-						t = ""
+						t = empty_html
 						retry -= 1
 				yield from asyncio.sleep(2)
 				print("retry: %s"%(8-retry), url)
@@ -64,7 +65,7 @@ class pagespliter(object):
 		return cid, ret
 
 	@asyncio.coroutine
-	def split(self, cid, hmax = 10000):
+	def split(self, cid, hmax = 5000):
 		@asyncio.coroutine
 		def stepget(cid):
 			sg = stepget

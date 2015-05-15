@@ -28,7 +28,8 @@ rule = (
                 "filter": "womai.list_filter",
             },
             "rule": {
-                "item": "//div[@class='product_list']/div[contains(@class, 'product_item')]",
+                "item": "//div[@class='product_list']/div[contains(@class, 'product_item')]/div[contains(@class, 'proitem_list')]",
+                "gid": "div[@class='product_item_price']/@id"
             },
             "multidst": {
                 "stock": {

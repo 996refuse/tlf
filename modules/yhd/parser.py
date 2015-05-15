@@ -51,6 +51,7 @@ def cats_parser(url, content,  rule):
     return ret
 
 pgburl = 'http://list.yhd.com/%s/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
+morepad = '?isGetMoreProducts=1'
 def pager(task, rule):
     try:
         tree = etree.HTML(task["text"])
@@ -78,12 +79,13 @@ def pager(task, rule):
     except:
         count = 1
     for i in range(1, count+1):
-        ret.append(pgburl%(cats, str(i)))
+        url = pgburl%(cats, str(i))
+        ret.extend([url, url + morepad])
     return ret
 
 
 re_price = re.compile("(?<=b\>)\d+\.\d+|(?<=b\>)\d+")
-re_pid = re.compile("\d+")
+re_gid = re.compile("\d+")
 def list_parser(task, rule):
     #pr.enable()
     try:
@@ -104,9 +106,9 @@ def list_parser(task, rule):
     else:
         price_rule = rule['price1']
     for node in nodes:
-        pid = re_pid.search(node.attrib['id']).group()
+        gid = re_gid.search(node.attrib['id']).group()
         price_node = node.xpath(price_rule)
-        if not pid or not price_node:
+        if not gid or not price_node:
             log_with_time("bad rules: %s %s"%(price_rule, task['url']))
             continue
         price_node = price_node[0]
@@ -122,7 +124,7 @@ def list_parser(task, rule):
                 log_with_time("bad response %s"%task['url'])
                 continue
             price = price.group()
-        ret.append((pid, price))
+        ret.append((gid, price))
         dps[gid] = int(time.time())
     #pr.disable()
     #pr.print_stats()

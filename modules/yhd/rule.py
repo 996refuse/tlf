@@ -93,7 +93,7 @@ rule = (
                 },
             "rule": {
                 "nodes1": "//div[@id='itemSearchList']/div",
-                "nodes2": "//ul[@id='itemSearchList']/li/div[contains(@class, 'search_item_box') and not(contains(@class, 'none'))]",
+                "nodes2": "//li/div[contains(@class, 'search_item_box') and not(contains(@class, 'none'))]",
                 "price1": "div/p[@class='proPrice']/em",
                 "price2": "div[contains(@class, 'pricebox')]/span[1]",
             },
@@ -120,7 +120,7 @@ rule = (
             },
             "test": [
             {
-                "url": "http://list.yhd.com/searchPage/c19931-0-0/b/a-s1-v0-p13-price-d0-f0-m1-rt0-pid-mid0-k",
+                "url": "http://list.yhd.com/searchPage/c33622-0-81835/b/a-s1-v0-p2-price-d0-f0-m1-rt0-pid-mid0-k/?isGetMoreProducts=1",
                 "check": "module_test"
             },
             {

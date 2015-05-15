@@ -47,7 +47,7 @@ def list_parser(task, rule):
 	ret = []
 	dps = {}
 	for node in nodes:
-		gid = re_gid.search(node.attrib.get('id', ""))
+		gid = re_gid.search(node.xpath(rule['gid'])[0])
 		if not gid:
 			log_with_time("bad regex %s"%task['url'])
 			continue
