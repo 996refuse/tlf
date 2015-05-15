@@ -166,7 +166,6 @@ def set_push_n(redis, key, *args):
     return redis.evalsha(SCRIPT_IDS["set_push_n"], len(args)+1,  key, *args)
 
 
-
 def profile_func(func, *args):
     import cProfile, pstats, StringIO
     pr = cProfile.Profile()
@@ -181,8 +180,20 @@ def profile_func(func, *args):
     print s.getvalue() 
 
 
-CONFIG = {}
+def get_memsize():
+    items = open("/proc/%s/statm" % os.getpid()).read().split(" ")
+    size = int(items[0])
+    return size
 
+
+def profile_mem(func, *args):
+    sizea = get_memsize()
+    func(*args)
+    sizeb = get_memsize()
+    print sizeb - sizea
+
+
+CONFIG = {} 
 
 def jsonp_json(content):
     a = content.find("(")
@@ -314,6 +325,17 @@ def format_price(result):
     return ret 
 
 
+
+def format_style_group(main_url, urls): 
+    site_id = CONFIG["site_id"] 
+    main_crc = get_urlcrc(site_id, main_url)
+    crcs = []
+    for k in urls:
+        crcs.append(str(get_urlcrc(site_id, k))) 
+    return main_crc, ",".join(crcs)
+
+
+
 QUERY_METHODS = set(("get", "head", "delete", "trace", "option"))
 UPLOAD_METHODS = set(("post", "delete")) 
 
@@ -332,16 +354,16 @@ def run_single(rule):
             log_with_time("unknown type: %s" % gt["type"])
             continue
         if gt["method"] in QUERY_METHODS:
-            h, c = do(l, query = gt.get("query")) 
+            res = do(l, query = gt.get("query"), redirect=10) 
         elif gt["method"] in UPLOAD_METHODS:
-            h, c= do(l, payload = gt.get("payload"))
+            res = do(l, payload = gt.get("payload"), redirect=10)
         else:
             log_with_time("unknown method: %s" % gt["method"])
             continue 
-        if h["status"] != 200:
+        if res["status"] != 200:
             log_with_time("get %s failed" % h) 
             exit(1) 
-        result = parser(l, c, fromlist[l]) 
+        result = parser(l, res, fromlist[l]) 
         if result and rule.get("price_range"):
             urls = load_price_range(rule["price_range"]) 
             result = replace_url_with_ranges(result, urls) 
@@ -446,7 +468,7 @@ def forward_dp(task):
     if "crc" not in task:
         log_with_time("lost crc: %s" % task["url"])
         return 
-    status = task["resp_header"]["status"] 
+    status = task["res_status"]["status"] 
     if CONFIG.get("proxy"):
         CONFIG["origin_node"].srem(CONFIG["origin"], task['origin'])
     if status != 200: 
@@ -510,7 +532,7 @@ def batch_parser(task):
     not200 = rule["get"].get("not200") 
     if CONFIG.get("proxy"):
         CONFIG["origin_node"].srem(CONFIG["origin"], task['origin'])
-    if task["resp_header"]["status"] != 200:
+    if task["res_status"]["status"] != 200:
         if not200 == "log": 
             log_with_time("not200: %s %s" % (task["resp_header"],
                 task["url"]))
@@ -713,7 +735,7 @@ def get_dps_diffset(src):
     atime = time.time() 
     origins = {} 
     while True: 
-        if time.time() - atime > 600: 
+        if time.time() - atime > 60: 
             log_with_time("wait timeout, got: %s" % len(diffset))
             break 
         b = get_dp_items(src, origins)
@@ -760,7 +782,8 @@ def set_proxies(node,  qname, tasks):
 def setup_dp_env(): 
     client = CONFIG["client"] 
     default_node = client["nodes"]["default"]
-    CONFIG["lc"] = llkv.Connection(**client["llkv_dp"])
+    CONFIG["lc"] = llkv.Connection(**client["llkv_dp"]) 
+    CONFIG["last_flush_time"] = time.time()
     CONFIG["fpack"] = filepack2.FilePack(db = default_node,
         limit = 1000, site_id=CONFIG["site_id"],
         datadir="/mnt/mfs") 
@@ -798,10 +821,16 @@ def setup_config(rule):
         CONFIG["fconfig"] = dst 
 
 
+
 def flush_dp_files():
     mlen = len(CONFIG["fpack"].meta) 
-    if not mlen:
+    if not mlen: 
         return
+    now = time.time()
+    if now - CONFIG["last_flush_time"] < 3600: 
+        log_with_time("wait to flush...")
+        return
+    CONFIG["last_flush_time"] = now
     log_with_time("flush %s files to disk" % mlen) 
     CONFIG["fpack"].flush()
     time.sleep(5) 
@@ -908,15 +937,9 @@ def my_server_id():
 
 
 def connect_mysql(config): 
-    if "mysql_con" in CONFIG:
-        try:
-            CONFIG["mysql_con"].close() 
-        except Exception as e:
-            log_with_time("close prev mysql con failed") 
-    CONFIG["mysql_con"] = MySQLdb.connect(**config)
-    CONFIG["mysql_cur"] = CONFIG["mysql_con"].cursor() 
-    CONFIG["mysql_config"] = config
-
+    con = MySQLdb.connect(**config)
+    cur = con.cursor() 
+    return con, cur 
 
 
 
@@ -930,7 +953,6 @@ def replace_log(name):
         os.remove(old_name) 
     except OSError as e:
         print "7z: compress log failed: %s" % e 
-
 
 
 
@@ -990,7 +1012,8 @@ def detach_and_set_log(CONFIG):
 
 
 
-def update_llkv(site_id,  key, price, stock):
+def update_llkv(profile, item):
+    site_id,  key, price, stock = item
     if stock > 1:
         stock = 1
     if stock < 0:
@@ -1001,29 +1024,85 @@ def update_llkv(site_id,  key, price, stock):
     if price < 0:
         price = 0
     ll_key = (site_id << 48) | ctypes.c_uint(key).value
-    CONFIG["llkv"].set(ll_key, price | (stock << 63)) 
+    profile["llkv"].set(ll_key, price | (stock << 63)) 
+
+
+B2C_SQL = 'insert into T_PriceStock (site_id, url_crc, update_date,  price, stock, update_time, server_id) values(%s, %s, "%s", %s, %s, "%s", %s) on duplicate key update price = %s, stock = %s, update_date="%s", update_time="%s", server_id=%s'
 
 
 
-INSERT_PRICE_SQL = 'insert into T_PriceStock (site_id, url_crc, update_date,  price, stock, update_time, server_id) values(%s, %s, "%s", %s, %s, "%s", %s) on duplicate key update price = %s, stock = %s, update_date="%s", update_time="%s", server_id=%s'
+TMALL_SQL = """\
+insert into T_PriceStock_Tmall (site_id, url_crc, \
+update_date, price, stock, update_time, server_id) \
+values (83, %s, "%s", %s, %s, "%s", %s) \
+on duplicate key update price=%s, stock=%s, update_date="%s", \
+update_time="%s", server_id=%s;\
+""" 
 
 
 
-def update_mysql(site_id, key, price, stock): 
+TAOBAO_SQL = """\
+insert into T_PriceStock_Taobao (url_crc, \
+update_date, price, stock, update_time, server_id) \
+values (%s, "%s", %s, %s, "%s", %s) \
+on duplicate key update price=%s, stock=%s, update_date="%s", \
+update_time="%s", server_id=%s;\
+""" 
+
+
+
+
+def commit_b2c(profile, items):
+    for i in items:
+        update_mysql(profile, i)
+    _safe_commit(profile["con"], profile["db"]) 
+
+
+
+def update_mysql(profile, item): 
+    sql = profile["gen_sql"](item) 
+    log_with_time(sql) 
+    _safe_insert_sql(profile["cur"], sql, profile["db"])
+    if profile.get("llkv"):
+        update_llkv(profile, item) 
+
+
+
+def gen_b2c_sql(item): 
     now = datetime.datetime.strftime(datetime.datetime.now(),
             '%Y-%m-%d %H:%M:%S')
     date = now.split(' ')[0] 
-    sql = INSERT_PRICE_SQL % (site_id, key, date, price, stock, now, CONFIG["myid"], price, stock, date, now, CONFIG["myid"])
-    log_with_time(sql) 
-    _safe_insert_sql(sql)
-    update_llkv(site_id, key, price, stock)
+    site_id, key, price, stock = item
+    sql = B2C_SQL % (site_id, key, date, price, stock,
+            now, CONFIG["myid"], price, stock, date, now, CONFIG["myid"]) 
+    return sql
 
 
 
-def _safe_insert_sql(sql): 
+def gen_taobao_sql(item):
+    now = datetime.datetime.strftime(datetime.datetime.now(),
+            '%Y-%m-%d %H:%M:%S')
+    date = now.split(' ')[0] 
+    site_id, key, price, stock, user_id = item
+    sql = TAOBAO_SQL % (site_id, key, date, price, stock,
+            now, user_id, price, stock, date, now, user_id) 
+    return sql
+
+
+def gen_tmall_sql(item):
+    now = datetime.datetime.strftime(datetime.datetime.now(),
+            '%Y-%m-%d %H:%M:%S')
+    date = now.split(' ')[0] 
+    site_id, key, price, stock, user_id = item
+    sql = TMALL % (site_id, key, date, price, stock,
+            now, user_id, price, stock, date, now, user_id) 
+    return sql 
+
+
+def _safe_insert_sql(cur, sql, config): 
     while True:
         try:
-            CONFIG["mysql_cur"].execute(sql)
+            cur.execute(sql)
             break
         except Exception as e: 
             if len(e.args) > 1:
@@ -1031,17 +1110,16 @@ def _safe_insert_sql(sql):
             else:
                 msg = ""
             if "gone away" in msg or "lost" in msg:
-                wait_for_mysql()
+                wait_for_mysql(config)
             else: 
                 log_with_time("bug, _safe_insert_sql: %s %s" % (e,  sql)) 
                 return 
 
 
-
-def _safe_commit(): 
+def _safe_commit(con, config): 
     while True:
         try:
-            CONFIG["mysql_con"].commit()
+            con.commit()
             break
         except Exception as e:
             if len(e.args) > 1:
@@ -1049,17 +1127,18 @@ def _safe_commit():
             else:
                 msg = ""
             if "gone away" in msg or "lost" in msg:
-                wait_for_mysql()
+                wait_for_mysql(config)
             else: 
                 log_with_time("bug, _safe_commit: %s" % e)
                 return 
 
 
-def wait_for_mysql():
+
+def wait_for_mysql(config):
     while True: 
         log_with_time("bug: wait_for_mysql: reconnect mysql") 
         try:
-            connect_mysql(CONFIG["mysql_config"])
+            connect_mysql(config)
             break
         except Exception as e:
             log_with_time("waiting mysql: %s" % e) 
@@ -1069,88 +1148,142 @@ def wait_for_mysql():
 TT_INFO = re.compile("p>([\-0-9]+).*s>([0-9]+)") 
 
 
-
-def format_style_group(main_url, urls): 
-    site_id = CONFIG["site_id"] 
-    main_crc = get_urlcrc(site_id, main_url)
-    crcs = []
-    for k in urls:
-        crcs.append(str(get_urlcrc(site_id, k))) 
-    return main_crc, ",".join(crcs)
-
-
-
-def update_db(items): 
-    llkv = CONFIG["llkv"] 
+def diff_list_item(profile, items): 
+    llkv = profile["llkv"] 
     prices = {}
     for i in items:
-        prices[i[1]] = i[2:] + [i[0]]
-    keys = []
-    for site_id, crc, _, _ in items:
-        unsigned_crc = ctypes.c_uint(int(crc)).value
-        keys.append((int(site_id) << 48) | unsigned_crc) 
+        prices[i[1]] = i[2:] + [i[0]] 
+    c_uint = ctypes.c_uint
+    keys = [] 
+    for item in items:
+        unsigned_crc = c_uint(int(item[1])).value
+        keys.append((int(item[0]) << 48) | unsigned_crc) 
     d = llkv.multi_get(keys) 
+    result = []
     for key, value in d.items():
-        k2 = ctypes.c_int(key & 0xffffffff).value
-        if k2 not in prices:
-            log_with_time("k2 not in prices")
+        key2 = c_uint(key & 0xffffffff).value
+        if key2 not in prices:
+            log_with_time("key2 not in prices")
             continue
-        price, stock, site_id = prices[k2] 
-        del prices[k2] 
+        price, stock, site_id = prices[key2] 
+        del prices[key2] 
         if not value:
             log_with_time("llkv empty key, %s" % key)
-            update_mysql(site_id, k2, price, stock)
+            result.append((site_id, key2, price, stock))
             continue 
         s = value >> 63
         p = value & 0x7fffffffffffffffL
         if p != price or s != stock:
-            update_mysql(site_id, k2, price, stock) 
+            result.append((site_id, key2, price, stock)) 
     for key, value in prices.items():
         price, stock, site_id = value 
-        update_mysql(site_id, key, price, stock) 
+        result.append((site_id, key, price, stock))
+    return result 
 
 
-commit_rule = {
-            "name": "commit",
-            "dst": {
-                "node": "default",
-                "name": "spider_result",
-                "type": "list" 
-                }
-            }
+
+def diff_promo_item(llkv, items):
+    pass 
 
 
-def run_commit(): 
-    load_config()
-    eval_lua_scripts_for_nodes(commit_rule)
-    import llkv
-    client = CONFIG["client"]
-    CONFIG["llkv"] = llkv.Connection(**client["llkv_list"])
-    connect_mysql(client["mysql"]) 
-    redis = get_node()
+
+def unpack_items(items): 
+    b = []
     unpack = msgpack.unpackb 
-    site_config = CONFIG["sites"]["idx"]
-    replace_stdout(site_config.get("log", "/tmp/spider-commit.log")) 
+    for i in items:
+        item = unpack(i) 
+        b.append(item) 
+    return b
+
+
+
+def commit(profile): 
+    b = [] 
+    items = list_pop_n(profile["node"],
+            profile["qname"],  1000) 
+    if not items:
+        return False 
+    b = unpack_items(items) 
+    diff_func = profile["diff_func"]
+    commit_func = profile["commit_func"]
+    for i in split_list_iter(b, 1000): 
+        result = diff_func(profile, i) 
+        commit_func(profile, result) 
+    return True 
+
+
+
+def setup_commit(rule): 
+    c = {}
+
+    eval_lua_scripts_for_nodes(rule)
+    node = get_node(rule["src"].get("node")) 
+    c["qname"] = rule["src"]["name"]
+    c["node"] = node 
+
+    commit = rule["commit"] 
+    if commit["type"] == "mysql": 
+        client = CONFIG["client"]
+        db = client[commit["db"]] 
+        c["db"] = db
+        con, cur = connect_mysql(db)
+        c["con"] = con
+        c["cur"] = cur 
+        c["gen_sql"] = commit["gen_sql"]
+    elif comit["type"] == "tt":
+        pass
+    c["commit_func"] = commit["func"]
+
+    diff = rule["diff"]
+    if diff["type"] == "llkv":
+        import llkv
+        llkv_con = llkv.Connection(**client[diff["llkv"]]) 
+        c["llkv"] = llkv_con
+    elif diff["type"] == "redis":
+        redis_con = redis.StrictRedis(**client[diff["redis"]])
+        c["redis"] = redis_con 
+    c["diff_func"] = diff["func"]
+    return c
+
+
+
+def run_commit(worker): 
+    load_config() 
+    rule = commit_rules.get(worker)
+    if rule:
+        profile = setup_commit(rule) 
+        log = "/tmp/spider-commit-%s.log" % worker
+    else:
+        print "bad commit worker: %s" % worker 
+        exit(1)
+    replace_stdout(log)
     while True: 
-        b = []
-        items = list_pop_n(redis, "spider_result",  1000)
-        for i in items:
-            item = msgpack.unpackb(i) 
-            if len(item) != 4: 
-                log_with_time("result format error %s" % item) 
-                continue 
-            b.append(item) 
-        if not b: 
+        status = commit(profile)
+        if not status:
             log_with_time("sleeping")
-            time.sleep(2)
-            continue
-        n = len(b) / 1000
-        if len(b) % 1000:
-            n += 1
-        for i in range(n):
-            items = b[i*1000: (i+1) * 1000]
-            update_db(items) 
-        _safe_commit() 
+            time.sleep(2) 
+
+
+
+commit_rules = {
+        "b2c": {
+            "src": {
+                "name": "spider_result",
+                "type": "list"
+                }, 
+            "diff": {
+                "type": "llkv",
+                "llkv": "llkv_list",
+                "func": diff_list_item,
+                },
+            "commit": {
+                "type": "mysql",
+                "db": "mysql",
+                "gen_sql": gen_b2c_sql,
+                "func": commit_b2c,
+                }
+            },
+        }
 
 
 
@@ -1164,10 +1297,12 @@ dp_idx_rule = {
         } 
 
 
-def run_dp_idx(): 
+
+def run_dp_idx(worker): 
     load_config()
     eval_lua_scripts_for_nodes(dp_idx_rule) 
-    connect_mysql(CONFIG["client"]["dp_idx"])
+    mysql_config = CONFIG["client"]["dp_idx"] 
+    con, cur = connect_mysql(mysql_config)
     node = get_node()
     wait = dp_idx_rule.get("wait", 2) 
     site_config = CONFIG["sites"]["idx"]
@@ -1181,8 +1316,8 @@ def run_dp_idx():
         sqls = msgpack.unpackb(l) 
         for sql in sqls:
             log_with_time(sql)
-            _safe_insert_sql(sql)
-        _safe_commit() 
+            _safe_insert_sql(cur, sql, mysql_config)
+        _safe_commit(con, mysql_config) 
 
 
 
@@ -1191,8 +1326,9 @@ def run_rt(rule):
 
 
 
+
 def valid_tester(task):
-    status = task["resp_header"]["status"] 
+    status = task["res_status"]["status"] 
     if status != 200:
         log_with_time("bad proxy: %s" % task["proxy"]) 
         return 
@@ -1203,7 +1339,9 @@ def valid_tester(task):
         CONFIG["ips_node"].sadd(CONFIG["ips_qname"], task["proxy"]) 
 
 
+
 proxy_src = "http://ff.daili666.com/ip/?tid=828576762586978&num=90000&foreign=none" 
+
 
 
 def run_ips(rule): 
@@ -1270,8 +1408,7 @@ def run_guard(rule):
 
 
 def get_promo_type(desc):
-    """ Get the promo type.
-
+    """ Get the promo type.  
     其他： 0
     满减： 1
     满返： 2
@@ -1287,20 +1424,7 @@ def get_promo_type(desc):
     elif u'券' in desc or u'返' in desc:
         promo_type = 2
     elif (u'满' in desc and u'赠' in desc) or (u'增' in desc) or (u'送' in desc):
-        promo_type = 3
-    #5, 6, 7 ->折扣, 11
-    #白菜 -> 12
-    #手机 -> 9
-    #团购 -> 8
-    #优惠券 -> 10 
-    #elif u'加' in desc and u'加入' not in desc:
-    #    promo_type = 4
-    #elif u'多买' in desc or u'多折' in desc:
-    #    promo_type = 5
-    #elif u'封顶' in desc:
-    #    promo_type = 6
-    #elif u'第二件半价' in desc:
-    #    promo_type = 7 
+        promo_type = 3 
     return promo_type 
 
 
@@ -1365,12 +1489,10 @@ def run_diff_dps(rule):
         sleep_with_counter(wait) 
 
 
-
 blt_worker = {
         "commit": run_commit,
         "idx": run_dp_idx, 
         } 
-
 
 
 
@@ -1383,6 +1505,7 @@ def import_all_sites():
             module = import_module("spider.modules.%s" % m) 
             ms[m] = module
     return ms
+
 
 
 def get_dst_by_node(module, node): 
@@ -1400,17 +1523,30 @@ def get_dst_by_node(module, node):
 
 
 
+def slow_hgetall(node, name):
+    d = {}
+    cursor = 0
+    while True:
+        cursor, items = node.hscan(name, cursor, count=100000) 
+        d.update(items) 
+        if not cursor or not len(items):
+            break 
+    return d
+
+
+
 def load_intime_dps(node, name): 
-    dpids = node.hgetall(name)
+    dpids = slow_hgetall(node, name)
     expires_time = int(time.time() - 3 * 24 * 3600)
     ret = set()
     unpackb = msgpack.unpackb 
-    for k,v in dpids.items():
+    for k,v in dpids.iteritems():
         if unpackb(v) < expires_time:
             node.hdel(name, k)
         else:
             ret.add(k)
-    return ret
+    return ret 
+
 
 
 def load_history_dps(path): 
@@ -1432,6 +1568,7 @@ def load_history_dps(path):
             t_add(item)
         print "load_history_dps", CONFIG["site_id"], len(target_set)
     return target_set 
+
 
 
 
@@ -1503,6 +1640,7 @@ def get_siteid(site):
 
 
 
+
 def replace_stdout(log): 
     if not debug: 
         sys.stdin = open("/dev/null", "r")
@@ -1510,6 +1648,7 @@ def replace_stdout(log):
         sys.stdout = fobj
         sys.stderr = fobj
         CONFIG["log_file"] = fobj 
+
 
 
 
@@ -1574,9 +1713,6 @@ def eval_lua_scripts_for_node(redis_nodes, node):
 def eval_lua_scripts_for_nodes(rule): 
     redis_nodes = {} 
     CONFIG["nodes"] = redis_nodes 
-    if not rule.get('dst') and not rule.get("multidst"):
-        log_with_time("rule format error, no dst")
-        exit(1); 
     for v in rule.get("multidst", {}).values():
         eval_lua_scripts_for_node(redis_nodes, v)
     dst = rule.get("dst")
@@ -1591,7 +1727,7 @@ def eval_lua_scripts_for_nodes(rule):
 def setup_site(site, cat): 
     load_config() 
     if site in blt_worker: 
-        blt_worker[site]()
+        blt_worker[site](cat)
         exit(0)
     m = load_site(site) 
     #查找相应的worker
@@ -1662,6 +1798,7 @@ def run_subsite(subsites, rule):
         run_worker(rule) 
         rule["repeat"] = repeat
         sleep_with_counter(repeat) 
+
 
 
 def start_all_sites(workers): 
@@ -1897,7 +2034,7 @@ def start_worker(site, worker):
     for v in CONFIG["workers"].values():
         l.add("%s-%s" % v)
     if "%s-%s" % (site, worker) in l:
-        log_with_time("already running %s, %s" % (site, worker))
+        log_with_time("already running %s, %s" % site, worker)
         return
     pid = detach_worker(site, worker)
     CONFIG["workers"][pid] = (site, worker)
@@ -2043,7 +2180,6 @@ master_comamds = {
         "getall": command_getall,
         "refresh": command_refresh,
         } 
-
 
 
 def die_msg(sk, addr, msg):
