@@ -232,16 +232,16 @@ def auto_redirect(task):
         remove_task(task, why="endless redirect")
         return
     if not "cookie" in task:
-        task["cookie"] = {}
+        task["cookie"] = {} 
     task["cookie"].update(get_cookie(task["res_cookie"])) 
+    task["url"] = l1
     insert_task(task) 
 
 
 
 def call_chain_filter(task): 
     flt = chain_next(task)
-    if not flt:
-        pdb.set_trace()
+    if not flt: 
         return 
     next = flt(task) 
     insert_task(next) 
@@ -256,7 +256,7 @@ def assign_key(d1, d2, *keys):
 def call_parser(task): 
     res_header = task["res_header"] 
     status = task["res_status"]["status"]
-    if task["redirect"] > 0 and 400 > status > 300:
+    if task["redirect"] > 0 and 400 > status > 300: 
         auto_redirect(task)
         return 
     if task.get("chain"):
@@ -343,7 +343,8 @@ def decode_chunk_stream(task):
                 break
             num += char 
         if goout:
-            break
+            recv.seek(back_idx, io.SEEK_SET) 
+            break 
         recv.seek(1, io.SEEK_CUR)
         x = int(num, 16) 
         if not x:
@@ -352,8 +353,8 @@ def decode_chunk_stream(task):
         chunk = recv.read(x) 
         if len(chunk) != x:
             recv.seek(back_idx, io.SEEK_SET)
-            break
-        recv.seek(2, io.SEEK_CUR)
+            break 
+        recv.seek(2, io.SEEK_CUR) 
         b.write(chunk) 
     task["chunked_idx"] = recv.tell()
     recv.seek(recv_end, io.SEEK_SET)
@@ -379,7 +380,6 @@ def parse_http_buffer(task):
         decode_chunked(task)
     call_parser(task) 
     remove_task(task)   
-
 
 
 
@@ -568,10 +568,8 @@ def send_remain_ssl(task):
     count = len(data) 
     try:
         sent = con.send(data)
-    except ssl.SSLError as e:
-        try:
-            handle_ssl_exception(task, e) 
-        except ssl.SSLError:
+    except ssl.SSLError as e: 
+        if handle_ssl_exception(task, e) < 0: 
             remove_task(task, why="send_remain_ssl: %s" % e)
             return
     buf.truncate(0)
@@ -588,26 +586,32 @@ def read_to_buffer(task):
     #一次把可用数据读出 
     con = task["con"]
     buf = task["recv"] 
+    status = 0
     while True:
         try: 
             mark = buf.tell()
             buf.write(con.recv(409600)) 
             if buf.tell() == mark:
                 parse_http_buffer(task) 
-                raise socket.error("stream end") 
+                break
         except socket.error as e:
             if e.errno == errno.EAGAIN: 
-                break
-            raise e 
+                status = 1
+            else: 
+                status = -1
+            break
+    return status
 
 
 
 def handle_read(task): 
     con = task["con"] 
-    try:
-        read_to_buffer(task)
-    except socket.error:
-        return 
+    status = read_to_buffer(task)
+    if not status: 
+        return
+    elif status < 0:
+        remove_task(task, why="read_to_buffer error") 
+        return
     #找http头并解析 
     if task["status"] & STATUS_RECV:
         parse_header(task)
@@ -620,6 +624,7 @@ def handle_read(task):
 
 
 def handle_ssl_exception(task, e): 
+    status = 1
     errno = e.errno
     #need read
     if errno == ssl.SSL_ERROR_WANT_READ: 
@@ -629,26 +634,31 @@ def handle_ssl_exception(task, e):
         ep.modify(task["fd"], EPOLLIN | EPOLLERR | EPOLLOUT) 
     #other
     else: 
-        raise e 
+        status = -1
+    return status
+
 
 
 def read_to_buffer_ssl(task): 
     #一次把可用数据读出 
     con  = task["ssl_con"]
     buf = task["recv"]
+    status = 0
     while True:
         try: 
             mark = buf.tell()
             buf.write(con.recv(409600)) 
             if buf.tell() == mark: 
                 parse_http_buffer(task)
-                raise ssl.SSLError("stream end") 
+                break
         except ssl.SSLError as e: 
             if e.errno == ssl.SSL_ERROR_ZERO_RETURN: 
                 parse_http_buffer(task) 
-                raise ssl.SSLError("stream end")
-            handle_ssl_exception(task, e)
+            else:
+                status = handle_ssl_exception(task, e)
             break
+    return status 
+                
 
 
 def handle_read_ssl(task): 
@@ -656,10 +666,11 @@ def handle_read_ssl(task):
     if task["status"] & STATUS_SSL_HANDSHAKE:
         ssl_do_handshake(task) 
         return 
-    con = task["ssl_con"]
-    try:
-        read_to_buffer_ssl(task)
-    except ssl.SSLError:
+    status = read_to_buffer_ssl(task)
+    if not status: 
+        return
+    elif status < 0:
+        remove_task(task, why="read_to_buffer_ssl")
         return 
     #找http头并解析 
     if task["status"] & STATUS_RECV:
