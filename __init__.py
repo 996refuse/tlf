@@ -195,6 +195,7 @@ def profile_mem(func, *args):
 
 CONFIG = {} 
 
+
 def jsonp_json(content):
     a = content.find("(")
     b = content.rfind(")")
@@ -226,19 +227,10 @@ def pack_result(tp, result):
 
 
 
-def forward_keys(redis, result, dst):
+def forward_keys(redis, result, dst): 
     qname = dst["name"] 
-    kp = dst.get("key_pat")
-    if kp:
-        pat, part = kp
-        if part == "site_id":
-            part = CONFIG["site_id"] 
-        for k,v in result:
-            key = pat % (k, part)
-            redis.set(key, v)
-    else:
-        for k, v in result:
-            redis.set(key, v)
+
+
 
 
 
@@ -250,6 +242,8 @@ def forward_one(redis, result, dst):
     if not tp:
         return 
     qname = dst["name"] 
+    if dst.get("with_siteid"):
+        qname = "%s_%s" % (qname, CONFIG["site_id"])
     if dst.get("log", True):
         log_result(tp, result)
     if dst.get("pack", True): 
@@ -263,8 +257,9 @@ def forward_one(redis, result, dst):
         set_push_n(redis, qname, *b)
     elif tp == "hash": 
         redis.hmset(qname, dict(b))
-    elif tp == "str":
-        forward_keys(redis, result, dst)
+    elif tp == "kv": 
+        for k, v in result:
+            redis.set(key, v) 
     else:
         log_with_time("unknown dst type")
         return 
