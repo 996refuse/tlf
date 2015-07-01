@@ -309,11 +309,11 @@ sp_site = set((25, 1025, 2025, 3025, 31, 1031, 2031, 3031, 4031))
 
 
 def format_price_item(item):
-    site_id = tp_ensure(CONFIG["site_id"])
+    site_id = tp_ensure(CONFIG["site_id"], int)
     url, price, stock = item     
 
-    tp_assert(url, price, str)
-    tp_assert(stock, int) 
+    tp_assert(str, url, price)
+    tp_assert(int, stock)
 
     if site_id in sp_site:
         urlcrc = int(url)
@@ -337,7 +337,7 @@ def format_price_item(item):
 
 def format_price(result): 
     ret = []
-    for i in result:
+    for i in result: 
         item = format_price_item(i) 
         if not item:
             log_with_time("price format error: %s: %s" % (site_id, i))
@@ -445,8 +445,9 @@ def run_single_repeat(rule):
 
 
 
-def replace_url_with_ranges(result, urls):
-    tp_assert(result, urls, list) 
+def replace_url_with_ranges(result, urls): 
+    tp_assert(list, result)
+    tp_assert(dict, urls)
 
     filtered = []
     for i in result:
@@ -461,7 +462,7 @@ def replace_url_with_ranges(result, urls):
 
 
 def load_price_range(name):
-    tp_assert(name, str)
+    tp_assert(str, name)
 
     if not name.startswith("/"):
         subdir = "modules/%s/%s" % (CONFIG["site"], name)
@@ -483,7 +484,7 @@ def load_price_range(name):
 
 
 def sleep_with_counter(n):
-    tp_assert(n, int)
+    tp_assert(int, n)
 
     for i in range(1, n+1):
         log_with_time("sleeping, cnt, %s" % i)
@@ -492,7 +493,7 @@ def sleep_with_counter(n):
 
 
 def load_func(path):
-    tp_assert(path, str)
+    tp_assert(str, path)
 
     import spider.modules 
     parts = path.split(".")
@@ -508,7 +509,7 @@ def load_func(path):
 
 
 def forward_result(task):
-    tp_assert(task, dict)
+    tp_assert(dict, task)
 
     rule = CONFIG["rule"]
     try:
@@ -525,7 +526,7 @@ def forward_result(task):
 
 
 def forward_dp(task): 
-    tp_assert(task, dict)
+    tp_assert(dict, task)
 
     if "crc" not in task:
         log_with_time("lost crc: %s" % task["url"])
@@ -542,7 +543,7 @@ def forward_dp(task):
 
 
 def get_name_by_xpath(text, expr):
-    tp_assert(text, expr, str)
+    tp_assert(str, text, expr)
 
     tree = etree.HTML(text)
     nodes = tree.xpath(expr)
@@ -553,7 +554,7 @@ def get_name_by_xpath(text, expr):
 
 
 def forward_file(task):
-    tp_assert(task, dict)
+    tp_assert(dict, task)
 
     fconfig = CONFIG["fconfig"]
     ftype = fconfig.get("type", "url")
@@ -577,7 +578,7 @@ def forward_file(task):
 
 
 def forward_offshelf(task):
-    tp_assert(task, dict)
+    tp_assert(dict, task)
 
     if "crc" not in task:
         log_with_time("lost crc %s" % task["url"])
@@ -592,8 +593,8 @@ def forward_offshelf(task):
 
 
 def not200_abort(not200, task): 
-    tp_assert(not200, str)
-    tp_assert(task, dict)
+    tp_assert(str, not200)
+    tp_assert(dict, task)
 
     log_with_time("not200: %s,  %s, %s" % (task["res_status"],
         task["res_header"], task["url"])) 
@@ -609,7 +610,7 @@ def not200_abort(not200, task):
 
 
 def batch_parser(task):
-    tp_assert(task, dict)
+    tp_assert(dict, task)
 
     rule = CONFIG["rule"] 
     not200 = rule["get"].get("not200") 
@@ -631,7 +632,7 @@ def batch_parser(task):
 
 
 def async_config(rule):
-    tp_assert(rule, dict)
+    tp_assert(dict, rule)
 
     args = rule["get"]["args"]
     async_http.debug = args.get("debug") 
@@ -652,8 +653,8 @@ def split_list_iter(l, n):
 
 
 def apply_group_filter(items, model):
-    tp_assert(items, list)
-    tp_assert(model, dict)
+    tp_assert(list, items)
+    tp_assert(dict, model)
 
     loader = CONFIG["src_loader"]
     flt = CONFIG["src_filter"]
@@ -670,8 +671,8 @@ def apply_group_filter(items, model):
 
 
 def apply_single_filter(items, model):
-    tp_assert(items, list)
-    tp_assert(model, dict)
+    tp_assert(list, items)
+    tp_assert(dict, model)
 
     tasks = [] 
     loader = CONFIG["src_loader"]
@@ -689,7 +690,7 @@ def apply_single_filter(items, model):
 
 
 def task_with_randua(rule):
-    tp_assert(rule, dict)
+    tp_assert(dict, rule)
 
     header = async_http.html_header.copy()
     header["User-Agent"] = async_http.random_useragent()
@@ -702,7 +703,7 @@ def task_with_randua(rule):
 
 
 def task_simple(rule):
-    tp_assert(rule, dict)
+    tp_assert(dict, rule)
 
     return {
             "method": rule["get"]["method"],
@@ -1148,7 +1149,7 @@ def update_mysql(profile, item):
     sql = profile["gen_sql"](item)
     log_with_time("%d\t%s\t%d\%d" % item)
     _safe_insert_sql(profile, sql)
-    assert profile.get("llkv"):
+    assert profile.get("llkv")
     update_llkv(profile, item)
 
 

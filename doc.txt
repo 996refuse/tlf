@@ -1,0 +1,41 @@
+抓取系统设计要解决的问题
+
+1. 网站众多, 规则复杂
+2. 程序经常要随着网站变
+3. 电商各种杂乱的策略， 有些反抓取， 有些有云盾,  有些隐藏列表页
+4. 电商网站不见得稳定的服务
+5. 要知道某个电商抓取是否出了错， 要知道统计数据，  要能普通用户控制
+6. 要高速下载， 但是得能控制频率防止被封
+7. 数据库并访问会导致死锁
+
+
+设计最终用流水线模型
+表现为
+cats -> node -> node -> node ->result
+
+cats是列表页的源,  node是中间处理的worker,  通过一步步传递要抓取的目标， 解析， 最后得到结果  
+
+流水线最终决定用redis,  数据格式为msgpack,   通过redis lua script优化对redis的指量访问 
+
+流水线上每一个节点都是一个独立的进程， 任何一台机器的worker都可以连接到线上， 从而使用自由分布式处理
+
+一个worker可以将消息发到N个worker的队列里
+
+node一般就是parser, 下载网页部分通过配置文件定义， 通过python spider test site worker可以能parser执行测试 ，  以确定parser考虑到了各种情况.
+
+开发过程中用python spider debug site worker可以在代码里pdb.set_trace()单步过快速确定问题
+
+考虑到worker的不稳定性，  每台机器上都有主进程管理这些worker， 提供启动， 停止， 更新代码, 统计汇总， 异常监控等功能 
+
+主进程的启动方式python spider all, 可以在主进程日志/tmp/spider-all.log里看到目前正在运行的worker, 可以看到是否有worker异常重启,  worker的日志在/tmp/spider-site-worker.log,  worker的日志不会因为重启消失 
+
+所有的抓取worker的结果最后汇总到spider_result队列，  spider commit是一个专用于提交结果的进程，  它会与llkv较验价格与库存是否发生变化， 最后批量提交到数据库，  这样就不存在数据并发锁的问题,  插入速度也比较快
+
+
+部署过程
+上传Tess,  执行Tess里的ubuntu-deps.sh,  build-libs.sh, 以安装图像识别模块_tess
+上传spider, 执行spider里的deps.sh安装必要的库
+
+
+
+
