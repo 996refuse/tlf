@@ -2,6 +2,7 @@ from lxml import etree
 from spider import log_with_time
 from spider import format_price
 import re
+import time
 import json
 import pdb 
 import traceback
@@ -9,7 +10,8 @@ import traceback
 
 base = "http://category.vip.com/search-1-0-1.html?%s" 
 
-def cats_parser(url, content, rule): 
+def cats_parser(url, res, rule): 
+    content = res['text']
     cats = set()
     for i in rule:
         cats = cats.union(set(re.findall(i, content))) 
@@ -59,21 +61,23 @@ item_base = "http://www.vip.com/detail-0-%s.html"
 
 
 def list_parser(task, rule): 
-    ret = []
+    ret = [] 
     dyn_items = re.findall('({.*?sell_price.*?}),', task["text"]) 
+    dps = []
     for i in dyn_items:
         try:
             item = json.loads(i)
         except ValueError:
             continue
         link = item_base % item["id"]
+        dps.append((link, ""))
         price = item["sell_price"] 
         ret.append((link, price, 1)) 
     try:
         t = etree.HTML(task["text"])
     except:
         traceback.print_exc()
-        return
+        return 
     nodes = t.xpath(rule["node"])
     for node in nodes:
         link = node.xpath(rule["link"])
@@ -81,6 +85,15 @@ def list_parser(task, rule):
         if not link or not price: 
             log_with_time("rule error: %s" % task["url"])
             continue
+        dps.append((link[0], ""))
         ret.append((link[0], price[0], 1)) 
     result = format_price(ret)
-    return result 
+    now = int(time.time())
+    dps_log = {}
+    for i in result:
+        dps_log[i[1]] = now
+    return {
+            "spider": result ,
+            "dp": dps,
+            "dps_log": dps_log,
+            }

@@ -10,7 +10,7 @@ import json
 
 reqburl = 'http://list.mi.com/accessories/ajaxView/0-0-0-0-'
 
-def cats_parser(url, content, rule):
+def cats_parser(url, res, rule):
     return [reqburl + '0-0']
 
 def pager(task, rule):
@@ -61,5 +61,5 @@ def list_parser(task, rule):
     fret = format_price(ret)
     return {
             "spider": fret,
-            #"dp": dps
+            "dp": dps
             }

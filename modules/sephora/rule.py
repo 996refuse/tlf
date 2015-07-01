@@ -40,7 +40,7 @@ rule = (
                 "async": True,
                 "method": "get", 
                 "args": {
-                    "limit": 30,
+                    "limit": 1,
                     "interval": 1, 
                     "debug": False,
                     }, 
@@ -65,7 +65,7 @@ rule = (
                 "method": "post",
                 "parser": "sephora.list_parser",
                 "args": { 
-                    "limit": 10,
+                    "limit": 1,
                     "interval": 1, 
                     "debug": False,
                     }, 

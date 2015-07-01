@@ -8,14 +8,17 @@ from spider import log_with_time
 from spider import async_http 
 from spider import format_price
 from spider import fix_price
-import _tess
+
 import pdb 
 import spider
 import getpass
+import json
 
-
-_tess.set_config({"datadir": "/usr/share/tessdata", "lang": "eng"})
-
+try:
+    import _tess
+    _tess.set_config({"datadir": "/usr/share/tessdata", "lang": "eng"})
+except:
+    log_with_time("please install _tess") 
 
 site_id = 25
 
@@ -41,7 +44,8 @@ district_table = {
 invalid_cats = set((u"电影", u"食品酒水", u"商品团", u"婚庆", u"丽人", u"生活", u"娱乐", u"美食"))
 
 
-def cats_parser(url, content, rule): 
+def cats_parser(url, res, rule): 
+    content = res['text']
     x = etree.HTML(content)
     n = x.xpath(rule) 
     ret = [] 
@@ -118,12 +122,13 @@ def pager(task, rule):
 
 
 
-def list_test(items):
+def pager_test(items):
     pdb.set_trace() 
 
 
 suning_p_base = "http://product.suning.com/%s.html"
 
+re_gid = re.compile("(?<=com/).+(?=.htm)")
 
 def extract_normal(url, tree, rule): 
     result = []
@@ -131,10 +136,12 @@ def extract_normal(url, tree, rule):
     now = int(time.time())
     dps_log = {} 
     nodes = tree.xpath(rule["normal_node"]) 
+    comments = {}
     for node in nodes: 
         title = node.xpath(rule["normal_title"]) 
         p_img = node.xpath(rule["normal_price"])
         stock = node.xpath(rule["normal_stock"]) 
+        comment = node.xpath(rule["normal_comment"])
         if not title or not p_img or not stock: 
             log_with_time("rule error: %s" % url)
             continue 
@@ -155,43 +162,52 @@ def extract_normal(url, tree, rule):
             dps_log[qid] = now 
             dps.append((link, qid, title[0]))
             result.append((link, qid, p_img[0], s))
+        gid = re_gid.search(link).group()
+        comments[gid] = comment[0]
     return {
             "price": result,
             "dp": dps,
-            "dps_log": dps_log
+            "dps_log": dps_log,
+            "comment": comments,
             } 
 
-
+re_gid = re.compile("(?<=com/).+(?=.htm)")
 def extract_book(url, tree, rule): 
     result = []
     dps = [] 
     now = int(time.time())
     dps_log = {} 
-    nodes = tree.xpath(rule["book_node"]) 
+    nodes = tree.xpath(rule["book_node"])
+    comments = {}
+    lid = re.search("\d+", url.split('-')[-1]).group()
     for node in nodes:
-        qid = node.attrib["class"].split(" ")[0] 
         link_node = node.xpath(rule["book_title"]) 
         stock = node.xpath(rule["book_stock"]) 
-        price = node.xpath(rule["book_price"])
-        if not link_node or not stock or not price: 
+        comment = node.xpath(rule["book_comment"])
+        if not link_node or not stock: 
             log_with_time("rule error: %s" % url)
             continue 
         link_node = link_node[0]
         link = link_node.attrib["href"]
+        gid = re_gid.search(link).group()
+        comments[gid] = comment[0]
         title = link_node.text
         if u"有货" in stock[0]:
             s = 1
         else:
             s = 0 
-        dps_log[qid] = now
-        dps.append((link, qid, title))
-        result.append((link, qid, price[0], s)) 
+        dps_log[gid] = now
+        dps.append((link, gid, title))
+        result.append((link, gid, lid, s)) 
     return {
-            "price": result,
-            "dp": dps,
+            "book_price": result,
+            #"dp": dps,
             "dps_log": dps_log,
+            "comment": comments
             } 
 
+def list_test(items):
+    pdb.set_trace()
 
 
 def list_parser(task, rule): 
@@ -202,11 +218,10 @@ def list_parser(task, rule):
         return extract_book(task["url"], tree, rule) 
 
 
-
 def price_parser(task, rule):
     price = _tess.recognize(task["text"], _tess.IMAGE_PNG, 32)
     p = fix_price(price)
-    if not p:
+    if not p: 
         log_with_time("no price: %s" % task["link"]) 
         return 
     log_with_time("%s %s %d" % (task["link"], p, task["stock"]))
@@ -214,3 +229,21 @@ def price_parser(task, rule):
     return format_price(ret) 
     
 
+def off_parser(task, rule): 
+    if len(task["text"]) < 100: 
+        log_with_time(task["link"])
+        return format_price([(task["qid"], -1, -1)])
+
+
+def off_check(items):
+    assert items 
+
+
+def book_price(task, rule):
+    try:
+        j = json.loads(task['text'])
+        price = j['price'][0]['proPrice'] #if j['price'] else 0
+    except:
+        log_with_time("bad response: %s" % task['link'])
+        return 
+    return format_price([[task['qid'], price, task['stock']]])

@@ -1,133 +1,88 @@
-#-*-encoding=utf-8-*- 
+#-*-encoding=utf-8-*-
 
 CLIENT = {
-        "nodes": { 
+        "nodes": {
             "default": {
                 "host": "127.0.0.1",
-                "port": 6379,
+                "port": 9000,
                 "db": 0
                 }, 
-            "group": { 
+            "diff_dps": {
                 "host": "127.0.0.1",
-                "port": 6379,
-                "db": 5,
+                "port": 6380,
+                "db": 0 
                 },
-            "dp_pairs": {
-                "host": "127.0.0.1",
-                "port": 6379,
-                "db": 0, 
-                },
-            "dps_log": {
-                "host": "127.0.0.1",
-                "port": 6379,
-                "db": 0
-                }, 
-            "comment": {
-                "host": "127.0.0.1",
-                "port": 6379,
-                "db": 0
-                }, 
             }, 
-        "mysql": {
-            "host": "127.0.0.1",
-            "port": 3306,
-            "db": "PriceStock",
-            "user": "root",
-            "passwd": "root_for_test_!@#",
-            }, 
-        "dp_idx": {
-            "host": "127.0.0.1",
-            "port": 3306,
-            "db": "dp_idx",
-            "user": "root",
-            "passwd": "root_for_test_!@#"
-            }, 
-        "data_file": {
-            "host": "127.0.0.1", 
-            "port": 3306,
-            "db": "dp_idx",
-            "user": "root",
-            "passwd": "root_for_test_!@#"
-            },
-        "llkv_list": {
-            "host": "127.0.0.1",
-            "port": 8000,
-            },
-        "llkv_dp": {
-            "host": "127.0.0.1",
-            "port": 8001 
-            },
         "server_id": 170,
         } 
 
-SITES = { 
+SITES = {
         "jd": {
             "site_id": 3,
-            "reload": 1, 
-            "workers": ("cats", "pager", "list", "dp", "off"),
-            "ignore": False,
-            }, 
-        "jd_book": {
-            "site_id": 3,
-            "reload": 1, 
-            "workers": ("cats", "pager", "list"),
-            "ignore": False,
-            }, 
-        "yhd.nanjing": {
-            "site_id": 31,
+            "workers": ("promo", ),
             "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
             "ignore": False
             },
-        "yhd.beijing": {
-            "site_id": 1031,
-            "reload": 1,
-            "workers": ("pager", "list", "stock"),
-            "ignore": False
-            }, 
-        "yhd.guangzhou": {
-            "site_id": 2031,
-            "reload": 1,
-            "workers": ("pager", "list", "stock"),
-            "ignore": False
-            }, 
-        "yhd.hubei": {
-            "site_id": 3031,
-            "reload": 1,
-            "workers": ("pager", "list", "stock"),
-            "ignore": False
-            }, 
-        "yhd.sichuan": {
-            "site_id": 4031,
-            "reload": 1,
-            "workers": ("pager", "list", "stock"),
-            "ignore": False
-            }, 
         "gome": {
             "site_id": 28,
-            "reload": 1, 
-            "workers": ("cats", "pager", "list"),
+            "workers": ("promo", ),
+            "reload": 1,
+            "ignore": False
+            }, 
+        "yixun.nanjing": {
+            "site_id": 15,
+            "reload": 1,
+            "workers": ("promo",  ),
+            "ignore": False,
+            }, 
+        "yixun.hubei": {
+            "site_id": 3015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.beijing": {
+            "site_id": 1015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.shenzhen": {
+            "site_id": 2015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.chongqing": {
+            "site_id": 4015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.shanxi": {
+            "site_id": 5015,
+            "reload": 1,
+            "workers": ("promo", ),
             "ignore": False,
             }, 
         "suning.nanjing": {
             "site_id": 25,
-            "workers": ("cats", "pager", "list", "price"),
+            "workers": ("offshelf", ),
             "ignore": False,
             },
         "suning.beijing": {
             "site_id": 1025,
-            "workers": ("pager", "list", "price"),
+            "workers": ("offshelf", ),
             "ignore": False
             }, 
-        "dangdang": {
-            "site_id": 2,
-            "workers": ("dp", ),
-            "ignore": False,
-            }, 
-        "bookuu": {
-            "site_id": 110,
-            "workers": ("dp", "ips", "guard"),
+        "suning.guangzhou": {
+            "site_id": 2025,
+            "workers": ("offshelf", ),
             "ignore": False
             },
-        } 
-
+        "suning.chengdu": {
+            "site_id": 3025,
+            "workers": ("offshelf", ),
+            "ignore": False,
+            },
+        }

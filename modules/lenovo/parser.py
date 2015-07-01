@@ -11,7 +11,8 @@ import time
 
 gurl = 'http://shop.lenovo.com.cn/search/getproduct.do?plat=4&categorycode=%s&keyword=&sorder=0&spage=%d&sarry=1'
 
-def cats_parser(url, content, rule):
+def cats_parser(url, res, rule):
+    content = res['text']
     t = etree.HTML(content)
     codes = [re.search("(?<=code=)\d+", i).group() for i in t.xpath(rule)]
     return [gurl%(i,1) for i in codes]

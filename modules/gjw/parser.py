@@ -9,7 +9,8 @@ import re
 import json
 import time
 
-def boot_parser(burl, content, rule):
+def boot_parser(burl, res, rule):
+    content = res['text']
     if 'www.yundun.cn' in content:
         urlexprs = re.search("(?<=\">).+(?=window)", content).group()
         urlexprs = urlexprs.replace("var", "").strip()

@@ -17,27 +17,30 @@ class IndexHandler(tornado.web.RequestHandler):
     def get(self):
         self.write(open("index.html").read())
 
-    def post(self):
-        #pdb.set_trace()
+    def post(self): 
         m = self.get_arguments("sfile")
         t = self.get_arguments("stype")
         e = self.get_arguments("sexpr")
         if not m or not t or not e:
-                self.write("arguments not enough")
-                return
+            self.write("arguments not enough")
+            return
         m = m[0]
         t = t[0]
         e = e[0]
 
-        f = open("list.html", "w")
-        h, rr = hh.get(m)
-        if h["status"] != 200:
-            self.write("err, bad response. %r" % h["status"])
-            return
-        f.write(rr)
-        f.close()
-        e=e.encode("utf-8")
-        #pdb.set_trace()
+        fn = None
+        if not m.startswith("file://"):
+            fn = "list.html"
+            f = open("list.html", "w")
+            res = simple_http.get(m)
+            if res["status"] != 200:
+                self.write("err, bad response. %r" % h["status"])
+                return
+            f.write(res["text"])
+            f.close()
+        else: 
+            fn = m[7:]
+        e= e.encode("utf-8") 
         p = ""
         if t == "xpath":
                 p = ","
@@ -48,8 +51,10 @@ class IndexHandler(tornado.web.RequestHandler):
         elif t == "attr":
                 p = "."
         try:
-            rt = subprocess.check_output(["./qxt", "list.html", p+e], stderr=sys.stderr)
-        except:
+            rt = subprocess.check_output(["./qxt", fn, p+e], stderr=sys.stderr)
+        except Exception as e :
+            import traceback
+            traceback.print_exc()
             self.write("call failed.")
             return
         self.write(rt)

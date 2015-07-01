@@ -10,10 +10,10 @@ import re
 import json
 import time
 
-def cats(url, content, rule):
+def cats(url, res, rule):
+	content = res['text']
 	content = content.decode("gbk", "replace")
 	t = etree.HTML(content)
-	return ['http://searchex.yixun.com/705798t706810-1-/']
 	return t.xpath(rule)
 
 padurl = "all/------%s---------.html#list"
@@ -38,6 +38,7 @@ def pager(task, rule):
 		ret.append(task['url'] + padurl % str(i))
 	return ret
 
+re_gid = re.compile("(?<=item-).+(?=.htm)")
 def list_parser(task, rule):
 	try:
 		t = etree.HTML(task['text'])
@@ -49,6 +50,8 @@ def list_parser(task, rule):
 		log_with_time("bad rule %s"%task['url'])
 		return
 	ret = []
+	comments = {}
+        promos = []
 	for node in nodes:
 		gid = node.xpath(rule["gid"])
 		price = node.xpath(rule["price"])
@@ -58,9 +61,19 @@ def list_parser(task, rule):
 			continue
 		gid = gid[0]
 		price = price[0].text
-		ret.append((gid, price, stock))
+		ret.append((gid, price, stock)) 
+		comment = node.xpath(rule['comment'])
+		if not comment:
+			log_with_time("bad rule for comments: %s"%task['url'])
+			comment = ['0']
+		_gid = re_gid.search(gid).group() 
+		comments[_gid] = re.search("\d+", ','.join(comment)).group()
+                promos.append(_gid)
 	fret = format_price(ret)
+        dp = []
+        for i in ret:
+            dp.append((i[0], "")) 
 	dps = {}
 	for i in fret:
 		dps[i[1]] = int(time.time())
-	return {"result":fret, "dps":dps}
+        return {"result":fret, "dps":dps, "comment": comments, "dp": dp, "promos": promos}

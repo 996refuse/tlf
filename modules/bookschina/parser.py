@@ -10,8 +10,8 @@ import json
 import time
 
 burl = "http://www.bookschina.com"
-def cats_parser(url, content, rule):
-    t = etree.HTML(content)
+def cats_parser(url, res, rule):
+    t = etree.HTML(res['text'])
     ret = [burl + i for i in t.xpath(rule)]
 
     # a bug from www.bookschina.com

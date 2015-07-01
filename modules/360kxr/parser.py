@@ -13,8 +13,8 @@ import time
 _tess.set_config({"datadir": "/usr/share/tessdata", "lang": "eng"})
 
 url = 'http://www.360kxr.com'
-def mcats_parser(url, content, rule):
-    t = etree.HTML(content)
+def mcats_parser(url, res, rule):
+    t = etree.HTML(res['text'])
     return [url + i for i in t.xpath(rule)]
 
 def scats_parser(task, rule):

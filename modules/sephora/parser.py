@@ -4,7 +4,8 @@ from spider import format_price
 from spider import log_with_time
 import re
 
-def cats_parser(url, content,  rule): 
+def cats_parser(url, res,  rule): 
+    content = res['text']
     t = etree.HTML(content)
     ret = []
     for i in rule:

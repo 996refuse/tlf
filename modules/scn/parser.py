@@ -8,7 +8,8 @@ import pdb
 import re
 import json
 
-def pager(url, content, rule):
+def pager(url, res, rule):
+    content = res['text']
     burl = url
     tree = etree.HTML(content)
     pgs = tree.xpath(rule)

@@ -9,8 +9,8 @@ import re
 import demjson
 import time
 
-def cats_parser(url, content, rule):
-    t = etree.HTML(content)
+def cats_parser(url, res, rule):
+    t = etree.HTML(res['text'])
     ret = t.xpath(rule)
 
     return ret
@@ -98,6 +98,6 @@ def stock2_parser(task, rule):
     else:
         stock = 0
 
-    ret = [(itemurl%task['gid'], task['price'], stock)]
+    ret = [(itemurl+task['gid'], task['price'], stock)]
     fret = format_price(ret)
     return fret

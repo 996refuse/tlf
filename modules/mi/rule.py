@@ -77,10 +77,10 @@ rule = (
                     "type": "list",
                     "name": "spider_result",
                     },
-                #"dp": {
-                #    "type": "list",
-                #    "name": "mi_dp"
-                #    },
+                "dp": {
+                    "type": "list",
+                    "name": "mi_dp"
+                    },
                 },
             "get": {
                 "method": "get",
@@ -97,5 +97,29 @@ rule = (
                 "check": "module_test_stock"
             }
             ]
-        }
+        },
+        {
+            "name": "dp",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "name": "mi_dp",
+                "type": "list",
+                "qtype": "dp",
+                },
+            "dst": {
+                "name": "mi_dp",
+                "type": "",
+                "qtype": "dp",
+                },
+            "get": {
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                },
+                "redirect": 2,
+            },
+        }, 
 )

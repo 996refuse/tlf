@@ -1,111 +1,88 @@
-#-*-encoding=utf-8-*- 
+#-*-encoding=utf-8-*-
 
 CLIENT = {
-        "nodes": { 
+        "nodes": {
             "default": {
                 "host": "127.0.0.1",
-                "port": 6379,
+                "port": 9000,
                 "db": 0
                 }, 
-            "group": {
-                "host": "192.168.1.165",
-                "port": 6978, 
-                "db": 5,
-                },
-            "dp_pairs": {
+            "diff_dps": {
                 "host": "127.0.0.1",
-                "port": 6379,
-                "db": 0,
-                }
+                "port": 6380,
+                "db": 0 
+                },
             }, 
-        "stat_redis": {
-            "host": "127.0.0.1",
-            "port": 6379,
-            "db": 0
-            },
-        "tt": {
-            "host": "192.168.1.168",
-            "port": 11261
-            }, 
-        "mysql": {
-            "host": "192.168.1.168",
-            "port": 3308,
-            "db": "PriceStock",
-            "user": "minishop",
-            "passwd": "MiniShop!@#"
-            }, 
-        "dp_idx": {
-            "host": "192.168.1.192",
-            "port": 3306,
-            "db": "dp_idx",
-            "user": "minishop",
-            "passwd": "MiniShop!@#"
-            }, 
-        "data_file": {
-            "host": "192.168.1.192", 
-            "port": 3306,
-            "db": "dp_idx",
-            "user": "minishop",
-            "passwd": "MiniShop!@#"
-            },
-        "llkv_list": {
-            "host": "192.168.1.191",
-            "port": 8000,
-            },
-        "llkv_dp": {
-            "host": "192.168.1.191",
-            "port": 8001 
-            },
         "server_id": 170,
         } 
 
-
-SITES = { 
-        "commit": {
-            "site_id": 0,
+SITES = {
+        "jd": {
+            "site_id": 3,
+            "workers": ("promo", ),
             "reload": 1,
-            "workers": ("commit",),
-            "ignore": False
-            },
-        "idx": {
-            "site_id": 0,
-            "reload": 1,
-            "workers": ("idx", ),
-            "ignore": False
-            },
-        "sephora": {
-            "site_id": 12,
-            "reload": 1, 
-            "workers": ("cats", "pager", "list"),
-            "ignore": False,
-            }, 
-        "vip": {
-            "site_id": 129,
-            "reload": 1,
-            "workers": ("cats", "pager", "list"),
-            "ignore": False,
-            },
-        "miyabaobei": {
-            "site_id": 195,
-            "reload": 1,
-            "workers": ("cats", "pager", "list", "stock"),
             "ignore": False
             },
         "gome": {
             "site_id": 28,
+            "workers": ("promo", ),
             "reload": 1,
-            "workers": ("cats", "pager", "list"),
-            "ignore": False, 
+            "ignore": False
+            }, 
+        "yixun.nanjing": {
+            "site_id": 15,
+            "reload": 1,
+            "workers": ("promo",  ),
+            "ignore": False,
+            }, 
+        "yixun.hubei": {
+            "site_id": 3015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.beijing": {
+            "site_id": 1015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.shenzhen": {
+            "site_id": 2015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.chongqing": {
+            "site_id": 4015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "yixun.shanxi": {
+            "site_id": 5015,
+            "reload": 1,
+            "workers": ("promo", ),
+            "ignore": False,
+            }, 
+        "suning.nanjing": {
+            "site_id": 25,
+            "workers": ("offshelf", ),
+            "ignore": False,
             },
-        "jd": {
-            "site_id": 3,
-            "workers": ("cats", "pager", "price", "list", "stock"),
-            "ignore": False,
+        "suning.beijing": {
+            "site_id": 1025,
+            "workers": ("offshelf", ),
+            "ignore": False
             }, 
-        "jd_book": {
-            "site_id": 3,
-            "workers": ("cats", "pager", "price", "list", "stock"),
+        "suning.guangzhou": {
+            "site_id": 2025,
+            "workers": ("offshelf", ),
+            "ignore": False
+            },
+        "suning.chengdu": {
+            "site_id": 3025,
+            "workers": ("offshelf", ),
             "ignore": False,
-            }, 
-        } 
-
+            },
+        }

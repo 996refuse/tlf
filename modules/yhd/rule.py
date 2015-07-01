@@ -1,14 +1,14 @@
 
 sites = {
     "source": "cats",
-    "run_by_order": True,
-    "sites": {
-        31: "nanjing",
-        1031: "beijing",
-        2031: "guangzhou",
-        3031: "hubei",
-        4031: "sichuan"
-        },
+    "order": True,
+    "sites": [
+        (31, "nanjing"),
+        (1031, "beijing"),
+        (2031, "guangzhou"),
+        (3031, "hubei"),
+        (4031, "sichuan")
+        ],
     }
 
 
@@ -16,9 +16,9 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-            "repeat": 3600,
+            "repeat": 20000,
             "from": {
-                "http://www.yhd.com/marketing/allproduct.html": "//dd/em/span/a/@href",
+                "http://www.yhd.com/marketing/allproduct.html": "//dl/dd/em/span/a/@href"
             },
             "get": {
                 "type": "simple",
@@ -40,7 +40,7 @@ rule = (
             "type": "fetch",
             "name": "pager",
             "boot": "yhd.set_province_id",
-            "rule": "//div[@class='search_select_page']/div",
+            "rule": "//div[ @class = 'select_page_num']/text()",
             "wait": 4,
             "src": {
                 "type": "list",
@@ -91,11 +91,12 @@ rule = (
                 "filter": "yhd.list_filter",
                 "subsite": True
                 },
-            "rule": {
-                "nodes1": "//div[@id='itemSearchList']/div",
-                "nodes2": "//li/div[contains(@class, 'search_item_box') and not(contains(@class, 'none'))]",
-                "price1": "div/p[@class='proPrice']/em",
-                "price2": "div[contains(@class, 'pricebox')]/span[1]",
+            "rule": { 
+                "node": "(//*[@id='itemSearchList']/*[@id]) | (//body/li)", 
+                "price": ".//*[@yhdprice]/@yhdprice",
+                "link": ".//a/@pmid",
+                "comment": ".//a[contains(@id, 'pdlinkcomment_')]/text()",
+                "shop": "(.//a[contains(@id, 'merchant_')]) | (.//a[contains(@onclick, 'store')])" 
             },
             "multidst": {
                 "stock": {
@@ -103,11 +104,29 @@ rule = (
                     "name": "yhd_stock",
                     "subsite": True,
                 },
+                "dp": {
+                    "type": "list",
+                    "name": "yhd_dp",
+                    },
                 "dps": {
                     "node": "dps_log",
                     "type": "hash",
                     "name": "yhd_dps_log"
                 },
+                "comment": {
+                    "name": "comment",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "comment",
+                    "pack": False
+                    },
+                "shop": {
+                    "name": "shop",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "shop",
+                    "pack": False
+                    } 
             },
             "get": {
                 "method": "get",
@@ -115,30 +134,26 @@ rule = (
                 "args": {
                     "limit": 100,
                     "interval": 1,
-                    "debug": False
+                    "debug": False,
+                    "key": ("title", )
                 }
             },
-            "test": [
+            "test": [ 
             {
-                "url": "http://list.yhd.com/searchPage/c33622-0-81835/b/a-s1-v0-p2-price-d0-f0-m1-rt0-pid-mid0-k/?isGetMoreProducts=1",
-                "check": "module_test"
-            },
+                "url": "http://list.yhd.com/searchVirCateAjax/vc1599/c0/b/a-s1-v0-p4-price-d0-mid0-f0-k?callback=jsonp1435313370351&isGetMoreProducts=1&moreProductsDefaultTemplate=0&isLargeImg=0",
+                "check": "yhd.list_test"
+            }, 
+
             {
-                "url": "http://list.yhd.com/searchPage/c32307-0-84337/b/a-s1-v0-p13-price-d0-f0-m1-rt0-pid-mid0-k",
-                "check": "module_test"
-            },
+                "url": "http://list.yhd.com/searchPage/c33044-0-0/b/a-s1-v4-p13-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp1435310878717&?isGetMoreProducts=1&isLargeImg=1",
+                "check": "yhd.list_test"
+            }, 
             {
-                "url": "http://list.yhd.com/searchPage/c23597-0-91235/b/a-s1-v0-p45-price-d0-f0-m1-rt0-pid-mid0-k",
-                "check": "module_test"
-            },
-            {
-                "url": "http://list.yhd.com/searchPage/c5073-0-84464/b/a-s1-v0-p7-price-d0-f0-m1-rt0-pid-mid0-k",
-                "check": "module_test"
-            },
-            {
-                "url": "http://list.yhd.com/searchPage/c35574-0-0/b/a-s1-v0-p12-price-d0-f0-m1-rt0-pid-mid0-k",
-                "check": "module_test"
-            },
+                "url": "http://list.yhd.com/searchPage/c33797-0-81144/b/a-s1-v0-p2-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp1435308845639&&isLargeImg=0",
+                "check": "yhd.list_test"
+            }, 
+
+
             ]
         },
         {
@@ -177,4 +192,27 @@ rule = (
             }
             ]
         },
+        {
+            "name": "dp",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "name": "yhd_dp",
+                "type": "list",
+                "qtype": "dp",
+                },
+            "dst": {
+                "name": "yhd_dp",
+                "type": "",
+                "qtype": "dp",
+                },
+            "get": {
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                }, 
+            },
+        }, 
 )

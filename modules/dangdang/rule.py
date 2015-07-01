@@ -1,4 +1,10 @@
 #-*-encoding=utf-8-*-
+
+import simple_http
+
+test_offcheck_hdr = simple_http.json_header.copy()
+test_offcheck_hdr["Referer"] = "http://category.dangdang.com" 
+
 rule = (
         {
             "name": "cats",
@@ -24,8 +30,7 @@ rule = (
             "wait": 4,
             "rule": {
                 "norm": "//ul[@class='paging']/li[@class='page_input']/span[1]",
-                "book": "//div[@class='page']/input[@name='totalPage']/@value",
-                "base": "//div[@class='page' or @class='data']/span[3]/text()",
+                "ebook": "//div[@class='page']/input[@name='totalPage']/@value",
             },
             "src": {
                 "type": "list",
@@ -41,7 +46,7 @@ rule = (
                 "method": "get",
                 "parser": "dangdang.pager",
                 "args": {
-                    "limit": 500,
+                    "limit": 50,
                     "interval": 1,
                     "debug": False
                 }
@@ -75,19 +80,21 @@ rule = (
                 "norm1": "//div[@id='content']/div/div/div",
                 "norm2": "//div[contains(@class, 'shoplist')]/ul/li/div",
                 "ebook": "//div[@id='category_ebookLst']//div[@class='ebookLst_s']",    # ebooks
-                "book": "//div[@name='Product']/div/ul/li",
+                "book": "//div[@name='Product']/div/ul/li/div",
+                "comment": "p[@class='star']/a/text()",
                 "gid": {
                     "ebook": "div[@class='ebookCon']/div/h2/a/@href",
                     "norm": "a/@href",
                 },
                 "price": {
                     "ebook": "div[@class='ebookCon']/div/div/span[@class='price']/span[1]/em",
-                    "book": "div/p/span[@class='price_n']",
+                    "book": "p/span[@class='price_n']",
                     "norm": "p[@class='price']/span[@class='price_n']",
                 },
                 "stock": {
-                    "book": "div/p[contains(@class, 'buy_button')]/a[1]/@href",
-                }
+                    "book": "p[contains(@class, 'buy_button')]/a[1]/@href",
+                },
+                "store_normal": "p[@class = 'link']/a", 
             },
             "multidst": {
                 "stock": {
@@ -98,24 +105,43 @@ rule = (
                     "type": "list",
                     "name": "spider_result",
                 },
+                "dp": {
+                    "type": "list",
+                    "name": "dangdang_dp",
+                },
                 "dps": {
                     "node": "dps_log",
                     "type": "hash",
                     "name": "dangdang_dps_log"
-                }
+                },
+                "comment": {
+                    "name": "comment",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "comment",
+                    "pack": False
+                    },
+                "shop": {
+                    "name": "shop",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "shop",
+                    "pack": False
+                    }
+
             },
             "get": {
                 "method": "get",
                 "parser": "dangdang.list_parser",
                 "args": {
-                    "limit": 500,  
+                    "limit": 50,  
                     "interval": 1,
                     "debug": False
                 }
             },
             "test": [
             {
-                "url": "http://e.dangdang.com/list_98.01.62.00_3_saleWeek_1.htm",
+                "url": "http://category.dangdang.com/cp01.63.18.00.00.00-lp20-hp23-pg2.html",
                 "check": "module_test",
             },
             {
@@ -147,10 +173,88 @@ rule = (
                 "method": "get",
                 "parser": "dangdang.stock_parser",
                 "args": {
-                    "limit": 500,
+                    "limit": 50,
                     "interval": 1,
                     "debug": False
                 }
             },
+        },
+        {
+            "name": "dp",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "name": "dangdang_dp",
+                "type": "list",
+                "qtype": "dp",
+                },
+            "dst": {
+                "name": "dangdang_dp",
+                "type": "",
+                "qtype": "dp",
+                },
+            "get": {
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                },
+            },
+        }, 
+        {
+            "type": "diff_dps", 
+            "name": "diff_dps", 
+            "src": { 
+                "type": "hash",
+                "node": "dps_log",
+                "name": "dps_log",
+                },
+            "wait": 86400, 
+            "dst": {
+                "type": "list",
+                "name": "dangdang_diff_dps",
+                "node": "diff_dps",
+                "log": False
+                }
+        }, 
+        {
+            "name": "offcheck",
+            "type": "fetch", 
+            "wait": 2,
+            "src": { 
+                "type": "list",
+                "name": "dangdang_diff_dps",
+                "batch": 3000, 
+                "group": True,
+                "node": "diff_dps",
+                "filter": "dangdang.off_filter",
+                },
+            "dst": { 
+                "name": "spider_result",
+                "type": "list", 
+                },
+            "get": {
+                "method": "post", 
+                "args": {
+                    "limit": 50,
+                    "interval": 1,
+                    "debug": False, 
+                }, 
+                "parser": "dangdang.checkoffline",
+            }, 
+            "test": [
+                {
+                    "payload": {
+                        "pids": "1098685806, 1111111", 
+                        "time": "1433917547",
+                        "type": "get_price",
+                        },
+                    "header": test_offcheck_hdr,
+                    "url": "http://category.dangdang.com/Standard/Search/Extend/hosts/api/get_price.php",
+                    "method": "post", 
+                    "check": "dangdang.offcheck_test"
+                    }
+                ]
         },
 )

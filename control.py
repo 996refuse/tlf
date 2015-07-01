@@ -33,7 +33,8 @@ cmd = {
         "stopall": (0, False), 
         "get": (2, True),
         "getall": (0, True),
-        "refresh": (0, True)
+        "refresh": (0, True),
+        "purgelog": (0, True),
         } 
 
 

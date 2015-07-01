@@ -4,7 +4,7 @@ import pdb
 
 def load_func():
     import os.path
-    func = spider.load_func("os.path.dirname")
+    func = spider.load_func("os.path.dirname") 
     assert func == os.path.dirname
 
 
@@ -92,8 +92,7 @@ def forward_dst():
     dst = {
             "node": "default",
             "name": "anyname",
-            "type": "str",
-            "key_pat": ("%s-%s", "site_id")
+            "type": "kv", 
             } 
     db = { 
             "host": "127.0.0.1",
@@ -101,8 +100,8 @@ def forward_dst():
             "db": 0 
         }
     r = redis.StrictRedis(**db) 
-    spider.forward_one(r, ((1, 2), (2, 4)), dst)
-    assert r.get("1-1111") == "2" and r.get("2-1111") == "4"
+    spider.forward_one(r, {1 : 2}, dst)
+    assert r.get("1") == "2"
 
 
 def is_worker_alive():
@@ -112,14 +111,34 @@ def is_worker_alive():
 
 
 
+def diff_promo():
+    from spider import llkv
+    import msgpack
+    profile = {
+            "llkv": llkv.Connection("127.0.0.1", 8000)
+            }
+    l = [("1-1", "abc"), ("1-2", "efg")]
+    result = spider.diff_promo_items(profile, l)
+    assert result == l
+
+
+
+def format_price():
+    from spider import format_price
+    spider.CONFIG["site_id"] = "test"
+    pdb.set_trace()
+    ret = format_price([("1", 2, 1), ("2", "2", 1), (3, 2, 1), (4, -1, 1)]) 
+    assert ret == [("test", 1, 200, 1), ("test", 2, 200, 1), ("test", 3, 200, 1), ("test", 4, -1, -1)] 
+
+
+
 all_cases = (
         ("write to file", forward_file),
         ("split price range", load_price_range),
         ("load function", load_func),
         ("redis nodes",redis_nodes),
         ("forward data", forward_dst),
-        ("is worker alive", is_worker_alive)
-        )
-
-        
-
+        ("is worker alive", is_worker_alive),
+        ("format price", format_price)
+        #("diff promo", diff_promo), 
+        ) 

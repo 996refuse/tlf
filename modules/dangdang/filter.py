@@ -5,6 +5,7 @@ import time
 import pdb
 import async_http
 
+
 def pager_filter(x):
     return {
             "url": x
@@ -25,3 +26,21 @@ def stock_filter(items):
     		"info": i,
     	})
     return ret
+
+priceurl = "http://category.dangdang.com/Standard/Search/Extend/hosts/api/get_price.php"
+def off_filter(items): 
+    gids = [item[0] for item in items] 
+    tasks = []
+    for i in split_list_iter(gids, 60):
+        offcheck_hdr = async_http.json_header.copy()
+        offcheck_hdr["Referer"] = "http://category.dangdang.com" 
+        tasks.append({ 
+            "url": priceurl,
+            "payload": {
+                "pids": ",".join(i),
+                "time": str(int(time.time())),
+                "type": "get_price",
+                }, 
+            "header": offcheck_hdr
+            }) 
+    return tasks

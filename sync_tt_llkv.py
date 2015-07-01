@@ -8,7 +8,7 @@ import os
 
 
 list_server = ("192.168.1.194", 8000)
-dp_server = ("192.168.1.191", 8001)
+dp_server = ("192.168.1.194", 8001)
 
 dp_pattern = re.compile("[0-9]+\t([0-9]+)\t([\-0-9]+)\t") 
 list_pattern = re.compile("([0-9\-]+)\t<p>([0-9\-]+)</p><s>([0-9\-]+)</s>") 
@@ -75,7 +75,7 @@ def load(path, server, pat, store_fn):
     m10 = 1024 * 1024 * 100
     cnt = 0
     fobj = open(path)
-    reset_file_ptr(fobj)
+    #reset_file_ptr(fobj)
     con = llkv.Connection(*server)
     while True: 
         data = fobj.read(m10) 
@@ -118,9 +118,41 @@ def get_key(server, key):
 
 
 
+def sync_dp_idx():
+    import MySQLdb
+    db = {
+            "host": "192.168.1.192",
+            "port": 3306,
+            "db": "dp_idx",
+            "user": "minishop",
+            "passwd": "MiniShop!@#"
+            } 
+    ll = llkv.Connection(*dp_server)
+    con = MySQLdb.connect(**db)
+    cur = con.cursor()
+    print "loading from dp_idx"
+    cur.execute("select url_crc, site_id from idx")
+    from ctypes import c_uint 
+    keys = []
+    cnt = 0
+    for crc, site_id in  cur.fetchall(): 
+        key = (site_id << 48) | c_uint(crc).value 
+        keys.append((key, 0))
+        if len(keys) > 1000: 
+            cnt += len(keys)
+            print "current", cnt
+            ll.multi_set(dict(keys)) 
+            keys = []
+    ll.close()
+    con.close()
+
+
+
+
 def main(): 
     import sys
     if sys.argv[1] == "dp":
+        sync_dp_idx()
         load("/pub_file/last_url.txt", dp_server, dp_pattern, dp_store)
     elif sys.argv[1] == "list":
         load("/tmp/llkv.list", list_server, list_pattern, list_store) 

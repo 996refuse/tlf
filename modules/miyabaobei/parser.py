@@ -9,7 +9,8 @@ from spider import log_with_time
 base = "http://www.miyabaobei.com"
 
 
-def cats_parser(url, content, rule): 
+def cats_parser(url, res, rule): 
+    content = res['text']
     t = etree.HTML(content)
     ret = []
     for i in rule:

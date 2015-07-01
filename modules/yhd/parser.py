@@ -19,122 +19,111 @@ cookie_table = {
         4031: 12
         }
 
+listurl = "http://list.yhd.com/%s"
 
-lsturl = "http://list.yhd.com/%s-0-0"
-ctgurl = "http://www.yhd.com/ctg/s2/%s-0-0"
-
-def cats_parser(url, content,  rule):
-    t = etree.HTML(content)
+def cats_parser(url, res,  rule): 
+    content = res['text']
+    t = etree.HTML(content) 
+    items = t.xpath(rule) 
     ret = set()
-    items = t.xpath(rule)
-    for v in items:
-        #pdb.set_trace()
-        if '/c0-0/' in v:
-            continue
-        if '/ctg/s2/' in v:
-            r = "(?<=/ctg/s2/).+"
-            cat = re.search(r, v)
-            if not cat:
-                log_with_time("bad regex: %r %r" % (r, v))
-                continue
-            cat = cat.group().split('-')[0]
-            ret.add(ctgurl % cat)
-        elif 'list.yhd.com' in v:
-            # http://list.yhd.com/.../
-            r = "(?<=yhd\.com\/).+"
-            cat = re.search(r, v)
-            if not cat:
-                log_with_time("bad regex: %r %r" % (r, v))
-                continue
-            cat = cat.group().split('-')[0]
-            ret.add(lsturl % cat)
+    for v in items: 
+        url = re.findall("/(v?c[0-9]+-[0-9]+-[0-9]+)/", v) 
+        if url:
+            ret.add(listurl % url[0]) 
     return ret
 
-pgburl = 'http://list.yhd.com/%s/b/a-s1-v0-p%s-price-d0-f0-m1-rt0-pid-mid0-k'
-morepad = '?isGetMoreProducts=1'
+
+parta_base = "http://list.yhd.com/searchPage/{cat}/b/a-s1-v4-p{page}-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp{cb}&&isLargeImg=1"
+
+partb_base = "http://list.yhd.com/searchPage/{cat}/b/a-s1-v4-p{page}-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp{cb}&?isGetMoreProducts=1&isLargeImg=1"
+
+virta_base = "http://list.yhd.com/searchVirCateAjax/{cat}/b/a-s1-v4-p{page}-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp{cb}&&isLargeImg=1"
+
+virtb_base = "http://list.yhd.com/searchVirCateAjax/{cat}/b/a-s1-v4-p{page}-price-d0-f0-m1-rt0-pid-mid0-k/?callback=jsonp{cb}&?isGetMoreProducts=1&isLargeImg=1"
+
+
+
 def pager(task, rule):
     try:
         tree = etree.HTML(task["text"])
     except:
         log_with_time("bad response %s" % task['url'])
-        return []
-
-    sspage = tree.xpath(rule)
-    ret = []
-    if not sspage:
-        log_with_time("rule error:%s %s"%(rule, task['url']))
-        return []
-    try:
-        cats, count = sspage
-    except:
-        log_with_time("rule error:%s %s"%(rule, task['url']))
-        return []
-
-    cats = cats.xpath("a[2]/@url")[0]
-    if cats == '0': cats = 'searchPage/' + task['url'].split('/')[-1]
-    else: cats = re.search("(?<=yhd\.com\/).+(?=\/b)", cats).group()
-
-    try:
-        count = int(re.search("(?<=/)\d+", etree.tostring(count)).group())
-    except:
-        count = 1
-    for i in range(1, count+1):
-        url = pgburl%(cats, str(i))
-        ret.extend([url, url + morepad])
+        return 
+    page = re.findall("/([0-9]+)", " ".join(tree.xpath(rule)))
+    if not page:
+        log_with_time("page rule error")
+        return 
+    cat = re.findall("/(v?c[0-9]+-[0-9]+-[0-9]+)", task["url"])[0] 
+    ret = [] 
+    for i in range(1, int(page[0]) + 1):
+        if cat.startswith("vc"):
+            url_a = virta_base.format(cat = cat, page=i, cb = int(time.time() * 1000)) 
+            url_b = virtb_base.format(cat = cat, page=i, cb = int(time.time() * 1000)) 
+        else:
+            url_a = parta_base.format(cat = cat, page=i, cb = int(time.time() * 1000)) 
+            url_b = partb_base.format(cat = cat, page=i, cb = int(time.time() * 1000))
+        ret.append(url_a)
+        ret.append(url_b) 
     return ret
 
+def list_test(items):
+    pdb.set_trace()
 
-re_price = re.compile("(?<=b\>)\d+\.\d+|(?<=b\>)\d+")
-re_gid = re.compile("\d+")
-def list_parser(task, rule):
-    #pr.enable()
+dp_base = "http://item.yhd.com/item/%s" 
+
+def list_parser(task, rule): 
     try:
-        j = json.loads(task["text"].decode("utf-8"))
+        j = jsonp_json(task["text"].decode("utf-8"))
         t = etree.HTML(j['value'])
-    except:
-        log_with_time("bad response: json decode error %s"%task['url'])
-        return []
+    except Exception as e:
+        import traceback
+        traceback.print_exc() 
+        exit(1)
     ret = []
     dps = {}
-    nodes = t.xpath(rule['nodes1'])
-    if not nodes:
-        nodes = t.xpath(rule['nodes2'])
-        if not nodes:
-            log_with_time("bad rules %s"%task['url'])
-            return []
-        price_rule = rule['price2']
-    else:
-        price_rule = rule['price1']
-    for node in nodes:
-        gid = re_gid.search(node.attrib['id']).group()
-        price_node = node.xpath(price_rule)
-        if not gid or not price_node:
-            log_with_time("bad rules: %s %s"%(price_rule, task['url']))
+    dp = []
+    comments = {}
+    shop = {}
+    #dp, comment, shopid, price
+    nodes = t.xpath(rule['node']) 
+    now = int(time.time()) 
+    for node in nodes: 
+        price = node.xpath(rule["price"]) 
+        if not price:
+            log_with_time("price rule error: %s" % task["url"])
             continue
-        price_node = price_node[0]
-        price = price_node.attrib.get("yhdprice")
-        if not price:
-            price = price_node.attrib.get("yhdPrice")
-        if not price:
-            price = price_node
-        if type(price) == lxml.etree._Element:
-            price = etree.tostring(price)
-            price = re_price.search(price)
-            if not price:
-                log_with_time("bad response %s"%task['url'])
-                continue
-            price = price.group()
+        price = price[0]
+        gid = re.findall("_([0-9]+)", node.attrib["id"])[0] 
+        comment = node.xpath(rule["comment"]) 
+        if comment: 
+            comments[gid] = re.findall("\d+", "".join(comment))[0]
+        shop_link = node.xpath(rule["shop"]) 
+        if shop_link: 
+            shop_link = shop_link[0]
+            store_id = re.findall("/m-([0-9]+)\.", shop_link.attrib.get("href"))[0] 
+            shop[gid] = "%s,%s" % (store_id, shop_link.attrib.get("title")) 
         ret.append((gid, price))
-        dps[gid] = int(time.time())
-    #pr.disable()
-    #pr.print_stats()
-    return {"stock":ret, "dps":dps}
-
-
+        dps[gid] = now
+        pmids = node.xpath(rule["link"])
+        if not pmids:
+            log_with_time("dp rule error: %s" % task["url"])
+            continue
+        dp.append((dp_base % pmids[0], gid, "")) 
+    return {
+            "stock":ret,
+            "dps":dps,
+            "comment": comments,
+            "shop": shop,
+            "dp": dp,
+            } 
 
 
 def stock_parser(task, rule):
-    j = json.loads(task["text"])
+    try:
+        j = json.loads(task["text"])
+    except ValueError:
+        log_with_time("json error: %s, %s" % (task["url"],task["text"]))
+        return
     if not j:
         log_with_time("bad response: %s" % task["url"])
         return

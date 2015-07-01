@@ -20,7 +20,7 @@ rule = (
             "name": "pager",
             "type": "fetch",
             "wait": 2,
-            "rule": "//span[@class = 'cat-paging-txt']/text()",
+            "rule": "//div[contains(@class, 'ui-paging')]/span[@class='total']/text()",
             "src": {
                 "type": "list",
                 "name": "vip_list",
@@ -55,9 +55,20 @@ rule = (
                 "name": "vip_page",
                 "batch": 60, 
                 },
-            "dst": {
-                "type": "list",
-                "name": "spider_result", 
+            "multidst": {
+                "spider": {
+                    "type": "list",
+                    "name": "spider_result", 
+                    },
+                "dp": {
+                    "type": "list",
+                    "name": "vip_dp"
+                    },
+                "dps_log": {
+                    "node": "dps_log",
+                    "type": "hash",
+                    "name": "vip_dps_log", 
+                    }
                 },
             "get": { 
                 "method": "get",
@@ -67,6 +78,35 @@ rule = (
                         "interval": 1,
                         "debug": False, 
                     } 
-                }
+                },
+            "test": [
+            {
+                "url": "http://category.vip.com/search-1-0-26.html?q=2|7849&wz=1",
+                "check": "module_test"
+            }
+            ]
+        },
+        {
+            "name": "dp",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                    "name": "vip_dp",
+                    "type": "list",
+                    "qtype": "dp", 
+                },
+            "dst": {
+                "name": "vip_dp",
+                "type": "list",
+                "qtype": "dp",
+                },
+            "get": {
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                    }
+                },
             }
         )

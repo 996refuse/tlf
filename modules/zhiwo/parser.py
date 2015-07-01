@@ -10,7 +10,8 @@ import json
 import time
 
 burl = "http://www.zhiwo.com"
-def cats_parser(url, content, rule):
+def cats_parser(url, res, rule):
+    content = res['text']
     t = etree.HTML(content)
     ret = [ burl + i for i in t.xpath(rule) ]
 

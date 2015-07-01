@@ -46,6 +46,7 @@ def install_deps():
     _("python-mysqldb") 
     _("libpng12-dev")
     _("make cmake") 
+    _("aria2")
     _("software-properties-common python-software-properties")
     _("autoconf") 
     _ = lambda x : sudo("apt-get -q -y remove %s" % x) 

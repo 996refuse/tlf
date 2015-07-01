@@ -9,8 +9,8 @@ import re
 import json
 import time
 
-def cats_parser(url, content, rule):
-    t = etree.HTML(content)
+def cats_parser(url, res, rule):
+    t = etree.HTML(res['text'])
     ret = t.xpath(rule)
 
     return ret

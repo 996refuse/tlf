@@ -1,13 +1,13 @@
 
 sites = { 
     "source": "cats",
-    "run_by_order": True,
-    "sites": {
-        25: "nanjing",
-        1025: "beijing", 
-        2025: "guangzhou",
-        3025: "chengdu",
-        }, 
+    "order": True,
+    "sites": [
+        (25, "nanjing"),
+        (1025, "beijing"), 
+        (2025, "guangzhou"),
+        (3025, "chengdu"),
+        ], 
     } 
 
 
@@ -27,7 +27,8 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "suning_cats",
+                "name": "suning_cats", 
+                "subsite": True,
                 },
             "test": ( 
                 {
@@ -60,13 +61,19 @@ rule = (
             "get": {
                 "method": "get", 
                 "parser": "suning.pager",
-                "not200": "log",
+                "not200": "retry",
                 "args": {
-                    "limit": 30,
+                    "limit": 5,
                     "interval": 1,
                     "debug": False 
                     },
                 },
+            "test": [
+                {
+                    "url": "http://list.suning.com/1-264317-0-0-0-9173.html",
+                    "check": "suning.pager_test"
+                }
+                ] 
         },
         { 
             "name": "list", 
@@ -85,6 +92,11 @@ rule = (
                     "type": "list",
                     "subsite": True,
                 },
+                "book_price": {
+                    "name": "suning_book_price",
+                    "type": "list",
+                    "subsite": True,
+                },
                 "spider": {
                     "name": "spider_result",
                     "type": "list"
@@ -99,32 +111,41 @@ rule = (
                     "node": "dps_log",
                     "name": "suning_dps_log",
                     "type": "hash",
+                    "subsite": True,
+                    },
+                "comment": {
+                    "name": "comment",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "comment",
+                    "pack": False
                     }
                 },
             "rule": {
                 "book_node": "//ul[@id = 'proList']/li", 
                 "book_title": "div[@class = 'thirdInfo']/h3/a",
                 "book_stock": "div[@class = 'thirdInfo']/span[@class = 'youhuo']/text()", 
-                "book_price": "div[@class = 'thirdInfo']/p/span[@class = 'snPrice']/b/img/@src2",
                 "normal_node": "//div[@id = 'proShow']/ul/li",
                 "normal_title": "div[@class = 'inforBg']/h3/a/p/text()",
                 "normal_stock": "div/div[contains(@class, 'comment')]/i/text()",
                 "normal_price": "div/div[contains(@class, 'infor-top')]/p/img/@src2",
                 "qid": "div[contains(@class , 'btn')]/div/img",
+                "normal_comment": "div/div[contains(@class, 'comment')]/p/a/i/text()",
+                "book_comment": "div[@class = 'thirdInfo']/form/p/span[@class='text-line']/em/a/text()",
                 },
             "get": {
                 "method": "get",
                 "parser": "suning.list_parser",
-                "not200": "log", 
+                "not200": "retry", 
                 "args": {
-                    "limit": 30,
+                    "limit": 5,
                     "interval": 1,
                     "debug": False, 
                     } 
                 },
             "test": ( 
                 {
-                    "url": "http://list.suning.com/0-249513-6-0-0-9173-0-0-0-0-10011.html",
+                    "url": "http://list.suning.com/0-258006-0-0-0-9173.html",
                     "check": "suning.list_test" ,
                     "ignore": True,
                 },
@@ -161,7 +182,44 @@ rule = (
                 }, 
                 "keys": ("qid", "stock", "stock")
             },
-        }, 
+        },
+        { 
+            "name": "book_price",
+            "type": "fetch",
+            "wait": 2,
+            "src": { 
+                "group": True,
+                "name": "suning_book_price",
+                "type": "list",
+                "filter": "suning.bookprice_filter",
+                "batch": 100,
+                "subsite": True,
+                },
+            "dst": {
+                "name": "spider_result",
+                "subsite": False,
+                "type": "list", 
+                },
+            "get": {
+                "method": "get",
+                "parser": "suning.book_price",
+                "not200": "log", 
+                "args": {
+                    "limit": 50,
+                    "interval": 1,
+                    "debug": False, 
+                }, 
+                "keys": ("qid", "stock")
+            },
+            "test": [
+            {
+                "url": "http://www.suning.com/emall/priceService_9173_107961923%7C%7C%7C_1.html",
+                "qid": "107961923",
+                "stock": 1,
+                "check": "module_test",
+            }
+            ]
+        },
         {
             "name": "dp",
             "type": "fetch", 
@@ -179,11 +237,64 @@ rule = (
             "get": {
                 "method": "get", 
                 "args": {
-                    "limit": 50,
+                    "limit": 5,
                     "interval": 1,
                     "debug": False, 
                 }, 
+                "redirect": 10,
                 "keys": ("qid", "stock"),
             },
-        }
+        },
+        {
+            "type": "diff_dps",
+            "name": "diff_dps",
+            "wait": 20000,
+            "src": {
+                "type": "hash",
+                "node": "dps_log",
+                "name": "dps_log",
+                "subsite": True,
+                },
+            "wait": 50000,
+            "dst": {
+                "type": "list",
+                "name": "suning_diff_dps",
+                "node": "diff_dps",
+                "subsite": True,
+                "log": False,
+                }
+        },
+        {
+            "name": "offshelf",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "type": "list",
+                "name": "suning_diff_dps",
+                "batch": 600, 
+                "node": "diff_dps",
+                "subsite": True,
+                "filter": "suning.off_filter",
+                },
+            "dst": {
+                "name": "spider_result",
+                "type": "list",
+                },
+            "get": {
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                }, 
+                "parser": "suning.off_parser",
+            },
+            "test": [
+                {
+                    "url": "http://price2.suning.cn/webapp/wcs/stores/prdprice/249321_9173_10000_9-1.png",
+                    "check": "suning.off_check",
+                    "qid": 249321,
+                }
+                ]
+        } 
         )

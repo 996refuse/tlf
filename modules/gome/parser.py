@@ -3,12 +3,16 @@ import json
 import re
 import pdb 
 import time
+import async_http
 from spider import async_http
 from lxml import etree
 from spider import format_price
 from spider import log_with_time
 from spider import format_style_group 
 from spider import jsonp_json
+from spider import get_crc
+from spider import format_promo
+
 
 def pager_filter(x): 
     cat =re.findall("/(cat[0-9]+)\.", x) 
@@ -28,7 +32,8 @@ def remove_gap(url):
     return "".join(b)
 
 
-def cats_parser(url, content, rule): 
+def cats_parser(url, res, rule): 
+    content = res['text']
     t = etree.HTML(content)
     ret = []
     filter = {}
@@ -77,7 +82,7 @@ def payload(cat, page):
     return ajax
 
 
-def test_list(items):
+def list_test(items):
     pdb.set_trace()
 
 
@@ -95,6 +100,9 @@ def list_parser(task, rule):
         return
     now = int(time.time())
     dps_log = {} 
+    shop = {}
+    comment = {}
+    promos = []
     for p in item["products"]: 
         try: 
             s = p["skus"] 
@@ -109,12 +117,141 @@ def list_parser(task, rule):
             stock = 1
         else:
             stock = 0 
+        promos.append((url, s["skuNo"]))
         skus.append((url, price, stock)) 
+        if p.get("shopId"):
+            shop[get_crc(url)] =  "%s,%s" % (p["shopId"], p["sName"])
+        if p.get("evaluateCount"): 
+            comment[get_crc(url)] = int(p["evaluateCount"])
     result = format_price(skus) 
     for r in result:
-        dps_log[r[1]] = now
+        dps_log[r[1]] = now 
     return {
             "spider": result,
             "dp": dp_pairs,
             "dps_log": dps_log,
+            "shop": shop,
+            "comment": comment,
+            "promo": promos,
             }
+
+
+
+promo_url = "http://g.gome.com.cn/ec/homeus/browse/store.jsp?callback=jQuery171028656046248371225_{time}&goodsNo={goodsNo}&city=23010100&areaId=230101001&siteId_p=&skuType_p=ZBBC&shelfCtgy3=PK01&zoneId=23010000&sid={sid}&pid={pid}&programId=111111111&threeD=n&_={time}"
+
+
+def promo_filter(item): 
+    url, sku = item 
+    parts =re.findall("/([A-Za-z-0-9]+)\.h", url)
+    if not parts:
+        log_with_time("url rule error: %s" % url)
+    pid, sid = parts[0].split("-") 
+    #if "A" in url:
+    #    goodsNo = re.findall("([0-9]+)\.html", url)[0]
+    #else:
+    #    goodsNo = sku
+    p = promo_url.format(time = int(time.time() * 1000), goodsNo = sku, sid = sid,  pid = pid)
+    return {
+            "url": p, 
+            "old": url
+            }
+
+
+def promo_test(items):
+    pdb.set_trace()
+
+
+def promo_parser(task, rule): 
+    j = jsonp_json(task["text"]) 
+    promos = [] 
+    log_with_time("url: %s" % task["old"])
+    crc = get_crc(task["old"])
+    #site_enable 
+    #1 客户端
+    #2 手机网页
+    #3 手机端 
+    if not j["proms"]: 
+        log_with_time("no promo: %s" % task["old"]) 
+        return format_promo([(crc, promos)])
+    for item in j["proms"]:
+        tp = item["type"] 
+        if tp == "ZENGPIN": 
+            b = []
+            for title in item["titleList"]:
+                b.append(title["title"])
+            if b:
+                promos.append({
+                    "keywords": "赠品",
+                    "type": 3,
+                    "desc": u"赠: %s" % "".join(b)
+                    })
+        elif tp == "LYMANZENG": 
+            b = []
+            for title in item["titleList"]:
+                b.append(title["title"])
+            if b:
+                promos.append({
+                    "keywords": "满赠",
+                    "type": 3,
+                    "desc": u"%s: %s" % (item["desc"], "".join(b))
+                    }) 
+        elif tp == "ZHIJIANG": 
+            #ignore
+            pass 
+        elif tp == "ZENGQUANRED" or tp == "ZENGQUANBLUE": 
+            b = []
+            for title in item["titleList"]:
+                b.append(u"%s张%s元%s" % (title["couponNum"], title["couponPrice"], title["couponName"])) 
+            if b:
+                promos.append({
+                    "keywords": "赠券",
+                    "type": 3,
+                    "desc": u"赠: " + "".join(b)
+                    }) 
+        elif tp == "MANJIAN_old": 
+            promos.append({
+                "keywords": "满减",
+                "type": 1,
+                "desc": item["desc"],
+                })
+        elif tp == "MANJIAN": 
+            promos.append({
+                "keywords": "满减",
+                "type": 1,
+                "desc": item["desc"],
+                }) 
+        elif tp == "LYMANJIAN": 
+            i = {
+                "keywords": "满减",
+                "type": 1,
+                "desc": item["desc"],
+                } 
+            if item.get("more") or item.get("more") == "true":
+                i["desc"] += item["more_msg"]
+            promos.append(i) 
+        elif tp == "LYMANFAN":
+            promos.append({
+                    "keywords": "返券",
+                    "type": 2, 
+                    "desc": item["desc"],
+                    }) 
+        elif tp == "MANFANRED": 
+            desc = item["desc"].replace("&lt;", "<")
+            desc = desc.replace("&gt;", ">")
+            promos.append({
+                    "keywords": "返券",
+                    "type": 2, 
+                    "desc": desc,
+                    }) 
+        elif tp == "ZHEKOU" or tp == "LYMANZHE": 
+            promos.append({
+                "keywords": "多买优惠",
+                "type": 11,
+                "desc": item["desc"]
+                })
+        #VIPPRICE -> 会员价忽略
+        else:
+            log_with_time("other promo: %s" % str(item))
+    if not promos:
+        log_with_time("no promo: %s" % task["old"]) 
+    return format_promo([(crc, promos)])

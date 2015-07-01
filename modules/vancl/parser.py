@@ -10,7 +10,8 @@ import json
 import time
 
 purl = 'http://s.vancl.com/p'
-def pager_parser(url, content, rule):
+def pager_parser(url, res, rule):
+    content = res['text']
     t = etree.HTML(content)
     pagenum = int(re.search("\d+", t.xpath(rule)[0].text).group())
     pages = [purl + str(i) + '.html' for i in range(1, pagenum+1)]

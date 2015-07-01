@@ -2,10 +2,10 @@ rule = (
         {
             "name": "cats",
             "type": "fetch",
-            "repeat": 20000, 
-            "from": { 
+            "repeat": 10000,
+            "from": {
                 "http://www.jd.com/allSort.aspx":  ["//div[@class = 'mc']/dl/dd/em/a"],
-                "http://d.jd.com/category/get?callback=getCategoryCallback":"", 
+                "http://d.jd.com/category/get?callback=getCategoryCallback":"",
                 },
             "get": {
                 "type": "simple",
@@ -15,17 +15,16 @@ rule = (
             "dst": {
                 "name": "jd_list",
                 "type": "list",
-                }, 
+                },
             "price_range": "price_range",
         }, 
-        {
+       {
             "name": "hotzone",
             "type": "fetch",
-            "repeat": 1200, 
-            "hotlimit": 10,
-            "from": { 
+            "repeat": 1200,
+            "from": {
                 "http://www.jd.com/allSort.aspx":  ["//div[@class = 'mc']/dl/dd/em/a"],
-                "http://d.jd.com/category/get?callback=getCategoryCallback":"", 
+                "http://d.jd.com/category/get?callback=getCategoryCallback":"",
                 },
             "get": {
                 "type": "simple",
@@ -35,15 +34,15 @@ rule = (
             "dst": {
                 "name": "jd_list",
                 "type": "list",
-                }, 
-            "price_range": "price_range",
-        }, 
+                },
+            "hotlimit": 10,
+        },
         {
             "type": "fetch",
             "name": "pager",
             "wait": 2,
             "rule": {
-                "normal": "//div[@class = 'f-pager']/span/i/text()", 
+                "normal": "//div[@class = 'f-pager']/span/i/text()",
                 "test1": "//div[contains(@class, 'pagin')]/span/i/text()"
                 },
             "src": {
@@ -55,24 +54,24 @@ rule = (
                 },
             "dst": {
                 "type": "list",
-                "name": "jd_page", 
+                "name": "jd_page",
                 },
             "get": {
                 "method": "get",
                 "parser": "jd.pager",
-                "not200": "log", 
+                "not200": "log",
                 "args": {
-                    "limit": 30,    
+                    "limit": 30,
                     "interval": 1,
                     "debug": False
-                }, 
+                },
             },
             "test": (
                 {
                     "url": "http://list.jd.com/list.html?cat=6728,6745,11953&ev=exprice_M180L200%40",
                     "check": "jd.test_list",
                 },
-                ) 
+                )
         },
         {
             "type": "fetch",
@@ -82,7 +81,7 @@ rule = (
                 "type": "list",
                 "name": "jd_styles",
                 "batch": 100,
-                "filter": "jd.styles_filter", 
+                "filter": "jd.styles_filter",
                 },
             "rule": "colorSize\s*:(.*]),",
             "multidst": {
@@ -93,97 +92,105 @@ rule = (
                 "dps_log": {
                     "node": "dps_log",
                     "type": "hash",
-                    "name": "jd_dps_log", 
+                    "name": "jd_dps_log",
                     }
                 },
             "get": {
                 "method": "get",
                 "parser": "jd.styles_parser",
-                "not200": "log", 
+                "not200": "log",
                 "args": {
-                    "limit": 100,    
+                    "limit": 100,
                     "interval": 1,
-                    "debug": False, 
-                }, 
+                    "debug": False,
+                },
             },
             "test": (
                 {
                     "url": "http://item.jd.com/1075935341.html",
-                    "check": "jd.test_list", 
-                }, 
-                { 
+                    "check": "jd.test_list",
+                },
+                {
                     "url": "http://item.jd.com/1117108069.html",
                     "check": "jd.test_list"
                 }
-                ) 
+                )
         },
         {
             "type": "fetch",
-            "name": "list", 
+            "name": "list",
             "wait": 2,
             "src": {
                 "type": "list",
                 "name": "jd_page",
-                "batch": 100,
+                "batch": 2000,
                 "filter": "jd.list_filter",
-                }, 
+                },
             "rule": {
-                "node": "//li[@class = 'gl-item']", 
-                "title": "div/div[@class = 'p-name']/a/em/text()",
-                "group": "div/div[contains(@class, 'p-scroll')]/span/div/ul/li[@class = 'ps-item']/a/img",
-                "comment": "div/div[@class = 'p-commit']/strong/a/text()",
+                "node": "//li[@class = 'gl-item']/div",
+                "title": "div[@class = 'p-name']/a/em/text()",
+                "group": "div[contains(@class, 'p-scroll')]/span/div/ul/li[@class = 'ps-item']/a/img",
+                "comment": "div[@class = 'p-commit']/strong/a/text()",
                 },
             "multidst": {
                 "dp": {
                     "type": "list",
-                    "name": "jd_dp", 
+                    "name": "jd_dp",
+                    "log": False,
                     },
                 "price": {
                     "type": "list",
-                    "name": "jd_price"
+                    "name": "jd_price" 
                     },
                 "dps_log": {
                     "node": "dps_log",
                     "type": "hash",
                     "name": "jd_dps_log",
+                    "log": False,
                     },
                 "styles": {
                     "type": "list",
                     "name": "jd_styles",
+                    "limit": 100000,
                     },
-                #"comment": { 
-                #    "name": "comment",
-                #    "type": "str",
-                #    "node": "comment", 
-                #    "key_pat": ("%s-%s", "site_id"),
-                #    "pack": False
-                #    }
-                }, 
+                "comment": {
+                    "name": "comment",
+                    "type": "hash",
+                    "with_siteid": True,
+                    "node": "comment",
+                    "pack": False,
+                    "log": False
+                    },
+                "promo": {
+                    "type": "list",
+                    "name": "jd_promo",
+                    "log": False,
+                    "limit": 20000000
+                    }
+                },
             "test": (
                 {
-                    "url": "http://list.jd.com/list.html?cat=1315,1343,9719",
-                    "check": "jd.test_list",
-                    "ignore": True
+                    "url": "http://list.jd.com/list.html?cat=1620%2C1625%2C1667&stock=0&page=336&JL=6_0_0&ev=exprice_M0L66%40",
+                    "check": "jd.test_list", 
                 },
                 {
                     "url": "http://list.jd.com/list.html?cat=1315,1342,1350",
-                    "check": "jd.test_list",
-                    "ignore": True
+                    "check": "jd.test_list", 
                 },
                 {
                     "url": "http://list.jd.com/list.html?cat=1315,1343,9719",
-                    "check": "jd.test_list", 
+                    "check": "jd.test_list",
                     }
                 ),
             "get": {
                 "method": "get",
                 "parser": "jd.list_parser",
-                "not200": "log", 
+                "not200": "log",
                 "args": {
-                    "limit": 100,    
+                    "limit": 100,
                     "interval": 1,
-                    "debug": False, 
-                }, 
+                    "debug": False,
+                },
             }
         },
         {
@@ -196,7 +203,7 @@ rule = (
                 "batch": 6000,
                 "group": True,
                 "filter": "jd.price_filter",
-                }, 
+                },
             "get": {
                 "method": "get",
                 "parser": "jd.price_parser",
@@ -205,11 +212,11 @@ rule = (
                 "args": {
                     "limit": 100,
                     "interval": 1,
-                    "debug": False, 
-                    }, 
+                    "debug": False,
+                    },
                 },
             "dst": {
-                "type": "list", 
+                "type": "list",
                 "name": "jd_stock",
                 },
         },
@@ -221,10 +228,10 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "jd_stock",
-                "batch": 300, 
+                "batch": 300,
                 "filter": "jd.stock_filter",
                 },
-            "get": { 
+            "get": {
                 "method": "get",
                 "parser": "jd.stock_parser",
                 "randua": True,
@@ -233,8 +240,8 @@ rule = (
                     "limit": 100,
                     "interval": 1,
                     "debug": False,
-                    "keys": ("price",), 
-                    }, 
+                    "keys": ("price",),
+                    },
                 },
             "dst": {
                 "type": "list",
@@ -252,70 +259,112 @@ rule = (
         } ,
         {
             "name": "dp",
-            "type": "fetch", 
+            "type": "fetch",
             "wait": 2,
-            "src": { 
+            "src": {
                 "name": "jd_dp",
-                "type": "list", 
+                "type": "list",
                 "qtype": "dp",
                 },
-            "dst": { 
+            "dst": {
                 "name": "jd_dp",
                 "type": "",
                 "qtype": "dp",
-                }, 
+                },
             "get": {
-                "method": "get", 
+                "method": "get",
                 "args": {
                     "limit": 100,
                     "interval": 1,
-                    "debug": False, 
-                }, 
+                    "debug": False,
+                },
+                "redirect": 2,
             },
-        }, 
+        },
         {
-            "type": "diff_dps", 
-            "name": "diff_dps", 
-            "wait": 20000,
-            "src": { 
+            "type": "diff_dps",
+            "name": "diff_dps",
+            "wait": 86400,
+            "src": {
                 "type": "hash",
                 "node": "dps_log",
                 "name": "dps_log",
-                },
-            "wait": 50000, 
+                }, 
             "dst": {
                 "type": "list",
                 "name": "jd_diff_dps",
                 "node": "diff_dps",
                 "log": False
                 }
-        }, 
+        },
         {
             "name": "offshelf",
-            "type": "fetch", 
+            "type": "fetch",
             "wait": 2,
-            "src": { 
+            "src": {
                 "type": "list",
                 "name": "jd_diff_dps",
-                "batch": 600, 
+                "batch": 600,
                 "group": True,
                 "node": "diff_dps",
                 "filter": "jd.off_filter",
                 },
-            "dst": { 
+            "dst": {
                 "name": "jd_stock",
-                "type": "list", 
+                "type": "list",
                 },
             "get": {
-                "method": "get", 
+                "method": "get",
+                "args": {
+                    "limit": 100,
+                    "interval": 1,
+                    "debug": False,
+                },
+                "randua": True,
+                "parser": "jd.price_parser",
+            },
+        },
+        {
+            "name": "promo",
+            "type": "fetch",
+            "wait": 2,
+            "src": {
+                "type": "list",
+                "name": "jd_promo",
+                "batch": 100,
+                "filter": "jd.promo_filter"
+                },
+            "dst": {
+                "name": "promo_result",
+                "type": "list",
+                },
+            "get": {
+                "method": "get",
                 "args": {
                     "limit": 100,
                     "interval": 1,
                     "debug": False, 
+                    },
+                "randua": True,
+                "parser": "jd.promo_parser"
                 }, 
-                "randua": True, 
-                "parser": "jd.price_parser",
-            }, 
-        }, 
+            "test": [ 
+                {
+
+                    "url": "http://pi.3.cn/promoinfo/get?id=1503987&area=12_904_3377_0&origin=1&callback=Promotions.set",
+                    "check": "jd.promo_test",
+                    "crc": 1,
+                    },
+                {
+                    "url": "http://pi.3.cn/promoinfo/get?id=1089942922&area=12_904_905_0&origin=1&callback=Promotions.set",
+                    "check": "jd.promo_test",
+                    "crc": 1,
+                    },
+                {
+                    "url": "http://pi.3.cn/promoinfo/get?id=1146927711&area=12_904_905_0&origin=1&callback=Promotions.set",
+                    "check": "jd.promo_test",
+                    "crc": 1
+                    }, 
+                ]
+        }
         )
-        

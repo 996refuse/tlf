@@ -12,7 +12,8 @@ import time
 
 yougou = 'http://www.yougou.com'
 
-def cats(url, content, rule):
+def cats(url, res, rule):
+	content = res['text']
 	try:
 		t = etree.HTML(content)
 	except:
