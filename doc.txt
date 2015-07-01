@@ -29,13 +29,12 @@ node一般就是parser, 下载网页部分通过配置文件定义， 通过pyth
 
 主进程的启动方式python spider all, 可以在主进程日志/tmp/spider-all.log里看到目前正在运行的worker, 可以看到是否有worker异常重启,  worker的日志在/tmp/spider-site-worker.log,  worker的日志不会因为重启消失 
 
+
 所有的抓取worker的结果最后汇总到spider_result队列，  spider commit是一个专用于提交结果的进程，  它会与llkv较验价格与库存是否发生变化， 最后批量提交到数据库，  这样就不存在数据并发锁的问题,  插入速度也比较快
 
 
 部署过程
 上传Tess,  执行Tess里的ubuntu-deps.sh,  build-libs.sh, 以安装图像识别模块_tess
-上传spider, 执行spider里的deps.sh安装必要的库
-
-
+上传spider, 执行spider里的deps.sh安装必要的库 
 
 

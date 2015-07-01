@@ -33,10 +33,9 @@ from importlib import import_module
 from lxml import etree
 from decimal import Decimal
 
-#my package
+#my package 
 from spider import async_http
-from spider import simple_http
-
+from spider import simple_http 
 
 from spider import modules
 from spider import configs
@@ -47,6 +46,8 @@ from spider import filepack2
 
 from bug import tp_assert
 from bug import tp_ensure
+from bug import key_assert
+
 
 
 __all__ = ["test", "async_http", "simple_http", "llkv", "filepack2", "modules"]
@@ -279,19 +280,20 @@ def forward_one(node, result, dst):
 
 
 def forward_dst(result, rule): 
+    assert "dst" in rule or "multidst" in rule
     if not result:
-        return
-    for k,v in rule.get("multidst", {}).items(): 
+        return 
+    if "dst" in rule: 
+        dst = rule["dst"]
+        node = get_node(dst.get("node")) 
+        forward_one(node, result,  dst)
+        return 
+    for k,v in rule["multidst"].items():
         if result.get(k):
             node = get_node(v.get("node")) 
             forward_one(node, result[k], v)
         else: 
             log_with_time("dst %s is empty" % k) 
-    if not "dst" in rule:
-        return
-    dst = rule["dst"]
-    node = get_node(dst.get("node")) 
-    forward_one(node, result,  dst)
 
 
 PRICE_STRIPED = set((u"¥", " ", "\t", "\n", "`"))
@@ -309,16 +311,13 @@ sp_site = set((25, 1025, 2025, 3025, 31, 1031, 2031, 3031, 4031))
 
 
 def format_price_item(item):
-    site_id = tp_ensure(CONFIG["site_id"], int)
+    site_id = CONFIG["site_id"]
     url, price, stock = item     
 
     tp_assert(str, url, price)
     tp_assert(int, stock)
 
-    if site_id in sp_site:
-        urlcrc = int(url)
-    else:
-        urlcrc = get_urlcrc(site_id, url)
+    urlcrc = get_crc(url)
     if not urlcrc: 
         return
     try: 
@@ -336,6 +335,8 @@ def format_price_item(item):
 
 
 def format_price(result): 
+    tp_assert(list, result)
+
     ret = []
     for i in result: 
         item = format_price_item(i) 
@@ -346,7 +347,7 @@ def format_price(result):
     return ret
 
 
-def get_crc(url):
+def get_crc(url): 
     site_id = CONFIG["site_id"]
     if site_id in sp_site:
         urlcrc = int(url)
@@ -613,7 +614,7 @@ def batch_parser(task):
     tp_assert(dict, task)
 
     rule = CONFIG["rule"] 
-    not200 = rule["get"].get("not200") 
+    not200 = rule["get"].get("not200", "trace") 
     if task["res_status"]["status"] != 200 and not200_abort(not200, task): 
         return 
     qtype = rule.get("dst", {}).get("qtype", "redis")
@@ -714,6 +715,9 @@ def task_simple(rule):
 
 
 def get_source_from_redis(src, node):
+    tp_assert(dict, src)
+    tp_assert(redis.StrictRedis, node)
+
     tp = src.get("type")
     qname = src["name"]
     batch = src.get("batch", 1)
@@ -736,6 +740,9 @@ def get_source_from_file(src):
 
 
 def get_source(src, node):
+    tp_assert(dict, src) 
+    tp_assert(redis.StrictRedis, node)
+
     qtype = src.get("qtype", "redis")
     if qtype == "redis":
         return get_source_from_redis(src, node)
@@ -752,6 +759,9 @@ def get_source(src, node):
 
 
 def apply_filter(rule, items):
+    tp_assert(dict, rule)
+    tp_assert(list, items)
+
     if not items:
         return
     ctp = rule["get"].get("client_type") 
@@ -773,6 +783,9 @@ def apply_filter(rule, items):
 
 
 def dp_diff(lc, items):
+    tp_assert(llkv.Connection, lc)
+    tp_assert(list, items)
+
     site_id = CONFIG["site_id"]
     crcs = {}
     for item in items:
@@ -796,7 +809,9 @@ def dp_diff(lc, items):
     return ret
 
 
-def get_dp_items(src, origins):
+def get_dp_items(src):
+    tp_assert(dict, src) 
+
     dps_redis = get_node("dp_redis")
     unpack = msgpack.unpackb
     qname = src["name"]
@@ -809,14 +824,15 @@ def get_dp_items(src, origins):
 
 
 def get_dps_diffset(src):
+    tp_assert(dict, src)
+
     diffset = []
-    atime = time.time()
-    origins = {}
+    atime = time.time() 
     while True:
         if time.time() - atime > 60:
             log_with_time("wait timeout, got: %s" % len(diffset))
             break
-        b = get_dp_items(src, origins)
+        b = get_dp_items(src)
         if not b:
             log_with_time("sleeping")
             time.sleep(src.get("wait", 1))
@@ -824,12 +840,15 @@ def get_dps_diffset(src):
         diffset.extend(dp_diff(CONFIG["lc"], b))
         if len(diffset) >= 1000:
             break
-    return diffset, origins
+    return diffset
 
 
 
 def get_source_from_dps(src, node):
-    diffset, origins = get_dps_diffset(src)
+    tp_assert(dict, src)
+    tp_assert(redis.StrictRedis, node)
+
+    diffset, origins = get_dps_diffset(src) 
     tasks = []
     for crc, url in diffset:
         task = {
@@ -854,6 +873,8 @@ def setup_dp_env():
 
 
 def setup_config(rule):
+    tp_assert(dict, rule)
+
     if rule["get"].get("args"):
         async_config(rule)
     CONFIG["rule"] = rule 
@@ -908,6 +929,8 @@ def get_node(node=None):
 
 
 def run_batch_do_wait(rule): 
+    tp_assert(dict, rule)
+
     wait = rule.get("wait", 1) 
     src = rule["src"]
     qtype = src.get("qtype", "redis") 
@@ -931,6 +954,8 @@ def run_batch_do_wait(rule):
 
 
 def run_batch(rule):
+    tp_assert(dict, rule)
+
     setup_config(rule)
     src = rule["src"]
     node = get_node(src.get("node")) 
@@ -944,6 +969,8 @@ def run_batch(rule):
 
 
 def run_worker_food(rule):
+    tp_assert(dict, rule)
+
     if not rule.get("repeat", 0):
         forward_dst(rule["food"], rule)
         log_with_time("%s done" % rule["name"])
@@ -956,6 +983,8 @@ def run_worker_food(rule):
 
 
 def now_is_in_period(period):
+    tp_assert(str, period)
+
     h = datetime.datetime.now().hour 
     start,end = period.split("-") 
     start = int(start)
@@ -968,6 +997,8 @@ def now_is_in_period(period):
 
 
 def run_worker_fetch(rule): 
+    tp_assert(dict, rule)
+
     period = rule.get("period")
     while period and not now_is_in_period(period):
         log_with_time("not allowed right now: %s" % period)
@@ -980,6 +1011,8 @@ def run_worker_fetch(rule):
 
 
 def run_worker(rule):
+    tp_assert(dict, rule)
+
     worker_types = {
             "fetch": run_worker_fetch,
             "food": run_worker_food, 
@@ -996,14 +1029,16 @@ def run_worker(rule):
 
 
 
-def connect_mysql(config):
+def connect_mysql(config): 
+    key_assert(config, "host", "port", "user", "passwd") 
     con = MySQLdb.connect(**config)
     cur = con.cursor()
     return con, cur
 
 
-
 def replace_log(name):
+    tp_assert(name, str)
+
     logdir = os.path.dirname(name) 
     if logdir: 
         nums = re.findall(os.path.basename(name) + "\.([0-9]+)",
@@ -1026,7 +1061,7 @@ def replace_log(name):
 
 
 
-def log_with_time(obj):
+def log_with_time(obj): 
     if not isinstance(obj, str):
         obj = repr(obj)
     try:
@@ -1055,6 +1090,8 @@ def log_with_time(obj):
 
 
 def detach_worker(site, cat):
+    tp_assert(str, site, cat)
+
     pid = os.fork()
     if not pid:
         os.execvp("python", ["python",
@@ -1066,6 +1103,8 @@ def detach_worker(site, cat):
 
 
 def detach_and_set_log(CONFIG):
+    tp_assert(dict, CONFIG)
+
     if not os.fork():
         os.setsid()
         p = os.fork()
@@ -1084,7 +1123,13 @@ def detach_and_set_log(CONFIG):
 
 
 def update_llkv(profile, item):
-    site_id,  key, price, stock = item
+    tp_assert(dict, profile)
+    tp_assert(tuple, item) 
+
+    site_id,  key, price, stock = item 
+
+    tp_assert(int, site_id, key, price, stock) 
+
     if stock > 1:
         stock = 1
     if stock < 0:
@@ -1123,14 +1168,18 @@ update_time="%s", server_id=%s;\
 
 
 def commit_b2c(profile, items):
+    tp_assert(dict, profile)
+    tp_assert(list, items) 
+
     for i in items:
         update_mysql(profile, i)
     _safe_commit(profile)
 
 
-
-
 def commit_promo(profile, items): 
+    tp_assert(dict, profile)
+    tp_assert(list, items)
+
     profile["tt"].multi_set(items) 
     c_uint = ctypes.c_uint
     crc32 = binascii.crc32
@@ -1141,13 +1190,16 @@ def commit_promo(profile, items):
         crc = int(dp_id[:idx]) 
         llkv_key = (site_id << 48) | c_uint(crc).value 
         crcs[llkv_key] = c_uint(crc32(j)).value 
-    profile["llkv"].multi_set(crcs)
+    profile["llkv"].multi_set(crcs) 
 
 
 
-def update_mysql(profile, item):
-    sql = profile["gen_sql"](item)
-    log_with_time("%d\t%s\t%d\%d" % item)
+def update_mysql(profile, item): 
+    tp_assert(dict, profile) 
+    tp_assert(tuple, item)
+
+    sql = profile["gen_sql"](item) 
+    log_with_time("%d\t%s\t%d\t%d" % item)
     _safe_insert_sql(profile, sql)
     assert profile.get("llkv")
     update_llkv(profile, item)
@@ -1156,6 +1208,8 @@ def update_mysql(profile, item):
 
 
 def gen_b2c_sql(item):
+    tp_assert(tuple, item)
+
     now = datetime.datetime.strftime(datetime.datetime.now(),
             '%Y-%m-%d %H:%M:%S')
     date = now.split(' ')[0]
@@ -1165,8 +1219,9 @@ def gen_b2c_sql(item):
     return sql
 
 
-
 def gen_taobao_sql(item):
+    tp_assert(list, item)
+
     now = datetime.datetime.strftime(datetime.datetime.now(),
             '%Y-%m-%d %H:%M:%S')
     date = now.split(' ')[0]
@@ -1176,7 +1231,10 @@ def gen_taobao_sql(item):
     return sql
 
 
+
 def gen_tmall_sql(item):
+    tp_assert(list, item)
+
     now = datetime.datetime.strftime(datetime.datetime.now(),
             '%Y-%m-%d %H:%M:%S')
     date = now.split(' ')[0]
@@ -1187,6 +1245,9 @@ def gen_tmall_sql(item):
 
 
 def _safe_insert_sql(profile, sql):
+    tp_assert(dict, profile)
+    tp_assert(str, sql)
+
     while True:
         try:
             profile["cur"].execute(sql)
@@ -1205,6 +1266,8 @@ def _safe_insert_sql(profile, sql):
 
 
 def _safe_commit(profile):
+    tp_assert(dict, profile)
+
     while True:
         try:
             profile["con"].commit()
@@ -1223,6 +1286,8 @@ def _safe_commit(profile):
 
 
 def wait_for_mysql(profile):
+    tp_assert(dict, profile)
+
     while True:
         log_with_time("bug: wait_for_mysql: reconnect mysql")
         try:
@@ -1239,26 +1304,33 @@ def wait_for_mysql(profile):
 TT_INFO = re.compile("p>([\-0-9]+).*s>([0-9]+)") 
 
 
-
-def diff_list_item(profile, items):
-    llkv = profile["llkv"]
-    prices = {}
-    for i in items:
-        prices[i[1]] = i[2:] + [i[0]]
-    c_uint = ctypes.c_uint
-    c_int = ctypes.c_int
-    keys = []
-    for item in items:
-        unsigned_crc = c_uint(int(item[1])).value
+def format_list_keys(items): 
+    llkv_keys = []
+    for item in items: 
+        unsigned_crc = ctypes.c_uint(int(item[1])).value
         key = (int(item[0]) << 48) | unsigned_crc
         if key > 0xffffffffffffffff:
-            log_with_time("key overflow: %s" % item)
-            continue
-        keys.append(key) 
-    d = llkv.multi_get(keys)
+            log_with_time("key overflow: %s" % str(item))
+            continue 
+        llkv_keys.append(key) 
+    return llkv_keys
+
+
+def diff_list_items(profile, items):
+    tp_assert(dict, profile)
+    tp_assert(list, items) 
+
+    prices = {}
+    for i in items:
+        prices[i[1]] = i[2:] + [i[0]] 
+
+    llkv_keys = format_list_keys(items)
+
+    d = profile["llkv"].multi_get(llkv_keys)
+
     result = []
     for key, value in d.items():
-        key2 = c_int(key & 0xffffffff).value
+        key2 = ctypes.c_int(key & 0xffffffff).value
         if key2 not in prices:
             log_with_time("key2 not in prices")
             continue
@@ -1278,28 +1350,32 @@ def diff_list_item(profile, items):
     return result 
 
 
-
-
-def diff_promo_items(profile, items):
-    crcs = {}
+def format_promo_keys(items):
     llkv_keys = []
-    c_uint = ctypes.c_uint 
+    crcs = {}
     for dp_id, j in items:
-        crcs[dp_id] = j
+        crcs[dp_id] = j 
         idx = dp_id.rfind("-") 
         site_id = int(dp_id[idx+1:])
         crc = int(dp_id[:idx]) 
-        key = (site_id << 48) | c_uint(crc).value 
+        key = (site_id << 48) | ctypes.c_uint(crc).value 
         if key > 0xffffffffffffffff:
-            log_with_time("key overflow: %s" % item)
-            continue 
+            log_with_time("key overflow: %s" % dp_id)
+            continue
         llkv_keys.append(key) 
-    kvs = profile["llkv"].multi_get(llkv_keys) 
-    crc32 = binascii.crc32
-    c_int = ctypes.c_int
-    ret = []
-    for k, ht in kvs.items():
-        crc = c_int(k & 0xffffffff).value 
+    return llkv_keys, crcs
+
+
+def diff_promo_items(profile, items):
+    tp_assert(dict, profile)
+    tp_assert(list, items) 
+
+    llkv_keys, crcs = format_promo_keys(items) 
+    d = profile["llkv"].multi_get(llkv_keys) 
+
+    ret = [] 
+    for k, ht in d.items():
+        crc = ctypes.c_int(k & 0xffffffff).value 
         site_id = k >> 48
         dp_id = "%s-%s" % (crc, site_id)
         j = crcs.get(dp_id) 
@@ -1311,17 +1387,17 @@ def diff_promo_items(profile, items):
             log_with_time("llkv empty key: %s" % dp_id)
             ret.append((dp_id, j))
             continue
-        ht = c_int(ht)
-        if ht != crc32(j):
+        ht = ctypes.c_int(ht)
+        if ht != binascii.crc32(j):
             ret.append((dp_id, j)) 
     for k, v in crcs:
         ret.append((k, v))
     return ret
 
 
-
-
 def unpack_items(items):
+    tp_assert(list, items)
+
     b = []
     unpack = msgpack.unpackb
     for i in items:
@@ -1332,6 +1408,8 @@ def unpack_items(items):
 
 
 def commit(profile):
+    tp_assert(dict, profile)
+
     b = []
     items = list_pop_n(profile["node"],
             profile["qname"],  1000)
@@ -1349,6 +1427,8 @@ def commit(profile):
 
 
 def setup_commit(rule):
+    tp_assert(dict, rule)
+
     c = {} 
     eval_lua_scripts_for_nodes(rule)
     node = get_node(rule["src"].get("node"))
@@ -1381,6 +1461,8 @@ def setup_commit(rule):
 
 
 def run_commit(worker):
+    tp_assert(str, worker)
+
     load_config()
     rule = commit_rules.get(worker)
     if rule:
@@ -1399,55 +1481,57 @@ def run_commit(worker):
 
 
 commit_rules = {
-        "b2c": {
-            "src": {
-                "name": "spider_result",
-                "type": "list"
-                },
-            "diff": {
-                "type": "llkv",
-                "llkv": "llkv_list",
-                "func": diff_list_item,
-                },
-            "commit": {
-                "type": "mysql",
-                "db": "mysql",
-                "gen_sql": gen_b2c_sql,
-                "func": commit_b2c,
-                }
+    "b2c": {
+        "src": {
+            "name": "spider_result",
+            "type": "list"
             },
-        "promo": {
-            "src": {
-                "name": "promo_result",
-                "type": "list",
-                },
-            "diff": {
-                "type": "llkv",
-                "llkv": "llkv_promo",
-                "func": diff_promo_items,
-                },
-            "commit": {
-                "type": "tt",
-                "db": "promo_tt", 
-                "func": commit_promo,
-                },
+        "diff": {
+            "type": "llkv",
+            "llkv": "llkv_list",
+            "func": diff_list_items,
+            },
+        "commit": {
+            "type": "mysql",
+            "db": "mysql",
+            "gen_sql": gen_b2c_sql,
+            "func": commit_b2c,
             }
+        },
+    "promo": {
+        "src": {
+            "name": "promo_result",
+            "type": "list",
+            },
+        "diff": {
+            "type": "llkv",
+            "llkv": "llkv_promo",
+            "func": diff_promo_items,
+            },
+        "commit": {
+            "type": "tt",
+            "db": "promo_tt", 
+            "func": commit_promo,
+            },
         }
+    }
 
 
 
 dp_idx_rule = {
+    "name": "dp_idx",
+    "dst": {
+        "node": "default",
         "name": "dp_idx",
-        "dst": {
-            "node": "default",
-            "name": "dp_idx",
-            "type": "list"
-            }
+        "type": "list"
         }
+    }
 
 
 
 def run_dp_idx(worker): 
+    tp_assert(str, worker)
+
     load_config()
     eval_lua_scripts_for_nodes(dp_idx_rule)
     mysql_config = CONFIG["client"]["dp_idx"] 
@@ -1481,6 +1565,8 @@ def flush_lines():
 
 
 def load_site(site): 
+    tp_assert(str, site)
+
     s = CONFIG["sites"].get(site)
     if not s: 
         print "bad site: %s" % site
@@ -1500,6 +1586,8 @@ debug = False
 
 
 def diff_dps(rule):
+    tp_assert(dict, rule)
+
     load_config()
     name = get_dst_by_node(CONFIG["module"], "dps_log")
     if not name:
@@ -1528,6 +1616,8 @@ def diff_dps(rule):
 
 
 def run_diff_dps(rule):
+    tp_assert(dict, rule)
+
     wait = rule.get("wait", 20000)
     while True:
         diff_dps(rule)
@@ -1554,6 +1644,8 @@ def import_all_sites():
 
 
 def get_dst_by_node(module, node):
+    tp_assert(str, node)
+
     site_id = get_siteid(CONFIG["site"])
     rule = getattr(module, "rule", [])
     for r in rule:
@@ -1569,6 +1661,9 @@ def get_dst_by_node(module, node):
 
 
 def slow_hgetall(node, name):
+    tp_assert(redis.StrictRedis, node)
+    tp_assert(str, name)
+
     d = {}
     cursor = 0
     while True:
@@ -1581,6 +1676,9 @@ def slow_hgetall(node, name):
 
 
 def load_intime_dps(node, name):
+    tp_assert(redis.StrictRedis, node)
+    tp_assert(str, name)
+
     dpids = slow_hgetall(node, name)
     expires_time = int(time.time() - 3 * 24 * 3600)
     ret = set()
@@ -1595,6 +1693,8 @@ def load_intime_dps(node, name):
 
 
 def load_history_dps(path):
+    tp_assert(str, path)
+
     pat = "[0-9]+\t%s\t([-0-9]+)\t" % CONFIG["site_id"]
     dp_pattern = re.compile(pat)
     m10 = 1024 * 1024 * 100
@@ -1618,6 +1718,8 @@ def load_history_dps(path):
 
 
 def load_price_dps(path):
+    tp_assert(str, path)
+
     pat = '([0-9-]+)\t([0-9-]+)\t([0-9-]+)\n'
     list_pattern = re.compile(pat)
     m10 = 1024 * 1024 * 100
@@ -1648,6 +1750,9 @@ def load_price_dps(path):
 
 
 def dump_urls_from_crcs(crcs, path):
+    tp_assert(dict, crcs)
+    tp_assert(str, path)
+
     pat = "%s\t([-0-9]+)\t(http.*)\t" % CONFIG["site_id"]
     dp_pattern = re.compile(pat)
     m10 = 1024 * 1024 * 100
@@ -1676,6 +1781,8 @@ HISTORY_TT_RE = re.compile("<(.*?)>")
 
 
 def sort_price_history(items): 
+    tp_assert(list, items)
+
     b = []
     for item in items:
         price, stock, date = item.split(",")
@@ -1696,6 +1803,9 @@ def sort_price_history(items):
 
 
 def update_price_history(tt_key, price, stock, date): 
+    tp_assert(str, tt_key, date)
+    tp_assert(int, price, stock)
+
     #price <= 0
     if price <= 0 or stock <= 0:
         log_with_time("update_price_history: price zero, %s" % tt_key) 
@@ -1745,6 +1855,8 @@ def update_price_history(tt_key, price, stock, date):
     
 
 def run_realtime(rule): 
+    tp_assert(dict, rule)
+
     src = rule["src"]
     qname = "%s_%sd" % (src["name"], CONFIG["site_id"])
     wait = rule.get("wait") 
@@ -1772,6 +1884,8 @@ def run_realtime(rule):
 
 
 def get_siteid(site):
+    tp_assert(str, site)
+
     ret = []
     for k,v in CONFIG["sites"].items():
         if k.startswith(site):
@@ -1784,6 +1898,8 @@ def get_siteid(site):
 
 
 def replace_stdout(log):
+    tp_assert(str, log)
+
     if debug:
         return 
     sys.stdin = open("/dev/null", "r")
@@ -1796,6 +1912,9 @@ def replace_stdout(log):
 
 
 def get_cat_from_rule(rule, cat):
+    tp_assert(tuple, rule)
+    tp_assert(str, cat)
+
     target = 0 
     for c in rule:
         if c["name"] == cat:
@@ -1803,6 +1922,8 @@ def get_cat_from_rule(rule, cat):
 
 
 def find_config(role): 
+    tp_assert(str, role)
+
     try:
         config = import_module("spider.configs.%s" % role)
     except Exception as e:
@@ -1830,12 +1951,17 @@ def load_config():
 
 
 def connect_redis(db):
+    key_assert(db, "host", "port")
+
     con = redis.StrictRedis(**db)
     load_lua_scripts(con)
     return con
 
 
-def eval_lua_scripts_for_node(redis_nodes, node):
+def eval_lua_scripts_for_node(redis_nodes, node): 
+    tp_assert(dict, redis_nodes)
+    tp_assert(dict, node)
+
     nodes = CONFIG["client"]["nodes"]
     qpat = node.get("queue_pat")
     if qpat:
@@ -1850,6 +1976,8 @@ def eval_lua_scripts_for_node(redis_nodes, node):
 
 
 def eval_lua_scripts_for_nodes(rule):
+    tp_assert(dict, rule)
+
     redis_nodes = {}
     CONFIG["nodes"] = redis_nodes
     for v in rule.get("multidst", {}).values():
@@ -1864,6 +1992,8 @@ def eval_lua_scripts_for_nodes(rule):
 
 
 def setup_site(site, cat):
+    tp_assert(str, site, cat)
+
     load_config()
     if site in blt_worker:
         blt_worker[site](cat)
@@ -1885,11 +2015,13 @@ def setup_site(site, cat):
 
 
 def setup_subsite(rule, cat):
+    tp_assert(dict, rule)
+    tp_assert(str, cat)
+
     subsites = getattr(CONFIG["module"], "sites", {})
     if not subsites:
         run_worker(rule)
-        exit(0)
-    #顺序执行分站 
+        exit(0) 
     if subsites.get("source") == cat and subsites.get("order"):
         repeat = rule.get("repeat")
         rule["old_dst"] = rule["dst"].copy()
@@ -1898,23 +2030,26 @@ def setup_subsite(rule, cat):
             exit(1)
         while True:
             run_subsite(subsites, rule)
-            sleep_with_counter(repeat)
-    #修改分站队列名
+            sleep_with_counter(repeat) 
     site_id = CONFIG["site_id"]
     sites = dict(subsites.get("sites", [])) 
-    if site_id in sites:
-        name = sites[site_id]
-        if rule.get("dst", {}).get("subsite"):
-            rule["dst"]["name"] += "_" + name
-        for v in rule.get("multidst", {}).values():
-            if v.get("subsite"):
-                v["name"] += "_" + name
-        if rule.get("src", {}).get("subsite"):
-            rule["src"]["name"] += "_" + name
+    if site_id not in sites:
+        log_with_time("%s not in subsites" % site_id)
+        return
+    name = sites[site_id]
+    if rule.get("dst", {}).get("subsite"):
+        rule["dst"]["name"] += "_" + name
+    for v in rule.get("multidst", {}).values():
+        if v.get("subsite"):
+            v["name"] += "_" + name
+    if rule.get("src", {}).get("subsite"):
+        rule["src"]["name"] += "_" + name
 
 
 
-def run_cat(site, cat):
+def run_cat(site, cat): 
+    tp_assert(str, site, cat)
+
     import atexit
     atexit.register(flush_lines)
     rule = setup_site(site, cat)
@@ -1926,7 +2061,10 @@ def run_cat(site, cat):
 
 
 
-def run_subsite(subsites, rule):
+def run_subsite(subsites, rule): 
+    tp_assert(dict, subsites)
+    tp_assert(dict, rule)
+
     for site_id, name in subsites["sites"]:
         CONFIG["site_id"] = site_id
         CONFIG["site"] = name
@@ -1943,6 +2081,8 @@ def run_subsite(subsites, rule):
 
 
 def test_parser(case, rule): 
+    tp_assert(dict, case, rule) 
+
     parser = load_func(rule["get"]["parser"])
     if case.get("ignore"):
         log_with_time("ignore: %s" % case["url"])
@@ -1968,6 +2108,9 @@ def test_parser(case, rule):
 
 
 def test_parsers(site, cat, target):
+    tp_assert(str, site, cat)
+    tp_assert(dict, target)
+
     print test_header_msg("test for [%s-%s]: " % (site, cat))
     test_header = "test for parser [%s]:"
     parser = target["get"]["parser"]
@@ -1982,6 +2125,8 @@ def test_parsers(site, cat, target):
 
 
 def load_worker_and_test(site, cat):
+    tp_assert(str, site, cat)
+
     global debug
     debug = True
     load_config()
@@ -2003,6 +2148,8 @@ def load_worker_and_test(site, cat):
 
 
 def test_worker_pass(site, worker):
+    tp_assert(str, site, worker)
+
     if not os.fork():
         load_worker_and_test(site, worker)
         exit(0)
@@ -2126,7 +2273,7 @@ def spider_basic_test():
             print test_pass_msg(test_header % site)
 
 
-def start_all_sites(workers):
+def start_all_sites(workers): 
     for i,v in CONFIG["sites"].items():
         if v.get("ignore"):
             log_with_time("skip: %s" % i)
@@ -2169,12 +2316,16 @@ def run():
 
 
 def stop_worker(pid):
+    tp_assert(int, pid)
+
     os.kill(pid, signal.SIGKILL)
     del CONFIG["workers"][pid]
 
 
 
 def start_worker(site, worker):
+    tp_assert(str, site, worker)
+
     l = set()
     for v in CONFIG["workers"].values():
         l.add("%s-%s" % v)

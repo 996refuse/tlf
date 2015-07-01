@@ -1,5 +1,4 @@
-
-def tp_assert(tp, *args):
+def tp_assert(tp, *args): 
     for i in args:
         assert isinstance(i ,tp) 
 
@@ -10,8 +9,7 @@ def tp_ensure(v, tp):
 def not_empty_assert(v):
     assert v
 
-
-def assert_key(v, *args):
+def key_assert(v, *args):
     for i in args:
         assert i in v
 

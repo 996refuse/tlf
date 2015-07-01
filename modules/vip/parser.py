@@ -72,7 +72,7 @@ def list_parser(task, rule):
         link = item_base % item["id"]
         dps.append((link, ""))
         price = item["sell_price"] 
-        ret.append((link, price, 1)) 
+        ret.append((link, str(price), 1)) 
     try:
         t = etree.HTML(task["text"])
     except:
@@ -85,7 +85,7 @@ def list_parser(task, rule):
         if not link or not price: 
             log_with_time("rule error: %s" % task["url"])
             continue
-        dps.append((link[0], ""))
+        dps.append((link[0], "")) 
         ret.append((link[0], price[0], 1)) 
     result = format_price(ret)
     now = int(time.time())

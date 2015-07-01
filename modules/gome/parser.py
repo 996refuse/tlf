@@ -106,8 +106,8 @@ def list_parser(task, rule):
     for p in item["products"]: 
         try: 
             s = p["skus"] 
-            price = s["price"]
-            url = s["sUrl"]
+            price = str(s["price"])
+            url = str(s["sUrl"])
             title = s["name"]
         except KeyError:
             log_with_time("rule error: %s" % task["text"])

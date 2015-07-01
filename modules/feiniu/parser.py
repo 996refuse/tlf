@@ -70,7 +70,7 @@ def price_parser(task, rule):
     ret = []
     for k,v in j.items():
         stock = 1 if v['cart_class'] else 0
-        ret.append([itemurl%k, v['price'], stock])
+        ret.append([str(itemurl%k), str(v['price']), stock]) 
     fret = format_price(ret)
     dps = {}
     for i in fret:

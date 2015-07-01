@@ -56,7 +56,7 @@ def list_parser(task, rule):
             log_with_time("bad response: %r %r" % (task['url'], i['commodity_id']))
             continue
         dps.append((i["url"], ""))
-        ret.append((i['url'], price, stock))
+        ret.append((str(i['url']), str(price), stock))
 
     fret = format_price(ret)
     return {

@@ -116,7 +116,7 @@ def diff_promo():
     import msgpack
     profile = {
             "llkv": llkv.Connection("127.0.0.1", 8000)
-            }
+            } 
     l = [("1-1", "abc"), ("1-2", "efg")]
     result = spider.diff_promo_items(profile, l)
     assert result == l
@@ -125,11 +125,20 @@ def diff_promo():
 
 def format_price():
     from spider import format_price
-    spider.CONFIG["site_id"] = "test"
-    pdb.set_trace()
-    ret = format_price([("1", 2, 1), ("2", "2", 1), (3, 2, 1), (4, -1, 1)]) 
-    assert ret == [("test", 1, 200, 1), ("test", 2, 200, 1), ("test", 3, 200, 1), ("test", 4, -1, -1)] 
+    spider.CONFIG["site_id"] = "test" 
+    ret = format_price([("2", "2", 1)])
+    assert ret == [("test", 2, 200, 1)]
 
+
+def diff_list():
+    from spider import diff_list_items 
+    from spider import llkv 
+    profile = {
+            "llkv": llkv.Connection(host="127.0.0.1", port=8000)
+            } 
+    ret = diff_list_items(profile, [[3, 1, 1, 0], [3, 0xffffff, 2, 0]]) 
+    assert ret == [(3, 1, 1, 0), (3, 16777215, 2, 0)]
+    
 
 
 all_cases = (
@@ -139,6 +148,7 @@ all_cases = (
         ("redis nodes",redis_nodes),
         ("forward data", forward_dst),
         ("is worker alive", is_worker_alive),
-        ("format price", format_price)
-        #("diff promo", diff_promo), 
+        ("format price", format_price),
+        ("diff promo", diff_promo), 
+        ("diff list", diff_list), 
         ) 

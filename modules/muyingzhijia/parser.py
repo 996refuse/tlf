@@ -84,5 +84,5 @@ def stock_parser(task, rule):
             stock = 1
         else:
             stock = 0 
-        ret.append((pid, price, stock)) 
+        ret.append((pid, str(price), stock)) 
     return format_price(ret)
