@@ -354,4 +354,10 @@ SITES = {
             "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
+        "lingshi": {
+            "site_id": 99,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            },
 }
