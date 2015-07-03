@@ -53,7 +53,7 @@ def list_parser(task, rule):
             stock = 1
         else:
             stock = 0
-        ret.append((gid, price, stock))
+        ret.append((str(gid), str(price), stock))
     fret = format_price(ret)
     dps = {}
     for i in fret:

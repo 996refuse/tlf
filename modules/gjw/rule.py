@@ -94,9 +94,9 @@ rule = (
                 "filter": "gjw.list_filter",
                 },
             "rule": {
-                "nodes": "//div[@id='J_ItemList']/div/div",
-                "gid": "p/a/@href",
-                "price": "p/em/@title",
+                "nodes": "//div[@class = 'min_in']",
+                "gid": "p[@class = 'productTitle']/a/@href",
+                "price": "p[@class = 'productPrice']/em/@title",
             },
             "dst": {
                 "type": "list",

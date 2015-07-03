@@ -136,9 +136,23 @@ def diff_list():
     profile = {
             "llkv": llkv.Connection(host="127.0.0.1", port=8000)
             } 
-    ret = diff_list_items(profile, [[3, 1, 1, 0], [3, 0xffffff, 2, 0]]) 
+    ret = diff_list_items(profile, [[3, 1, 1, 0], [3, 16777215, 2, 0]]) 
     assert ret == [(3, 1, 1, 0), (3, 16777215, 2, 0)]
     
+
+def redis_proxy_connect():
+    import simple_http
+    import json
+    res = simple_http.get("http://127.0.0.1:8866/connect", query={"node": "test", "db": json.dumps({"host": "127.0.0.1", "port": 6379})}) 
+    assert res["status"] == 200
+
+
+def redis_proxy_get(): 
+    import simple_http 
+    redis_proxy_connect()
+    res = simple_http.get("http://127.0.0.1:8866/redis_proxy", query={"node": "test", "type": "list", "key": "jd_page", "batch": "10"})
+    pdb.set_trace()
+    assert res["status"] == 200
 
 
 all_cases = (
@@ -149,6 +163,7 @@ all_cases = (
         ("forward data", forward_dst),
         ("is worker alive", is_worker_alive),
         ("format price", format_price),
-        ("diff promo", diff_promo), 
+        #("diff promo", diff_promo), 
         ("diff list", diff_list), 
+        ("redis_proxy connect", redis_proxy_get) 
         ) 

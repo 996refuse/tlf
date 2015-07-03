@@ -219,7 +219,11 @@ def list_parser(task, rule):
 
 
 def price_parser(task, rule):
-    price = _tess.recognize(task["text"], _tess.IMAGE_PNG, 32)
+    try:
+        price = _tess.recognize(task["text"], _tess.IMAGE_PNG, 32)
+    except:
+        log_with_time("invalid image: %s" % task["link"])
+        return
     p = fix_price(price)
     if not p: 
         log_with_time("no price: %s" % task["link"]) 
@@ -232,7 +236,7 @@ def price_parser(task, rule):
 def off_parser(task, rule): 
     if len(task["text"]) < 100: 
         log_with_time(task["link"])
-        return format_price([(task["qid"], -1, -1)])
+        return format_price([(str(task["qid"]), str(-1), -1)])
 
 
 def off_check(items):
@@ -246,4 +250,4 @@ def book_price(task, rule):
     except:
         log_with_time("bad response: %s" % task['link'])
         return 
-    return format_price([[task['qid'], price, task['stock']]])
+    return format_price([[str(task['qid']), str(price), task['stock']]])

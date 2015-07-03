@@ -169,7 +169,7 @@ SITES = {
             "site_id": 135,
             "reload": 1,
             "workers": ("cats", "pager", "list", "stock"),
-            "ignore": False,
+            "ignore": True,
             },
         "feiniu": {
             "site_id": 180,

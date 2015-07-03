@@ -86,6 +86,6 @@ def stock_parser(task, rule):
             stock = 0
         price = i["sp"]
         qid = i["id"]
-        ret.append((qid, price, stock)) 
+        ret.append((str(qid), str(price), stock)) 
     result = format_price(ret)
     return result 

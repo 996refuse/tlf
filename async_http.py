@@ -99,7 +99,7 @@ debug = False
 
 config = {
         "limit": 20, 
-        "timeout": 30,
+        "timeout": 10,
         "interval": 1,
         "retry": True,
         "retry_limit": 3
@@ -113,7 +113,7 @@ internal_keys = set(("con",
 "recv",
 "send",
 "status",
-"fd",
+"fd", 
 "random",
 "start",
 "res_status",
@@ -121,7 +121,11 @@ internal_keys = set(("con",
 "res_header",
 "text", 
 "why",
-"header_only"))
+"reason",
+"header_only"
+"chunked_idx",
+"chunked_b",
+))
 
 
 possible_methods = set(("GET",
@@ -324,7 +328,7 @@ def convert_chunked(cbuf, normal_stream):
             if char == "\r": 
                 break
             num += char 
-        if goout:
+        if goout: 
             break
         cbuf.seek(1, io.SEEK_CUR)
         x = int(num, 16) 
@@ -360,7 +364,14 @@ def decode_chunk_stream(task):
             recv.seek(back_idx, io.SEEK_SET) 
             break 
         recv.seek(1, io.SEEK_CUR)
-        x = int(num, 16) 
+        try:
+            x = int(num, 16) 
+        except: 
+            f = open("chunk_bug." + str(time.time()), "w+")
+            log_with_time("chunk_bug")
+            f.write(task["recv"].getvalue())
+            f.close()
+            exit(1)
         if not x:
             done = True
             break
@@ -401,7 +412,6 @@ def parse_header(task):
     recv = task["recv"]
     content = recv.getvalue()
     body_pos = content.find("\r\n\r\n") 
-    #没找到头再等 
     if body_pos < 0:
         return 
     recv.truncate(0)
@@ -745,8 +755,7 @@ def handle_event(ep):
             do_timer()
             continue 
         task = fd_task.get(fd)
-        if not task:
-            os.close(fd) 
+        if not task: 
             continue
         if event & EPOLLERR: 
             remove_task(task, why="epoll err") 
@@ -942,7 +951,10 @@ def dispatch_tasks(task_list):
     g["timerfd"] = open_timerfd() 
     ep.register(timerfd, EPOLLIN|EPOLLERR)
     run_async(ep) 
-    os.close(timerfd)
+    os.close(timerfd) 
+    ep.close()
+    del g["timerfd"] 
+    del g["ep"]
     fcnt = len(failed_tasks) 
     log_with_time("acnt: %d, fcnt: %d, time: %d" % (acnt,
         fcnt, time.time() - start_time))

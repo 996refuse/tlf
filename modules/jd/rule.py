@@ -48,9 +48,8 @@ rule = (
             "src": {
                 "type": "list",
                 "name": "jd_list",
-                "batch": 30,
-                "filter": "jd.pager_filter",
-                "qtype": "redis",
+                "batch": 300,
+                "filter": "jd.pager_filter", 
                 },
             "dst": {
                 "type": "list",
@@ -63,6 +62,7 @@ rule = (
                 "args": {
                     "limit": 30,
                     "interval": 1,
+                    "timeout": 5,
                     "debug": False
                 },
             },
@@ -366,5 +366,27 @@ rule = (
                     "crc": 1
                     }, 
                 ]
-        }
+        },
+        {
+                "name": "rt",
+                "type": "realtime",
+                "wait": 1,
+                "src": {
+                    "type": "list",
+                    "name": "realtime",
+                    "batch": 20,
+                    "group": True,
+                    },
+                "dst": {
+                    "type": "list",
+                    "name": "realtime_result",
+                    }, 
+                "get": {
+                    "parser": "jd.rt_parser",
+                    },
+                "test": [{
+                    "url": ["http://item.jd.com/1125072.html", "http://item.jd.com/1221390.html"],
+                    "check": "jd.rt_test",
+                    }]
+            },
         )

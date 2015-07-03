@@ -40,7 +40,7 @@ def pager(task, rule):
         ret.append(burl + '-search-page-' + str(i) + '.htm')
     return ret
 
-def list_parser(task, rule):
+def list_parser(task, rule): 
     t = etree.HTML(task['text'])
     nodes = t.xpath(rule['nodes'])
     ret = []
@@ -50,6 +50,7 @@ def list_parser(task, rule):
         if not gid or not price:
             log_with_time("bad response: %r" % task['url'])
             continue
+        gid = re.findall("id-([0-9]+)", gid[0])
         ret.append((gid[0], price[0]))
     return ret
 

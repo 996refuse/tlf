@@ -115,7 +115,7 @@ SITES = {
             },
         "jd_book": {
             "site_id": 3,
-            "workers": ("cats", "pager", "price", "list", "stock", "promo"),
+            "workers": ("cats", "pager", "price", "list", "stock", "promo", "rt"),
             "ignore": False,
             },
         "suning.nanjing": {

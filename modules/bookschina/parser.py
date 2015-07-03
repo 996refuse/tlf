@@ -59,7 +59,7 @@ def list_parser(task, rule):
         gid = gid[0]
         price = price[0].text
         price = re_price.search(price).group()
-        ret.append((itemurl+gid, price, 1))
+        ret.append((str(itemurl+gid), str(price), 1))
     fret = format_price(ret)
     for i in fret:
         dps[i[1]] = int(time.time())

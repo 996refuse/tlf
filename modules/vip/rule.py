@@ -108,5 +108,6 @@ rule = (
                     "debug": False,
                     }
                 },
+            "redirect": 2,
             }
         )

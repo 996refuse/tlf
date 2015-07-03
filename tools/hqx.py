@@ -9,7 +9,7 @@ import webbrowser
 import pdb
 import subprocess
 import sys
-import simple_http as hh
+import simple_http
 
 define("port", default=8080, help="run on the given port", type=int)
 

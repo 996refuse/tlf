@@ -68,7 +68,7 @@ def price_parser(task, rule):
 
     try:
         for k,v in j['data'].items():
-            ret.append((itemurl%k, v['np'], stocks[k]))
+            ret.append((str(itemurl%k), str(v['np']), stocks[k]))
     except:
         pdb.set_trace()
         return []

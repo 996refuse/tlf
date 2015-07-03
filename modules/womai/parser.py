@@ -78,6 +78,6 @@ def stock_parser(task, rule):
         except:
             price = -1
         stock = 1 if i['sellable'] else 0
-        ret.append((itemurl%gid, price, stock))
+        ret.append((str(itemurl%gid), str(price), stock))
     fret = format_price(ret)
     return fret

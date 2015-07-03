@@ -5,7 +5,7 @@ rule = (
             "type": "fetch",
             "repeat": 20000,
             "from": {
-                'http://www.111.com.cn': "//div[@id='allCategoryHeader']/ul/li[(position()<last())]/div/h4/a/@href",
+                'http://www.111.com.cn/categories/': "//div[@class = 'mt']/h3/a/@href",
             },
             "get": {
                 "type": "simple",

@@ -80,6 +80,7 @@ def fix_price(price):
 
 
 def list_parser(task, rule): 
+    import pdb
     t = etree.HTML(task["text"])
     nodes = t.xpath(rule["node"])
     ret = []
@@ -90,6 +91,6 @@ def list_parser(task, rule):
             log_with_time("rule error: %s" % task["old_url"])
             continue
         p = fix_price(price[0]) 
-        ret.append((link[0], p, 1)) 
+        ret.append((str(link[0]), str(p), 1)) 
     result = format_price(ret)
     return result 

@@ -10,7 +10,7 @@ import json
 import time
 
 def cats_parser(url, res, rule):
-    t = etree.HTML(res['text'])
+    t = etree.HTML(res['text'].decode("gbk")) 
     ret = t.xpath(rule)
 
     return ret

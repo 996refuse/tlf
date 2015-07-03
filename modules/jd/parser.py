@@ -8,6 +8,9 @@ import pdb
 import re
 import json
 import time
+import random
+import simple_http
+import traceback
 
 #http://list.jd.com/list.html?cat=670,671,672
 #http://list.jd.com/670-677-678.html
@@ -55,7 +58,11 @@ normal_base = "http://list.jd.com/list.html?cat={0}&stock=0&page={1}&JL=6_0_0"
 
 
 def pager(task, rule):
-    tree = etree.HTML(task["text"])
+    try:
+        tree = etree.HTML(task["text"])
+    except:
+        traceback.print_exc()
+        return
     count = tree.xpath(rule["normal"])
     if not count:
         log_with_time("pager, no count: %s" % task["url"])
@@ -185,5 +192,65 @@ def stock_parser(task, rule):
             log_with_time("key not in stocks: %s" % task["url"])
             continue
         ret.append((key, price, stocks[key]))
-    result = format_price(ret)
+    result = format_price(ret) 
     return result
+
+
+
+def get_pids(items):
+    pids = {}
+    for entry in items: 
+        pid = GET_PID.findall(entry[2])
+        if not pid:
+            continue
+        pid = pid[0]
+        pids[pid] = entry  
+    return pids.keys() 
+
+
+GET_PID = re.compile("/([0-9]+)\.") 
+
+price_url = "http://p.3.cn/prices/mgets?type=1&skuIds=%s&area=1_72_2799&callback=JQuery%s&_=%s" 
+
+stock_url = "http://st.3.cn/gsis.html?type=getstocks&skuids=%s&provinceid=1&cityid=72&areaid=2799&callback=jsonp%s&_=%s"
+
+
+def rt_test(items):
+    pdb.set_trace()
+
+
+def rt_parser(items): 
+    pids = get_pids(items)
+    if not pids:
+        log_with_time("got nothing: %s" % entries)
+        return
+    purl = price_url % (",".join(["J_" + i for i in pids]), 
+            random.randint(1000000, 10000000), int(time.time() * 1000)) 
+    surl = stock_url % (async_http.quote(",".join([i for i in pids])), 
+            random.randint(1000000, 10000000), int(time.time() * 1000)) 
+
+    price_res = simple_http.get(purl) 
+    stock_res = simple_http.get(surl)
+    if price_res["status"] != 200 or stock_res["status"] != 200:
+        log_with_time("not200: %s" % price["res"])
+        return
+    try:
+        price_json = jsonp_json(price_res["text"]) 
+        stock_json = jsonp_json(stock_res["text"].decode("gbk"))
+    except: 
+        traceback.print_exc()
+        return
+    prices = {} 
+    for i in price_json: 
+        prices[i["id"].split("_")[1]] = i["p"]
+    stocks = {} 
+    for k,v in stock_json.items(): 
+        s = v["StockStateName"]
+        if u"有货" in s or u"现货" in s:
+            stocks[k] = 1
+        else:
+            stocks[k] = 0 
+    ret = []
+    for pid in prices:
+        ret.append((str(pid), str(prices[pid]), stocks[pid])) 
+    return format_price(ret)

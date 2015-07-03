@@ -59,6 +59,10 @@ RESPONSE_ERROR = redis.exceptions.ResponseError
 
 sys.path.append("/".join(os.path.dirname(__file__).split("/")[:-1]))
 
+BIT_MASK_48 = 0xffffffffffff 
+BIT_MASK_63 = 0x7fffffffffffffffL
+BIT_MASK_64 = 0xffffffffffffffff
+
 LUA_LIST_POP_N = """
 local key = KEYS[1]
 local num = tonumber(KEYS[2])
@@ -152,7 +156,7 @@ def load_lua_scripts(node):
 
 """
 list_pop_n(redis, "mykey", 10)
-"""
+""" 
 def list_pop_n(redis, key, n):
     return redis.evalsha(SCRIPT_IDS["list_pop_n"], 2, key, n)
 
@@ -614,7 +618,7 @@ def batch_parser(task):
     tp_assert(dict, task)
 
     rule = CONFIG["rule"] 
-    not200 = rule["get"].get("not200", "trace") 
+    not200 = rule["get"].get("not200", "") 
     if task["res_status"]["status"] != 200 and not200_abort(not200, task): 
         return 
     qtype = rule.get("dst", {}).get("qtype", "redis")
@@ -637,7 +641,8 @@ def async_config(rule):
 
     args = rule["get"]["args"]
     async_http.debug = args.get("debug") 
-    for i in ("limit", "interval", "retry"):
+
+    for i in ("limit", "interval", "retry", "timeout"):
         if i in args:
             async_http.config[i] = args[i] 
 
@@ -799,7 +804,7 @@ def dp_diff(lc, items):
         else:
             log_with_time("unknown dp format")
             continue
-        key = ctypes.c_uint(crc).value | site_id << 48
+        key = get_llkv_key(site_id, crc) 
         crcs[key] = (crc, url)
     d = lc.multi_get(crcs.keys())
     ret = []
@@ -848,7 +853,7 @@ def get_source_from_dps(src, node):
     tp_assert(dict, src)
     tp_assert(redis.StrictRedis, node)
 
-    diffset, origins = get_dps_diffset(src) 
+    diffset = get_dps_diffset(src) 
     tasks = []
     for crc, url in diffset:
         task = {
@@ -1002,7 +1007,7 @@ def run_worker_fetch(rule):
     period = rule.get("period")
     while period and not now_is_in_period(period):
         log_with_time("not allowed right now: %s" % period)
-        sleep(10) 
+        time.sleep(10) 
     if not rule.get("src"):
         gt = rule["get"]
         run_single_repeat(rule)
@@ -1016,6 +1021,7 @@ def run_worker(rule):
     worker_types = {
             "fetch": run_worker_fetch,
             "food": run_worker_food, 
+            "realtime": run_realtime,
             "diff_dps": run_diff_dps,
             }
     rt = rule.get("type")
@@ -1037,7 +1043,7 @@ def connect_mysql(config):
 
 
 def replace_log(name):
-    tp_assert(name, str)
+    tp_assert(str, name)
 
     logdir = os.path.dirname(name) 
     if logdir: 
@@ -1080,12 +1086,12 @@ def log_with_time(obj):
     log_file = CONFIG.get("log_file")
     if log_file and log_file.tell() > CONFIG["general"]["log_size"]: 
         fobj = CONFIG["log_file"]
-        name = fobj.name
-        fobj.close()
+        name = fobj.name 
         try:
             replace_log(name)
         except OSError as e:
             print "replace_log error: %s" % e
+        fobj.close()
 
 
 
@@ -1139,7 +1145,7 @@ def update_llkv(profile, item):
         return
     if price < 0:
         price = 0
-    ll_key = (site_id << 48) | ctypes.c_uint(key).value
+    ll_key = get_llkv_key(site_id, key) 
     profile["llkv"].set(ll_key, price | (stock << 63))
 
 
@@ -1167,38 +1173,11 @@ update_time="%s", server_id=%s;\
 
 
 
-def commit_b2c(profile, items):
-    tp_assert(dict, profile)
-    tp_assert(list, items) 
-
-    for i in items:
-        update_mysql(profile, i)
-    _safe_commit(profile)
-
-
-def commit_promo(profile, items): 
-    tp_assert(dict, profile)
-    tp_assert(list, items)
-
-    profile["tt"].multi_set(items) 
-    c_uint = ctypes.c_uint
-    crc32 = binascii.crc32
-    crcs = {}
-    for dp_id, j in items:
-        idx = dp_id.rfind("-") 
-        site_id = int(dp_id[idx+1:])
-        crc = int(dp_id[:idx]) 
-        llkv_key = (site_id << 48) | c_uint(crc).value 
-        crcs[llkv_key] = c_uint(crc32(j)).value 
-    profile["llkv"].multi_set(crcs) 
-
-
-
 def update_mysql(profile, item): 
     tp_assert(dict, profile) 
     tp_assert(tuple, item)
 
-    sql = profile["gen_sql"](item) 
+    sql = gen_b2c_sql(item) 
     log_with_time("%d\t%s\t%d\t%d" % item)
     _safe_insert_sql(profile, sql)
     assert profile.get("llkv")
@@ -1210,8 +1189,7 @@ def update_mysql(profile, item):
 def gen_b2c_sql(item):
     tp_assert(tuple, item)
 
-    now = datetime.datetime.strftime(datetime.datetime.now(),
-            '%Y-%m-%d %H:%M:%S')
+    now = get_datetime() 
     date = now.split(' ')[0]
     site_id, key, price, stock = item
     sql = B2C_SQL % (site_id, key, date, price, stock,
@@ -1222,8 +1200,7 @@ def gen_b2c_sql(item):
 def gen_taobao_sql(item):
     tp_assert(list, item)
 
-    now = datetime.datetime.strftime(datetime.datetime.now(),
-            '%Y-%m-%d %H:%M:%S')
+    now = get_datetime()
     date = now.split(' ')[0]
     site_id, key, price, stock, user_id = item
     sql = TAOBAO_SQL % (site_id, key, date, price, stock,
@@ -1235,8 +1212,7 @@ def gen_taobao_sql(item):
 def gen_tmall_sql(item):
     tp_assert(list, item)
 
-    now = datetime.datetime.strftime(datetime.datetime.now(),
-            '%Y-%m-%d %H:%M:%S')
+    now = get_datetime()
     date = now.split(' ')[0]
     site_id, key, price, stock, user_id = item
     sql = TMALL % (site_id, key, date, price, stock,
@@ -1300,6 +1276,51 @@ def wait_for_mysql(profile):
             time.sleep(5) 
 
 
+def get_llkv_key(site_id, crc):
+    if crc > crc & BIT_MASK_48:
+        log_with_time("crc overflow: %s %s" % (site_id, crc))
+    return site_id << 48 | ctypes.c_uint(crc).value 
+
+
+def get_datetime():
+    now = datetime.datetime.strftime(datetime.datetime.now(),
+            '%Y-%m-%d %H:%M:%S')
+    return now
+
+
+
+def commit_b2c(profile, items):
+    tp_assert(dict, profile)
+    tp_assert(list, items) 
+
+    for i in items:
+        update_mysql(profile, i)
+    _safe_commit(profile)
+
+
+
+def commit_promo(profile, items): 
+    tp_assert(dict, profile)
+    tp_assert(list, items)
+
+    profile["tt"].multi_set(items) 
+    crc32 = binascii.crc32
+    crcs = {}
+    for dp_id, j in items:
+        idx = dp_id.rfind("-") 
+        site_id = int(dp_id[idx+1:])
+        crc = int(dp_id[:idx]) 
+        llkv_key = get_llkv_key(site_id, crc)
+        crcs[llkv_key] = ctypes.c_uint(crc32(j)).value 
+    profile["llkv"].multi_set(crcs) 
+
+
+
+def commit_realtime(profile, items):
+    pdb.set_trace()
+
+
+
 
 TT_INFO = re.compile("p>([\-0-9]+).*s>([0-9]+)") 
 
@@ -1307,9 +1328,8 @@ TT_INFO = re.compile("p>([\-0-9]+).*s>([0-9]+)")
 def format_list_keys(items): 
     llkv_keys = []
     for item in items: 
-        unsigned_crc = ctypes.c_uint(int(item[1])).value
-        key = (int(item[0]) << 48) | unsigned_crc
-        if key > 0xffffffffffffffff:
+        key = get_llkv_key(int(item[0]), int(item[1])) 
+        if key > BIT_MASK_64: 
             log_with_time("key overflow: %s" % str(item))
             continue 
         llkv_keys.append(key) 
@@ -1330,9 +1350,9 @@ def diff_list_items(profile, items):
 
     result = []
     for key, value in d.items():
-        key2 = ctypes.c_int(key & 0xffffffff).value
-        if key2 not in prices:
-            log_with_time("key2 not in prices")
+        key2 = ctypes.c_int(key & BIT_MASK_48).value
+        if key2 not in prices: 
+            log_with_time("crc overflow: %s" % key2)
             continue
         price, stock, site_id = prices[key2]
         del prices[key2]
@@ -1341,7 +1361,7 @@ def diff_list_items(profile, items):
             result.append((site_id, key2, price, stock))
             continue
         s = value >> 63
-        p = value & 0x7fffffffffffffffL
+        p = value & BIT_MASK_63
         if p != price or s != stock:
             result.append((site_id, key2, price, stock))
     for key, value in prices.items():
@@ -1358,8 +1378,8 @@ def format_promo_keys(items):
         idx = dp_id.rfind("-") 
         site_id = int(dp_id[idx+1:])
         crc = int(dp_id[:idx]) 
-        key = (site_id << 48) | ctypes.c_uint(crc).value 
-        if key > 0xffffffffffffffff:
+        key = get_llkv_key(site_id, crc) 
+        if key > BIT_MASK_64:
             log_with_time("key overflow: %s" % dp_id)
             continue
         llkv_keys.append(key) 
@@ -1375,7 +1395,7 @@ def diff_promo_items(profile, items):
 
     ret = [] 
     for k, ht in d.items():
-        crc = ctypes.c_int(k & 0xffffffff).value 
+        crc = ctypes.c_int(k & BIT_MASK_48).value 
         site_id = k >> 48
         dp_id = "%s-%s" % (crc, site_id)
         j = crcs.get(dp_id) 
@@ -1425,6 +1445,32 @@ def commit(profile):
 
 
 
+def mysql_connector(commit): 
+    c = {} 
+    client = CONFIG["client"] 
+    db = CONFIG["client"][commit["db"]]
+    c["db"] = db
+    con, cur = connect_mysql(db)
+    c["con"] = con
+    c["cur"] = cur 
+    return c
+
+
+def promo_connector(commit): 
+    import pyrant 
+    return {
+        "tt": pyrant.Tyrant(**CONFIG["client"][commit["tt"]]) 
+        }
+
+
+def realtime_connector(commit): 
+    import pyrant 
+    c = {} 
+    c["tt_price"] = pyrant.Tyrant(**CONFIG["client"][commit["tt_price"]]) 
+    c["tt_promo"] = pyrant.Tyrant(**CONFIG["client"][commit["tt_promo"]]) 
+    c.update(mysql_connector(commit))
+    return c
+
 
 def setup_commit(rule):
     tp_assert(dict, rule)
@@ -1434,20 +1480,23 @@ def setup_commit(rule):
     node = get_node(rule["src"].get("node"))
     c["qname"] = rule["src"]["name"]
     c["node"] = node
-    client = CONFIG["client"] 
+
     commit = rule["commit"]
+
     if commit["type"] == "mysql": 
-        db = client[commit["db"]]
-        c["db"] = db
-        con, cur = connect_mysql(db)
-        c["con"] = con
-        c["cur"] = cur
-        c["gen_sql"] = commit["gen_sql"]
+        c2 = mysql_connector(commit)
     elif commit["type"] == "tt":
-        import pyrant
-        c["tt"] = pyrant.Tyrant(**client["promo_tt"]) 
+        c2 = promo_connector(commit)
+    elif commit["type"] == "realtime":
+        c2 = realtime_connector(commit)
+    c.update(c2)
     c["commit_func"] = commit["func"] 
+
+    if not rule.get("diff"):
+        return
+
     diff = rule["diff"] 
+    client = CONFIG["client"] 
     if diff["type"] == "llkv":
         import llkv
         llkv_con = llkv.Connection(**client[diff["llkv"]])
@@ -1493,8 +1542,7 @@ commit_rules = {
             },
         "commit": {
             "type": "mysql",
-            "db": "mysql",
-            "gen_sql": gen_b2c_sql,
+            "db": "mysql", 
             "func": commit_b2c,
             }
         },
@@ -1510,10 +1558,24 @@ commit_rules = {
             },
         "commit": {
             "type": "tt",
-            "db": "promo_tt", 
+            "tt": "promo_tt", 
             "func": commit_promo,
             },
-        }
+        },
+    "realtime": {
+        "src": {
+            "name": "realtime_result",
+            "type": "list",
+            },
+        "diff": None,
+        "commit": {
+            "type": "realtime",
+            "db": "mysql", 
+            "tt_price": "tt_price",
+            "tt_promo": "tt_promo",
+            "func": commit_realtime 
+            },
+        },
     }
 
 
@@ -1858,15 +1920,16 @@ def run_realtime(rule):
     tp_assert(dict, rule)
 
     src = rule["src"]
-    qname = "%s_%sd" % (src["name"], CONFIG["site_id"])
+    qname = "%s_%s" % (src["name"], CONFIG["site_id"])
     wait = rule.get("wait") 
     batch = src.get("batch", 1) 
     group = src.get("group", False)
     unpack = msgpack.unpackb
 
+    get_def = rule["get"]
     setup_config(rule) 
     node = get_node(src.get("node")) 
-    parser = load_func(src.get("parser")) 
+    parser = load_func(get_def.get("parser")) 
 
     while True: 
         b = list_pop_n(node, qname, batch)
@@ -2107,6 +2170,29 @@ def test_parser(case, rule):
     func(result)
 
 
+
+def test_rt_parser(case, rule):
+    tp_assert(dict, case, rule) 
+
+    parser = load_func(rule["get"]["parser"])
+    if case.get("ignore"):
+        log_with_time("ignore: %s" % case["url"])
+        return
+    url = case["url"]
+    func = load_func(case["check"]) 
+
+    site_id = CONFIG["site_id"]
+
+    if isinstance(url, list):
+        entries = []
+        for i in url: 
+            entries.append([0, 0, i, {"site_id": site_id}])
+        func(parser(entries))
+    else:
+        func(parser([0, 0, url, {"site_id": site_id}])) 
+
+
+
 def test_parsers(site, cat, target):
     tp_assert(str, site, cat)
     tp_assert(dict, target)
@@ -2114,14 +2200,21 @@ def test_parsers(site, cat, target):
     print test_header_msg("test for [%s-%s]: " % (site, cat))
     test_header = "test for parser [%s]:"
     parser = target["get"]["parser"]
+
+    if target.get("type") != "realtime":
+        test_func = test_parser
+    else:
+        test_func = test_rt_parser
+
     for case in target["test"]:
         try:
-            test_parser(case, target)
+            test_func(case, target)
             print test_pass_msg(test_header % parser)
         except:
             print test_fail_msg(test_header % parser)
             traceback.print_exc()
             exit(1)
+
 
 
 def load_worker_and_test(site, cat):
@@ -2370,7 +2463,7 @@ def command_start(**kwargs):
     worker = kwargs.get("worker") 
     for s,v in CONFIG["sites"].items():
         if site in s and worker in v["workers"]: 
-            start_worker(s, worker)
+            start_worker(str(s), str(worker))
 
 
 

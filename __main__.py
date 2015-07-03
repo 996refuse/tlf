@@ -22,6 +22,9 @@ if __name__ == "__main__":
             spider.test_modules()
         else:
             spider.load_worker_and_test(argv[2], argv[3]) 
+    elif arg1 == "redis_proxy":
+        from spider import redis_proxy
+        redis_proxy.run()
     elif arg1 == "create":
         from spider import template
         template.create_module(argv[2], *argv[3:])

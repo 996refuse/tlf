@@ -101,7 +101,7 @@ def __book_list_parser1(t, task, rule):
             continue
         gid = _re_b1_gid.search(gid[0]).group()
         price = _re_b1_price.search(price[0].text).group()
-        ret.append((gid, price, 1)) 
+        ret.append((str(gid), str(price), 1)) 
         comment = node.xpath(rule['comment']) 
         if not comment:
             comment = ["0"]
@@ -137,7 +137,7 @@ def __book_list_parser2(t, task, rule):
             continue
         stock = stock[0]
         st = 1 if 'AddToShoppingCart' in stock else 0
-        ret.append((gid, price, st)) 
+        ret.append((str(gid), str(price), st)) 
         comment = node.xpath(rule['comment']) 
         if not comment:
             comment = ["0"]
@@ -169,7 +169,7 @@ def __norm_list_parser1(t, task, rule):
         price = _re_b2_price.search(price[0].text).group()
         gid = node.xpath(rule['gid']['norm'])
         gid = _re_n1_gid.search(gid[0]).group()
-        ret.append((gid, price, 1))
+        ret.append((str(gid), str(price), 1))
         comment = node.xpath(rule['comment']) 
         if not comment:
             comment = ["0"]
@@ -221,7 +221,7 @@ def stock_parser(task, rule):
         log_with_time("bad response %s"%task['url'])
         return
 
-    ret = [(itemurl % task['info'][0], task['info'][1], stock)]
+    ret = [(itemurl % task['info'][0], str(task['info'][1]), stock)]
     fret = format_price(ret)
     return fret
 
@@ -239,6 +239,6 @@ def checkoffline(task, rule):
     ret = []
     for k,v in j.items():
         if not v['is_found']:
-            ret.append((k, -1, -1))
+            ret.append((str(k), str(-1), -1))
     fret = format_price(ret)
     return fret
