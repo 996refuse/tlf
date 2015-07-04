@@ -360,4 +360,10 @@ SITES = {
             "workers": ("cats", "pager", "list"),
             "ignore": False,
             },
+        "likeface": {
+            "site_id": 52,
+            "reload": 1,
+            "workers": ("cats", "pager", "list"),
+            "ignore": False,
+            }
 }
